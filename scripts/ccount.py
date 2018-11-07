@@ -41,16 +41,18 @@ def equalize(image):
     return exposure.equalize_adapthist(image, clip_limit=0.03)
 
 
-def down_scale(img, scale):
+def down_scale(img, scaling_factor=2):
     '''
     input1: image
-    input2: scale-ratio
+    input2: scaling_factor, # scale factor for each dim 1-> 1/1, 2 -> 1/2, 4 -> 1/4
     return: down scaled image array that is 1/scale-ratio in both x and y dimentions
+    e.g.: block_small = down_scale(block, scaling_factor)  
     '''
-    return resize(img, (img.shape[0] // scale, img.shape[1] // scale))
+    return resize(img, (img.shape[0] // scaling_factor, img.shape[1] // scaling_factor))
 
 
-def find_blob(image_bright_blob_on_dark, max_sigma=40, min_sigma=4, num_sigma=5, threshold=0.1, overlap=.0):
+def find_blob(image_bright_blob_on_dark, scaling_factor = 2, 
+    max_sigma=40, min_sigma=4, num_sigma=5, threshold=0.1, overlap=.0):
     '''
     input: gray scaled image with bright blob on dark background
     output: [n, 3] array of blob information, [y-locaiton, x-location, r-blob-radius]
@@ -65,7 +67,9 @@ def find_blob(image_bright_blob_on_dark, max_sigma=40, min_sigma=4, num_sigma=5,
     Detecting larger blobs is especially slower because of larger kernel sizes during convolution.
     Only bright blobs on dark backgrounds are detected. See skimage.feature.blob_log for usage.
     '''
-    print('block-scaled size', image_bright_blob_on_dark.shape)
+    print('image size', image_bright_blob_on_dark.shape)
+    image_bright_blob_on_dark = down_scale(image_bright_blob_on_dark, scaling_factor)
+    print('image-blob detection size', image_bright_blob_on_dark.shape)
     tic = time.time()
     blobs = blob_log(
         image_bright_blob_on_dark, 
@@ -73,6 +77,7 @@ def find_blob(image_bright_blob_on_dark, max_sigma=40, min_sigma=4, num_sigma=5,
         threshold=threshold, overlap=overlap
         )
     blobs[:, 2] = blobs[:, 2] * sqrt(2)  # adjust r
+    blobs = blobs * scaling_factor  # scale back coordinates
     toc = time.time()
     print("detection time: ", toc - tic)
     # larger num_sigma: more accurate boundry, slower
@@ -83,7 +88,8 @@ def find_blob(image_bright_blob_on_dark, max_sigma=40, min_sigma=4, num_sigma=5,
     return blobs
 
 
-def vis_blob_on_block(blobs, block_img_equ, block_img_ori, blob_extention_ratio=1.4):
+def vis_blob_on_block(blobs, block_img_equ, block_img_ori, 
+    blob_extention_ratio=1.4, blob_extention_radius=2):
     '''
     blobs: blob info array [n, 3]
     block_img_equ: corresponding block_img equalized
@@ -91,20 +97,20 @@ def vis_blob_on_block(blobs, block_img_equ, block_img_ori, blob_extention_ratio=
     plot: plot block_img with blobs in yellow circles
     '''
 
-    fig, axes = plt.subplots(1, 2, figsize=(15, 30), sharex=True, sharey=True)
+    fig, axes = plt.subplots(2, 1, figsize=(60, 30), sharex=True, sharey=True)
     ax = axes.ravel()
 
     ax[0].set_title('Blobs detected')
-    ax[0].imshow(block_img_equ, 'gray', interpolation='nearest')
+    ax[0].imshow(block_img_equ, 'gray', interpolation='nearest', clim=(0.0, 1.0))
     for blob in blobs:
         y, x, r = blob
-        c = plt.Circle((x, y), r * blob_extention_ratio, color='yellow', linewidth=1,
+        c = plt.Circle((x, y), r * blob_extention_ratio + blob_extention_radius, color='yellow', linewidth=1,
                        fill=False)  # r*1.3 to get whole blob
         ax[0].add_patch(c)
     # ax[0].set_axis_off()
 
     ax[1].set_title("Input")
-    ax[1].imshow(block_img_ori, 'gray')
+    ax[1].imshow(block_img_ori, 'gray', clim=(0.0, 1.0))
 
     plt.tight_layout()
     plt.show()
@@ -158,7 +164,8 @@ def crop_blobs(blobs, block_img, block_row=-1, block_column=-1, crop_width=100,
     2. Crop for each blob
     '''
     # White padding so that blobs on the edge can get cropped image
-    padded = np.pad(block_img, crop_width, pad_with, padder=1)  # 1 = white padding, 0 = black padding
+    padder = max(np.max(block_img), 1)
+    padded = np.pad(block_img, crop_width, pad_with, padder=padder)  # 1 = white padding, 0 = black padding
 
     # crop for each blob
     flat_crops = np.empty((0, int(6 + 2 * crop_width * 2 * crop_width)))
@@ -180,7 +187,7 @@ def crop_blobs(blobs, block_img, block_row=-1, block_column=-1, crop_width=100,
     return flat_crops
 
 
-def plot_flat_crop(flat_crop):
+def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0):
     '''
     input: one padded crop of a blob
     plt: yellow circle and hard-masked side-by-side
@@ -188,7 +195,9 @@ def plot_flat_crop(flat_crop):
     return: cropped image and hard-masked image
     '''
     # reshape
-    [y, x, r_, label, row, col] = flat_crop[0:6]
+    [y, x, r, label, row, col] = flat_crop[0:6]
+    r_ = r * blob_extention_ratio + blob_extention_radius
+
     flat = flat_crop[6:]
     w = int(sqrt(len(flat)) / 2)
     image = np.reshape(flat, (w + w, w + w))
@@ -206,7 +215,7 @@ def plot_flat_crop(flat_crop):
     c = plt.Circle((w - 1, w - 1), r_, color='yellow', linewidth=1, fill=False)
     ax[0].add_patch(c)
     ax[1].set_title('For model training\ncurrent label:{}\nradius:{}'.format(int(label), r_))
-    ax[1].imshow(hard_masked, 'gray')
+    ax[1].imshow(hard_masked, 'gray', clim=(0.0, 1.0))
     plt.tight_layout()
     plt.show()
     fig.canvas.draw()
@@ -214,68 +223,124 @@ def plot_flat_crop(flat_crop):
     return image, hard_masked
 
 
-def plot_flat_crops(flat_crops):
+def plot_flat_crops(flat_crops, blob_extention_ratio=1, blob_extention_radius=0):
     '''
     input: flat_crops
     task: plot padded crop and hard-masked crop side-by-side
     '''
-    np.apply_along_axis(plot_flat_crop, axis=1, arr=flat_crops)
+    for flat_crop in flat_crops:
+        plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
+
+# # Depreciated, use block_equalize + find_blob istread
+# def split_image(image, 
+#     block_height=2048, block_width=2048, 
+#     crop_width=100,
+#     blob_extention_ratio=1.4,
+#     blob_extention_radius=2,
+#     scaling_factor=2,
+#     max_sigma=40, min_sigma=11, num_sigma=5, threshold=0.1, overlap=.0 
+#     ):
+#     '''
+#     split
+#     scale down
+#     equalization
+#     feed into find_blob
+#     '''
+#     height = block_height
+#     width = block_width
+
+#     image_flat_crops = np.empty((0, int(6 + 2 * crop_width * 2 * crop_width)))
+
+#     r = 0
+#     while (r + 1) * height <= image.shape[0]:
+#         top = r * height
+#         bottom = (r + 1) * height
+#         c = 0
+#         while (c + 1) * width <= image.shape[1]:
+#             # get each block
+#             left = c * width
+#             right = (c + 1) * width
+#             block = image[top:bottom, left:right]
+#             print('block row:', r, '; column:', c, '; bottom-right pixcel:', bottom, right)
+#             # scale down
+#             block_small = down_scale(block, scaling_factor)  # scale factor for each dim 1-> 1/1, 2 -> 1/2, 4 -> 1/4
+#             # equalization (good for blob detection, not nessessarily good for classifier) (todo)
+#             block_small_equ = equalize(block_small)
+#             # blob detection
+#             blobs = find_blob(
+#                 (1 - block_small_equ), 
+#                 max_sigma=max_sigma, min_sigma=min_sigma, num_sigma=num_sigma, 
+#                 threshold=threshold, overlap=overlap, 
+#                 scaling_factor=scaling_factor
+#             )  # reverse color, get bright blobs
+#             # visualization of equalized block with blob yellow circles, and block before equalization
+#             vis_blob_on_block(blobs, block_small_equ, block_small)
+#             # create crop from blob (50x50 crops, with white padding)
+#             block_flat_crops = crop_blobs(blobs, block_small, block_row=r, block_column=c, crop_width=crop_width) # image before
+#             # equalization
+#             image_flat_crops = np.append(image_flat_crops, block_flat_crops, axis=0)
+
+#             print("{} block_flat_crops".format(len(block_flat_crops)))
+#             print("{} image_flat_crops".format(len(image_flat_crops)))
+#             # np.apply_along_axis( plot_flat_crop, axis=1, arr=block_flat_crops)
+#             c += 1
+#         r += 1
+
+#     return image_flat_crops
 
 
-def split_image(image, 
-    block_height=2048, block_width=2048, 
-    crop_width=100,
-    blob_extention_ratio=1.4,
-    blob_extention_radius=2,
-    scaling_factor=2,
-    max_sigma=40, min_sigma=11, num_sigma=5, threshold=0.1, overlap=.0 
-    ):
+
+def block_equalize(image, block_height=2048, block_width=2048):
     '''
     split
-    scale down
     equalization
-    feed into find_blob
+    stitch and return
     '''
-    height = block_height
-    width = block_width
-
-    image_flat_crops = np.empty((0, int(6 + 2 * crop_width * 2 * crop_width)))
+    image_equ = np.empty(image.shape)
 
     r = 0
-    while (r + 1) * height <= image.shape[0]:
-        top = r * height
-        bottom = (r + 1) * height
+    while (r + 1) * block_height <= image.shape[0]:
+        top = r * block_height
+        bottom = (r + 1) * block_height
         c = 0
-        while (c + 1) * width <= image.shape[1]:
+        while (c + 1) * block_width <= image.shape[1]:
             # get each block
-            left = c * width
-            right = (c + 1) * width
-            block = image[top:bottom, left:right]
-            print('block row:', r, '; column:', c, '; bottom-right pixcel:', bottom, right)
-            # scale down
-            block_small = down_scale(block, scaling_factor)  # scale factor for each dim 1-> 1/1, 2 -> 1/2, 4 -> 1/4
+            left = c * block_width
+            right = (c + 1) * block_width
             # equalization (good for blob detection, not nessessarily good for classifier) (todo)
-            block_small_equ = equalize(block_small)
-            # blob detection
-            blobs = find_blob(
-                (1 - block_small_equ), 
-                max_sigma=max_sigma, min_sigma=min_sigma, num_sigma=num_sigma, 
-                threshold=threshold, overlap=overlap
-            )  # reverse color, get bright blobs
-            # visualization of equalized block with blob yellow circles, and block before equalization
-            vis_blob_on_block(blobs, block_small_equ, block_small)
-            # create crop from blob (50x50 crops, with white padding)
-            block_flat_crops = crop_blobs(blobs, block_small, block_row=r, block_column=c, crop_width=crop_width) # image before
-            # equalization
-            image_flat_crops = np.append(image_flat_crops, block_flat_crops, axis=0)
-
-            print("{} block_flat_crops".format(len(block_flat_crops)))
-            print("{} image_flat_crops".format(len(image_flat_crops)))
-            # np.apply_along_axis( plot_flat_crop, axis=1, arr=block_flat_crops)
+            image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
+            # print('block row:', r, '; column:', c, '; bottom-right pixcel:', bottom, right)              
             c += 1
         r += 1
 
+    return image_equ
+
+
+def find_blobs_and_crop(image, image_equ, 
+    crop_width=100,
+    scaling_factor=2,
+    max_sigma=40, min_sigma=11, num_sigma=5, threshold=0.1, overlap=.0,
+    blob_extention_ratio=1.4, blob_extention_radius=2,
+    ):
+    '''
+    '''
+    image_flat_crops = np.empty((0, int(6 + 2 * crop_width * 2 * crop_width)))
+
+    blobs = find_blob(
+        (1 - image_equ), scaling_factor=scaling_factor,
+        max_sigma=max_sigma, min_sigma=min_sigma, num_sigma=num_sigma, threshold=threshold, overlap=overlap
+    )  # reverse color, get bright blobs
+
+    vis_blob_on_block(blobs, image_equ, image, 
+        blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
+
+    # create crop from blob
+    image_flat_crops = crop_blobs(blobs, image, crop_width=crop_width) # image before
+    print("{} image_flat_crops".format(len(image_flat_crops)))
+
     return image_flat_crops
+
+
 
 
 def pop_label_flat_crops(flat_crops, random=True, seed=1, skip_labeled=True):
@@ -362,7 +427,8 @@ def load_blobs_db(in_db_name):
     return image_flat_crops
 
 
-def show_rand_crops(crops, label_filter="na", num_shown=5):
+def show_rand_crops(crops, label_filter="na", num_shown=5, 
+    blob_extention_ratio=1, blob_extention_radius=0):
     '''
     blobs: the blobs crops
     label_filter: 0, 1, -1; "na" means no filter
@@ -373,8 +439,9 @@ def show_rand_crops(crops, label_filter="na", num_shown=5):
         crops = crops[filtered_idx, :]
 
     if (len(crops) >= num_shown):
-        randidx = np.random.choice(range(len(crops)), num_shown)
-        plot_flat_crops(crops[randidx, :])
+        randidx = np.random.choice(range(len(crops)), num_shown, replace=False)
+        plot_flat_crops(crops[randidx, :], 
+            blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
     elif (len(crops) > 0):
         plot_flat_crops(crops)
     else:
