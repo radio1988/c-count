@@ -9,6 +9,7 @@ from skimage.transform import rescale, resize, downscale_local_mean
 from IPython.display import clear_output
 from random import randint
 from time import sleep
+import gzip
 
 import numpy as np
 import matplotlib
@@ -415,7 +416,14 @@ def load_blobs_db(in_db_name):
     while 1:
         # in_db_name = in_db_name.strip()
         if os.path.isfile(in_db_name):
-            image_flat_crops = np.load(in_db_name)
+            if in_db_name.endswith('npy'):
+                image_flat_crops = np.load(in_db_name)
+            elif in_db_name.endswith('npy.gz'):
+                f = gzip.GzipFile(in_db_name, "r")
+                image_flat_crops = np.load(f)
+            else:
+                raise Exception ("db suffix not npy nor npy.gz")
+                
             print("{} read into RAM".format(in_db_name))
             print("{} cropped blobs, {} pixcels in each blob".format(len(image_flat_crops),
                                                                      image_flat_crops.shape[1] - 6))
