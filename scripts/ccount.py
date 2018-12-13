@@ -401,13 +401,7 @@ yes=1, no=0, undistinguishable=u, skip=s, go-back=b, excape=e: '''.format(i + 1,
             i -= 1
 
         print('new label: ', label, flat_crops[idx[i], 0:4])
-        print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
-            sum(image_flat_crops[:, 3] == 1),
-            sum(image_flat_crops[:, 3] == 0),
-            sum(image_flat_crops[:, 3] == -2),
-            sum(image_flat_crops[:, 3] == -1),
-            "\n"
-        ))
+        print("there are {} blobs unlabeled\n\n".format(sum(flat_crops[:, 3] == -1)))
         clear_output()
 
     return flat_crops
