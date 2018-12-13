@@ -401,7 +401,13 @@ yes=1, no=0, undistinguishable=u, skip=s, go-back=b, excape=e: '''.format(i + 1,
             i -= 1
 
         print('new label: ', label, flat_crops[idx[i], 0:4])
-        print("there are {} blobs unlabeled\n\n".format(sum(flat_crops[:, 3] == -1)))
+        print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
+            sum(image_flat_crops[:, 3] == 1),
+            sum(image_flat_crops[:, 3] == 0),
+            sum(image_flat_crops[:, 3] == -2),
+            sum(image_flat_crops[:, 3] == -1),
+            "\n"
+        ))
         clear_output()
 
     return flat_crops
@@ -428,6 +434,12 @@ def load_blobs_db(in_db_name):
             print("{} cropped blobs, {} pixcels in each blob".format(len(image_flat_crops),
                                                                      image_flat_crops.shape[1] - 6))
             print("{} unlabeled blobs".format(sum(image_flat_crops[:, 3] == -1)))
+            print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
+                sum(image_flat_crops[:, 3] == 1),
+                sum(image_flat_crops[:, 3] == 0),
+                sum(image_flat_crops[:, 3] == -2),
+                sum(image_flat_crops[:, 3] == -1),
+            ))
             break
         else:
             print("{} file not found".format(in_db_name))
