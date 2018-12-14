@@ -8,64 +8,89 @@ from keras import backend as K
 from collections import Counter
 import numpy as np
 import argparse
+from ccount import *
 
 # import matplotlib.pyplot as plt # tk not on hpcc
 # import cv2 # not on hpcc
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
+ap.add_argument("-db", "--blobs-db", type=str,
+                help="path to blobs-db file, e.g. xxx.labeled.npy.gz")
 ap.add_argument("-s", "--save-model", type=int, default=-1,
                 help="(optional) whether or not model should be saved to disk")
 ap.add_argument("-l", "--load-model", type=int, default=-1,
                 help="(optional) whether or not pre-trained model should be loaded")
 ap.add_argument("-w", "--weights", type=str,
                 help="(optional) path to weights file")
+
 args = vars(ap.parse_args())
 
-# grab the MNIST dataset (if this is your first time running this
-# script, the download may take a minute -- the 55MB MNIST dataset
-# will be downloaded)
-print("[INFO] downloading MNIST...")
-((trainData, trainLabels), (testData, testLabels)) = mnist.load_data()
-print(trainData.shape, trainLabels.shape)
 
-# Test: create smaller dataset
-trainData = trainData[100:200, :, :]
+# Parameters
+verbose = 1  # {0, 1}
+
+
+# Load Labeled blobs_db
+blobs = load_blobs_db(args["blobs_db"])
+blobs = blobs[blobs[:, 3] >= 0, :]  # remove unlabeled and uncertain
+
+N = blobs.shape[0]
+w = int(sqrt(blobs.shape[1]-6) / 2)  # width of img
+
+# todo: equalization
+# todo: masking
+
+flats = blobs[:, 6:]
+Data = flats.reshape(N, 2*w, 2*w)
+Labels = blobs[:, 3]
+Labels = Labels.astype(int)
+
+# Split
+N_train = int(N*0.7)
+trainData = Data[0:N_train]
+testData = Data[N_train:]
+trainLabels = Labels[0:N_train]
+testLabels = Labels[N_train:]
+print('training data: ', trainData.shape)
+print('testing data:', testData.shape)
 print(type(trainData), trainData.shape)
 print(type(trainLabels), trainLabels.shape)
 
-trainLabels = trainLabels[100:200]
-print("input content:\n", Counter(trainLabels))
 
-# if we are using "channels first" ordering, then reshape the
-# design matrix such that the matrix is:
-# num_samples x depth x rows x columns
-if K.image_data_format() == "channels_first":
-	trainData = trainData.reshape((trainData.shape[0], 1, 28, 28))
-	testData = testData.reshape((testData.shape[0], 1, 28, 28))
+# check image
+import matplotlib.pyplot as plt # tk not on hpcc
+i = 0
+plt.imshow(trainData[i], 'gray')
+plt.title('trainData:' + str(Labels[i]))
+plt.show()
 
-# otherwise, we are using "channels last" ordering, so the design
-# matrix shape should be: num_samples x rows x columns x depth
-else:
-	trainData = trainData.reshape((trainData.shape[0], 28, 28, 1))
-	testData = testData.reshape((testData.shape[0], 28, 28, 1))
 
-# scale data to the range of [0, 1]
-trainData = trainData.astype("float32") / 255.0
-testData = testData.astype("float32") / 255.0
+print(trainData.shape, trainLabels.shape)
+
+print("Training Labels:\n", Counter(trainLabels))
+print("Training Labels:\n", Counter(trainLabels))
+
+
+trainData = trainData.reshape((trainData.shape[0], 2*w, 2*w, 1))
+testData = testData.reshape((testData.shape[0], 2*w, 2*w, 1))
+print("max pixel value: ", np.max(trainData))
+print("min pixel value: ", np.min(trainData))
+
+
 
 # transform the training and testing labels into vectors in the
 # range [0, classes] -- this generates a vector for each label,
 # where the index of the label is set to `1` and all other entries
 # to `0`; in the case of MNIST, there are 10 class labels
-trainLabels = np_utils.to_categorical(trainLabels, 10)
-testLabels = np_utils.to_categorical(testLabels, 10)
+trainLabels = np_utils.to_categorical(trainLabels, 2)
+testLabels = np_utils.to_categorical(testLabels, 2)
 
 # initialize the optimizer and model
 print("[INFO] compiling model...")
 opt = SGD(lr=0.01)
-model = LeNet.build(numChannels=1, imgRows=28, imgCols=28,
-                    numClasses=10,
+model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w,
+                    numClasses=2,
                     weightsPath=args["weights"] if args["load_model"] > 0 else None)
 model.compile(loss="categorical_crossentropy", optimizer=opt,
               metrics=["accuracy"])
@@ -74,20 +99,20 @@ model.compile(loss="categorical_crossentropy", optimizer=opt,
 # pre-existing model
 if args["load_model"] < 0:
     print("[INFO] training...")
-    model.fit(trainData, trainLabels, batch_size=10, epochs=200,  # test epoch should be 20, verbose should be 1
-              verbose=0)
+    model.fit(trainData, trainLabels, batch_size=100, epochs=1,  # test epoch should be 20, verbose should be 1
+              verbose=verbose)
 
 # show the accuracy on the testing set
 print("[INFO] evaluating...")
 (loss, accuracy) = model.evaluate(trainData, trainLabels,
-                                  batch_size=20, verbose=0)
+                                  batch_size=20, verbose=verbose)
 print("[INFO] training accuracy: {:.2f}%".format(accuracy * 100))
 
 
 # show the accuracy on the testing set
 print("[INFO] evaluating...")
 (loss, accuracy) = model.evaluate(testData, testLabels,
-                                  batch_size=20, verbose=0)
+                                  batch_size=20, verbose=verbose)
 print("[INFO] validation accuracy: {:.2f}%".format(accuracy * 100))
 
 
