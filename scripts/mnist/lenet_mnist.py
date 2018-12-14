@@ -71,15 +71,21 @@ model.compile(loss="categorical_crossentropy", optimizer=opt,
 # pre-existing model
 if args["load_model"] < 0:
     print("[INFO] training...")
-    model.fit(trainData, trainLabels, batch_size=100, epochs=200,  # test epoch should be 20, verbose should be 1
-              verbose=1)
+    model.fit(trainData, trainLabels, batch_size=10, epochs=200,  # test epoch should be 20, verbose should be 1
+              verbose=0)
+
+# show the accuracy on the testing set
+print("[INFO] evaluating...")
+(loss, accuracy) = model.evaluate(trainData, trainLabels,
+                                  batch_size=20, verbose=0)
+print("[INFO] training accuracy: {:.2f}%".format(accuracy * 100))
 
 
 # show the accuracy on the testing set
 print("[INFO] evaluating...")
 (loss, accuracy) = model.evaluate(testData, testLabels,
-                                  batch_size=10, verbose=1)
-print("[INFO] accuracy: {:.2f}%".format(accuracy * 100))
+                                  batch_size=20, verbose=0)
+print("[INFO] validation accuracy: {:.2f}%".format(accuracy * 100))
 
 
 # check to see if the model should be saved to file
