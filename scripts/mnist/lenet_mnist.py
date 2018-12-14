@@ -5,21 +5,22 @@ from keras.datasets import mnist
 from keras.optimizers import SGD
 from keras.utils import np_utils
 from keras import backend as K
+from collections import Counter
 import numpy as np
 import argparse
-import matplotlib.pyplot as plt
-#import cv2
+
+# import matplotlib.pyplot as plt # tk not on hpcc
+# import cv2 # not on hpcc
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-s", "--save-model", type=int, default=-1,
-	help="(optional) whether or not model should be saved to disk")
+                help="(optional) whether or not model should be saved to disk")
 ap.add_argument("-l", "--load-model", type=int, default=-1,
-	help="(optional) whether or not pre-trained model should be loaded")
+                help="(optional) whether or not pre-trained model should be loaded")
 ap.add_argument("-w", "--weights", type=str,
-	help="(optional) path to weights file")
+                help="(optional) path to weights file")
 args = vars(ap.parse_args())
-
 
 # grab the MNIST dataset (if this is your first time running this
 # script, the download may take a minute -- the 55MB MNIST dataset
@@ -31,7 +32,6 @@ print(trainData.shape, trainLabels.shape)
 # Test: create smaller dataset
 trainData = trainData[100:200, :, :]
 trainLabels = trainLabels[100:200]
-from collections import Counter
 print("input content:\n", Counter(trainLabels))
 
 # if we are using "channels first" ordering, then reshape the
@@ -58,51 +58,54 @@ testData = testData.astype("float32") / 255.0
 trainLabels = np_utils.to_categorical(trainLabels, 10)
 testLabels = np_utils.to_categorical(testLabels, 10)
 
-
 # initialize the optimizer and model
 print("[INFO] compiling model...")
 opt = SGD(lr=0.01)
 model = LeNet.build(numChannels=1, imgRows=28, imgCols=28,
-	numClasses=10,
-	weightsPath=args["weights"] if args["load_model"] > 0 else None)
+                    numClasses=10,
+                    weightsPath=args["weights"] if args["load_model"] > 0 else None)
 model.compile(loss="categorical_crossentropy", optimizer=opt,
-	metrics=["accuracy"])
+              metrics=["accuracy"])
 
 # only train and evaluate the model if we *are not* loading a
 # pre-existing model
 if args["load_model"] < 0:
-	print("[INFO] training...")
-	model.fit(trainData, trainLabels, batch_size=100, epochs=500,  # test epoch should be 20, verbose should be 1
-		verbose=1)
+    print("[INFO] training...")
+    model.fit(trainData, trainLabels, batch_size=100, epochs=200,  # test epoch should be 20, verbose should be 1
+              verbose=1)
 
-	# show the accuracy on the testing set
-	print("[INFO] evaluating...")
-	(loss, accuracy) = model.evaluate(testData, testLabels,
-		batch_size=10, verbose=1)
-	print("[INFO] accuracy: {:.2f}%".format(accuracy * 100))
+
+# show the accuracy on the testing set
+print("[INFO] evaluating...")
+(loss, accuracy) = model.evaluate(testData, testLabels,
+                                  batch_size=10, verbose=1)
+print("[INFO] accuracy: {:.2f}%".format(accuracy * 100))
 
 
 # check to see if the model should be saved to file
 if args["save_model"] > 0:
-	print("[INFO] dumping weights to file...")
-	model.save_weights(args["weights"], overwrite=True)
+    print("[INFO] dumping weights to file...")
+    model.save_weights(args["weights"], overwrite=True)
 
 
 # randomly select a few testing digits
 for i in np.random.choice(np.arange(0, len(testLabels)), size=(10,)):
-	# classify the digit
-	probs = model.predict(testData[np.newaxis, i])
-	prediction = probs.argmax(axis=1)
+    # classify the digit
+    probs = model.predict(testData[np.newaxis, i])
+    prediction = probs.argmax(axis=1)
+    print("[INFO] Predicted: {}, Actual: {}".format(prediction[0], np.argmax(testLabels[i])))
 
-	# extract the image from the testData if using "channels_first"
-	# ordering
-	if K.image_data_format() == "channels_first":
-		image = (testData[i][0] * 255).astype("uint8")
+    # extract the image from the testData if using "channels_first"
+    # ordering
+    if K.image_data_format() == "channels_first":
+        image = (testData[i][0] * 255).astype("uint8")
+    else:
+        # otherwise we are using "channels_last" ordering
+        image = (testData[i] * 255).astype("uint8")
 
-	# otherwise we are using "channels_last" ordering
-	else:
-		image = (testData[i] * 255).astype("uint8")
 
+
+    # # open-csv not on hpcc
 	# # merge the channels into one image
 	# image = cv2.merge([image] * 3)
 	#
@@ -113,14 +116,12 @@ for i in np.random.choice(np.arange(0, len(testLabels)), size=(10,)):
 	# # show the image and prediction
 	# cv2.putText(image, str(prediction[0]), (5, 20),
 	# 			cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
-	print("[INFO] Predicted: {}, Actual: {}".format(prediction[0],
-		np.argmax(testLabels[i])))
+    # cv2.imshow("Digit", image)
+    # cv2.waitKey(0)
 
-	image = np.reshape(image, [28, 28])
-	print(image.shape)
-	plt.imshow(image, 'gray')
-	plt.title("Label:" + str(np.argmax(testLabels[i])) + '; Prediction:' + str(prediction[0]))
-	plt.show()
 
-	# cv2.imshow("Digit", image)
-	# cv2.waitKey(0)
+    # # python-tk not on hpcc
+	# plt.imshow(image, 'gray')
+	# plt.title("Label:" + str(np.argmax(testLabels[i])) + '; Prediction:' + str(prediction[0]))
+	# plt.show()
+

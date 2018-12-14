@@ -2,6 +2,7 @@
 from keras.models import Sequential
 from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
+from keras.layers.core import Dropout
 from keras.layers.core import Activation
 from keras.layers.core import Flatten
 from keras.layers.core import Dense
@@ -23,18 +24,21 @@ class LeNet:
         # define the first set of CONV => ACTIVATION => POOL layers
         model.add(Conv2D(20, 5, padding="same",  # 20 filters of 5x5
                          input_shape=inputShape))
+        model.add(Dropout(0.5))
         model.add(Activation(activation))
         model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
         # define the second set of CONV => ACTIVATION => POOL layers
         # It’s common to see the number of CONV  filters learned increase in deeper layers of the network.
         model.add(Conv2D(50, 5, padding="same"))
+        model.add(Dropout(0.5))
         model.add(Activation(activation))
         model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
         # define the first FC => ACTIVATION layers
         model.add(Flatten())
         model.add(Dense(500))
+        model.add(Dropout(0.5))
         model.add(Activation(activation))
 
         # define the second FC layer
