@@ -11,8 +11,9 @@ from collections import Counter
 import numpy as np
 import argparse
 
-import matplotlib.pyplot as plt # tk not on hpcc
-import cv2 # not on hpcc
+import matplotlib.pyplot as plt  # tk not on hpcc
+matplotlib.use('Agg')  # not display on hpcc
+import cv2  # not on hpcc
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -99,8 +100,8 @@ print(type(trainLabels), trainLabels.shape)
 for i in range(0,10):
     plt.imshow(trainData[i], 'gray')
     plt.title('trainData'+str(i) + ' label=' + str(Labels[i]))
-    plt.show()
-
+    out_png = 'trainData' + args["blobs_db"] + str(i) + '.label_' + str(Labels[i]) + '.png'
+    plt.savefig(out_png, dpi=150)
 
 print(trainData.shape, trainLabels.shape)
 
@@ -163,6 +164,7 @@ if args["save_model"] > 0:
 
 
 # randomly select a few testing digits
+np.random.seed(1)
 for i in np.random.choice(np.arange(0, len(testLabels)), size=(10,)):
     # classify the digit
     probs = model.predict(testData[np.newaxis, i])
@@ -177,23 +179,29 @@ for i in np.random.choice(np.arange(0, len(testLabels)), size=(10,)):
         # otherwise we are using "channels_last" ordering
         image = (testData[i] * 255).astype("uint8")
 
-    # open-csv not on hpcc
-    # merge the channels into one image
-    image = cv2.merge([image] * 3)
+    # python-tk not on hpcc
+    print(image.shape)
+    image = np.reshape(image, image.shape[0:2])
+    plt.imshow(image, 'gray')
+    plt.title("Label:" + str(np.argmax(testLabels[i])) + '; Prediction:' + str(prediction[0]))
+    out_png = 'testData.' + args["blobs_db"] + str(i) + \
+    '.label_' + str(Labels[i]) + '.pred_' + str(prediction[0]) + '.png'
+    plt.savefig(out_png, dpi=300)
 
-    # resize the image from a 28 x 28 image to a 96 x 96 image so we
-    # can better see it
-    image = cv2.resize(image, (400, 400), interpolation=cv2.INTER_LINEAR)
+    # # open-csv not on hpcc
+    # # merge the channels into one image
+    # image = cv2.merge([image] * 3)
+    #
+    # # resize the image from a 28 x 28 image to a 96 x 96 image so we
+    # # can better see it
+    # image = cv2.resize(image, (400, 400), interpolation=cv2.INTER_LINEAR)
+    #
+    # # show the image and prediction
+    # cv2.putText(image, str(prediction[0]), (5, 20),
+    #             cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+    # cv2.imshow("Digit", image)
+    # cv2.waitKey(0)
 
-    # show the image and prediction
-    cv2.putText(image, str(prediction[0]), (5, 20),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
-    cv2.imshow("Digit", image)
-    cv2.waitKey(0)
 
-
-    # # python-tk not on hpcc
-	# plt.imshow(image, 'gray')
-	# plt.title("Label:" + str(np.argmax(testLabels[i])) + '; Prediction:' + str(prediction[0]))
-	# plt.show()
+np.random.seed()
 
