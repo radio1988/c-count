@@ -40,9 +40,12 @@ training_ratio = 0.7  # proportion of data to be in training set
 
 # Load Labeled blobs_db
 blobs = load_blobs_db(args["blobs_db"])
+
 # Remove unlabeled and uncertain
 blobs = blobs[blobs[:, 3] >= 0, :]
+
 # Remove bias by reducing No (in all inputs)
+# todo: balancing after augmentation
 idx_yes = np.arange(0, blobs.shape[0])[blobs[:, 3] == 1]
 idx_no =  np.arange(0, blobs.shape[0])[blobs[:, 3] == 0]
 N_Yes = len(idx_yes)
@@ -65,11 +68,6 @@ Counter(blobs[:, 3])
 N = blobs.shape[0]
 w = int(sqrt(blobs.shape[1]-6) / 2)  # width of img
 
-# todo: hpcc open-cv2
-# todo: masking
-# todo: augmentation
-# todo: unbalanced data
-
 
 
 # Reshape into 2D images
@@ -78,6 +76,96 @@ Data = flats.reshape(N, 2*w, 2*w)
 Labels = blobs[:, 3]
 Rs = blobs[:, 2]
 Labels = Labels.astype(int)
+
+# todo: augmentation
+# todo: augmentation on blob level (keep Data, label, Rs cosistant)
+# todo: change R alone with scaling
+# todo: augmentation in batch training
+
+
+# flipping
+# print('flipping inputs...')
+# flippedData = np.array([np.fliplr(image) for image in Data])
+# # check image
+# for i in range(0,2):
+#     plt.imshow(Data[i], 'gray')
+#     plt.title('Data'+str(i) + ' label=' + str(Labels[i]))
+#     plt.show()
+#     plt.imshow(flippedData[i], 'gray')
+#     plt.title('flippedData'+str(i) + ' label=' + str(Labels[i]))
+#     plt.show()
+
+# Mixed
+TranslatedData = np.array([np.fliplr(image) for image in Data])
+import imgaug as ia
+from imgaug import augmenters as iaa
+
+# Sometimes(0.5, ...) applies the given augmenter in 50% of all cases,
+# e.g. Sometimes(0.5, GaussianBlur(0.3)) would blur roughly every second image.
+sometimes = lambda aug: iaa.Sometimes(0.9, aug)
+
+
+Data = Data.reshape(N, 2*w, 2*w, 1)
+
+print("Data, with channels", Data.shape)
+
+seq = iaa.Sequential(
+    [
+        # apply the following augmenters to most images
+        iaa.Fliplr(0.5), # horizontally flip 50% of all images
+        iaa.Flipud(0.2), # vertically flip 20% of all images
+        # crop images by -5% to 10% of their height/width
+        sometimes(iaa.CropAndPad(
+            percent=(-0.01, 0.001),
+            pad_mode=ia.ALL,
+            pad_cval=(0, 1)
+        )),
+        sometimes(iaa.Affine(
+            scale={"x": (0.8, 1.2), "y": (0.8, 1.2)}, # scale images to 80-120% of their size, individually per axis
+            translate_percent={"x": (-0.05, 0.05), "y": (-0.05, 0.05)}, # translate by -20 to +20 percent (per axis)
+            rotate=(-45, 45), # rotate by -45 to +45 degrees
+            shear=(-16, 16), # shear by -16 to +16 degrees
+            order=[0, 1], # use nearest neighbour or bilinear interpolation (fast)
+            cval=(0, 1), # if mode is constant, use a cval between 0 and 255
+            mode=ia.ALL # use any of scikit-image's warping modes (see 2nd image from the top for examples)
+        )),
+    ],
+    random_order=True
+)
+
+augData = seq.augment_images(Data)
+
+augData = augData.reshape(N, 2*w, 2*w)
+Data = Data.reshape(N, 2*w, 2*w)
+
+print("data_aug:", augData.shape)
+Data = np.concatenate([Data, augData])
+Labels = np.concatenate([Labels, Labels])
+Rs = np.concatenate([Rs, Rs])
+
+print(Data.shape)
+def normalize_img(image):
+    image = image - np.min(image)
+    image = image / np.max(image)
+    return image
+print('max data', np.max(Data), 'min', np.min(Data))
+Data = np.array([normalize_img(image) for image in Data])
+print('max data', np.max(Data), 'min', np.min(Data))
+sleep (8)
+
+# check image
+for i in range(0,10):
+    plt.imshow(Data[i], 'gray')
+    plt.title('Data'+str(i) + ' label=' + str(Labels[i]))
+    plt.show()
+    plt.imshow(augData[i], 'gray')
+    plt.title('augData'+str(i) + ' label=' + str(Labels[i]))
+    plt.show()
+
+sleep(5)
+
+
+
 
 
 
@@ -137,7 +225,7 @@ testLabels = np_utils.to_categorical(testLabels, 2)
 # initialize the optimizer and model
 # todo: use F1 score and accuracy
 # todo: early stopping
-# todo: Adam
+# todo: feature normalization (optional)
 print("[INFO] compiling model...")
 opt = Adam(lr=0.0001)  # todo: ADAM
 model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w,
@@ -177,7 +265,7 @@ if args["save_model"] > 0:
 # todo: not working on HPCC, but works on mac
 # _tkinter.TclError: couldn't connect to display ":0.0"
 np.random.seed(1)
-for i in np.random.choice(np.arange(0, len(testLabels)), size=(10,)):
+for i in np.random.choice(np.arange(0, len(testLabels)), size=(30,)):
     # classify the digit
     probs = model.predict(testData[np.newaxis, i])
     prediction = probs.argmax(axis=1)
@@ -215,3 +303,5 @@ for i in np.random.choice(np.arange(0, len(testLabels)), size=(10,)):
     # cv2.waitKey(0)
 np.random.seed()
 
+
+# todo: prediction for other db (npy)
