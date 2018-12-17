@@ -18,6 +18,9 @@ import cv2  # not on hpcc
 # Communication
 print('example training: python lenet_colonies.py -db mid.strict.npy.gz -s 1 -w ./output/mid.strict.hdf5')
 print('example loading: python lenet_colonies.py -db mid.strict.npy.gz -l 1 -w ./output/mid.strict.hdf5')
+# todo: uncertain as negative
+# todo: predict for other datasets (-l 1 -w path -db new -s 0) (for one image in one npy file)
+# todo: change format to
 
 
 # Construct the argument parser and parse the arguments
@@ -56,7 +59,8 @@ print("{} Split ratio, split Data into {} training and {} testing".\
       format(training_ratio, trainBlobs.shape[0], valBlobs.shape[0]))
 
 # Balancing Yes/No ratio
-trainBlobs = balancing_by_duplicating_yes(trainBlobs)
+if args["load_model"] < 0:
+    trainBlobs = balancing_by_duplicating_yes(trainBlobs)
 
 # Parse blobs
 trainImages, trainLabels, trainRs = parse_blobs(trainBlobs)
@@ -67,9 +71,10 @@ print(trainImages.shape, trainLabels.shape, trainRs.shape)
 # todo: augmentation on blob level (keep Data, label, Rs cosistant)
 # todo: change R alone with scaling
 # todo: augmentation in batch training
-trainImages = augment_images(trainImages)
-print("trainImagesAug:", trainImages.shape)
-print('max data', np.max(trainImages), 'min', np.min(trainImages))
+if args["load_model"] < 0:
+    trainImages = augment_images(trainImages)
+    print("trainImagesAug:", trainImages.shape)
+    print('max data', np.max(trainImages), 'min', np.min(trainImages))
 
 # Downscale images
 print("Downscaling images by ", scaling_factor)
@@ -91,6 +96,7 @@ print("Masking images...")
 trainImages = np.array([mask_image(image, r=trainRs[ind]) for ind, image in enumerate(trainImages)])
 valImagesMsk = np.array([mask_image(image, r=valRs[ind]) for ind, image in enumerate(valImages)])
 
+# Reshape for model
 trainImages = trainImages.reshape((trainImages.shape[0], 2*w, 2*w, 1))
 valImagesMsk = valImagesMsk.reshape((valImagesMsk.shape[0], 2*w, 2*w, 1))
 valImages = valImages.reshape((valImages.shape[0], 2*w, 2*w, 1))
@@ -128,7 +134,7 @@ print("[INFO] evaluating...")
 print("[INFO] training accuracy: {:.2f}%".format(accuracy * 100))
 
 print("[INFO] evaluating...")
-(loss, accuracy) = model.evaluate(valImages, valLabels,
+(loss, accuracy) = model.evaluate(valImagesMsk, valLabels,
                                   batch_size=20, verbose=verbose)
 print("[INFO] validation accuracy: {:.2f}%".format(accuracy * 100))
 
@@ -138,29 +144,52 @@ if args["save_model"] > 0:
     print("[INFO] dumping weights to file...")
     model.save_weights(args["weights"], overwrite=True)
 
+# Prediction at load mode
+if args["load_model"] > 0:
+    # randomly select a few testing digits
+    # todo: fix tk in hpcc
+    # _tkinter.TclError: couldn't connect to display ":0.0"
+    # load
+    print('loading...', args["blobs_db"])
+    blobs = load_blobs_db(args["blobs_db"])
+    w = int(sqrt(blobs.shape[1] - 6) / 2)  # width of img
+    # parse
+    Images, Labels, Rs = parse_blobs(blobs)
+    # equalize
+    Images_ = np.array([equalize(image) for image in Images])
+    # scale down
+    Images_ = np.array([down_scale(image, scaling_factor=scaling_factor) for image in Images_])
+    w = int(w / scaling_factor)
+    Rs = Rs / scaling_factor * r_extension_ratio
+    # mask
+    Images_ = np.array([mask_image(image, r=Rs[ind]) for ind, image in enumerate(Images_)])
+    # reshape for model
+    Images_ = Images_.reshape((Images_.shape[0], 2 * w, 2 * w, 1))
 
-# randomly select a few testing digits
-# todo: fix tk in hpcc
-# _tkinter.TclError: couldn't connect to display ":0.0"
-print('Showing samples from validation set')
-np.random.seed(1)
-for i in np.random.choice(np.arange(0, len(valLabels)), size=(10,)):
-    # classify the digit
-    probs = model.predict(valImages[np.newaxis, i])
-    prediction = probs.argmax(axis=1)
-    print("[INFO] Predicted: {}, Actual: {}".format(prediction[0], np.argmax(valLabels[i])))
+    print('Showing rand samples from', args['blobs_db'])
+    while True:
+        i = np.random.choice(np.arange(0, len(Images_)))
+        # classify the digit
+        probs = model.predict(Images_[np.newaxis, i])
+        prediction = probs.argmax(axis=1)
+        print("[INFO] Predicted: {}, Actual: {}".format(prediction[0], np.argmax(Labels[i])))
 
-    image = (valImages[i] * 255).astype("uint8")
+        image = (Images[i] * 255).astype("uint8")
 
-    # python-tk not on hpcc
-    print(image.shape)
-    image = np.reshape(image, image.shape[0:2])
-    plt.imshow(image, 'gray')
-    plt.title("Label:" + str(np.argmax(testLabels[i])) + '; Prediction:' + str(prediction[0]))
-    out_png = 'valImage.' + args["blobs_db"] + str(i) + \
-    '.label_' + str(Labels[i]) + '.pred_' + str(prediction[0]) + '.png'
-    plt.savefig(out_png, dpi=150)
-np.random.seed()
+        # python-tk not on hpcc
+        print(image.shape)
+        image = np.reshape(image, image.shape[0:2])
+        plt.imshow(image, 'gray')
+        plt.title("Label:" + str(np.argmax(Labels[i])) + '; Prediction:' + str(prediction[0]))
+        plt.show()
+
+        # x = input("keep poping images until the input is e\n")
+        # if x == 'e':
+        #     break
+
+        # out_png = 'valImage.' + args["blobs_db"] + str(i) + \
+        # '.label_' + str(Labels[i]) + '.pred_' + str(prediction[0]) + '.png'
+        # plt.savefig(out_png, dpi=150)
 
 
-# todo: prediction for other db (npy)
+    # todo: prediction for other db (npy)
