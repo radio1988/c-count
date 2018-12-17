@@ -11,12 +11,16 @@ from random import randint
 from time import sleep
 import gzip
 
+
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import os.path
 import re
 import time
+
+import imgaug as ia
+from imgaug import augmenters as iaa
 
 # from ccount import *
 
@@ -50,6 +54,20 @@ def down_scale(img, scaling_factor=2):
     e.g.: block_small = down_scale(block, scaling_factor)  
     '''
     return resize(img, (img.shape[0] // scaling_factor, img.shape[1] // scaling_factor))
+
+
+def blobs_stat(blobs):
+    '''
+    print summary of labels in blobs
+    :param blobs:
+    :return:
+    '''
+    print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
+        sum(blobs[:, 3] == 1),
+        sum(blobs[:, 3] == 0),
+        sum(blobs[:, 3] == -2),
+        sum(blobs[:, 3] == -1),
+    ))
 
 
 def find_blob(image_bright_blob_on_dark, scaling_factor = 2, 
@@ -444,13 +462,7 @@ def load_blobs_db(in_db_name):
             print("{} read into RAM".format(in_db_name))
             print("{} cropped blobs, {} pixcels in each blob".format(len(image_flat_crops),
                                                                      image_flat_crops.shape[1] - 6))
-            print("{} unlabeled blobs".format(sum(image_flat_crops[:, 3] == -1)))
-            print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
-                sum(image_flat_crops[:, 3] == 1),
-                sum(image_flat_crops[:, 3] == 0),
-                sum(image_flat_crops[:, 3] == -2),
-                sum(image_flat_crops[:, 3] == -1),
-            ))
+            blobs_stat(image_flat_crops)
             break
         else:
             print("{} file not found".format(in_db_name))
@@ -496,3 +508,145 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
 # ax[1].imshow(block_equ, 'gray')
 # ax[2].set_title('scaled block')
 # ax[2].imshow(block_equ_small, 'gray')
+
+def split_train_valid(array, training_ratio):
+    """
+    Split into train and valid
+    :param array: 2D array, each row is a sample
+    :param ratio: ratio of train in all, e.g. 0.7
+    :return: two arrays
+    """
+    N = array.shape[0]
+    N1 = int(N * training_ratio)
+    np.random.seed(3)
+    np.random.shuffle(array)
+    np.random.seed()
+    train = array[0:N1]
+    valid = array[N1:]
+    return train, valid
+
+def normalize_img(image):
+    '''
+    Normalize images into [0,1]
+    :param image:
+    :return:
+    '''
+    image = image - np.min(image)
+    image = image / np.max(image)
+    return image
+
+
+def balancing_by_removing_no(blobs):
+    '''
+    balance yes/no ratio to 1, by removing excess NO samples
+    :return: balanced blobs (with less samples)
+    '''
+    print('Before balancing:')
+    blobs_stat(blobs)
+
+    idx_yes = np.arange(0, blobs.shape[0])[blobs[:, 3] == 1]
+    idx_no = np.arange(0, blobs.shape[0])[blobs[:, 3] == 0]
+    N_Yes = len(idx_yes)
+    N_No = len(idx_no)
+
+    if N_No > N_Yes:
+        print('number of No matched to yes by sub-sampling')
+        idx_no = np.random.choice(idx_no, N_Yes, replace=False)
+        idx_choice = np.concatenate([idx_yes, idx_no])
+        np.random.seed(2)
+        np.random.shuffle(idx_choice)
+        np.random.seed()
+        blobs = blobs[idx_choice,]
+
+    print("After balancing by removing neg samples")
+    blobs_stat(blobs)
+
+    return blobs
+
+
+def balancing_by_duplicating_yes(blobs):
+    '''
+    balance yes/no ratio to 1, by duplicating lacked Yes blobs
+    :return: balanced blobs (with less samples)
+    '''
+    print('Before balancing:')
+    blobs_stat(blobs)
+
+    idx_yes = np.arange(0, blobs.shape[0])[blobs[:, 3] == 1]
+    idx_no = np.arange(0, blobs.shape[0])[blobs[:, 3] == 0]
+    N_Yes = len(idx_yes)
+    N_No = len(idx_no)
+
+    if N_No > N_Yes:
+        print('number of No matched to yes by sub-sampling')
+        idx_yes = np.random.choice(idx_yes, N_No, replace=True)
+        idx_choice = np.concatenate([idx_yes, idx_no])
+        np.random.seed(2)
+        np.random.shuffle(idx_choice)
+        np.random.seed()
+        blobs = blobs[idx_choice,]
+
+    print("After balancing by adding positive samples")
+    blobs_stat(blobs)
+
+    return blobs
+
+
+def parse_blobs(blobs):
+    '''
+    parse blobs into Images, Labels, Rs
+    :param blobs:
+    :return:  Images, Labels, Rs
+    '''
+    Flats = blobs[:, 6:]
+    w = int(sqrt(blobs.shape[1] - 6) / 2)  # width of img
+    Images = Flats.reshape(len(Flats), 2*w, 2*w)
+    Labels = blobs[:, 3]
+    Rs = blobs[:, 2]
+
+    return Images, Labels, Rs
+
+
+def augment_images(Images):
+    '''
+    Input images (n_samples, 2*w, 2*w)
+    Process: Augmentation; Normalization back to [0, 1]
+    Output augmented images of the same shape
+    :param Images:
+    :return: augImages
+    '''
+    # Sometimes(0.5, ...) applies the given augmenter in 50% of all cases,
+    # e.g. Sometimes(0.5, GaussianBlur(0.3)) would blur roughly every second image.
+    sometimes = lambda aug: iaa.Sometimes(0.9, aug)
+
+    w2 = Images.shape[1]
+    Images = Images.reshape(len(Images), w2, w2, 1) # formatting
+
+    seq = iaa.Sequential(
+        [
+            # apply the following augmenters to most images
+            iaa.Fliplr(0.5), # horizontally flip 50% of all images
+            iaa.Flipud(0.5), # vertically flip 20% of all images
+            # crop images by -5% to 10% of their height/width
+            sometimes(iaa.CropAndPad(
+                percent=(-0.01, 0.01),
+                pad_mode=ia.ALL,
+                pad_cval=(0, 1)
+            )),
+            sometimes(iaa.Affine(
+                scale={"x": (0.9, 1.1), "y": (0.9, 1.1)}, # scale images to 80-120% of their size, individually per axis
+                translate_percent={"x": (-0.02, 0.02), "y": (-0.02, 0.02)}, # translate by -20 to +20 percent (per axis)
+                rotate=(-45, 45), # rotate by -45 to +45 degrees
+                shear=(-5, 5), # shear by -16 to +16 degrees
+                order=[0, 1], # use nearest neighbour or bilinear interpolation (fast)
+                cval=(0, 1), # if mode is constant, use a cval between 0 and 255
+                mode=ia.ALL # use any of scikit-image's warping modes (see 2nd image from the top for examples)
+            )),
+        ],
+        random_order=True
+    )
+
+    Images = seq.augment_images(Images)
+    Images = Images.reshape(len(Images), w2, w2)  # formatting back
+    Images = np.array([normalize_img(image) for image in Images])
+    return Images
