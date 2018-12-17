@@ -174,6 +174,8 @@ if args["save_model"] > 0:
 
 
 # randomly select a few testing digits
+# todo: not working on HPCC, but works on mac
+# _tkinter.TclError: couldn't connect to display ":0.0"
 np.random.seed(1)
 for i in np.random.choice(np.arange(0, len(testLabels)), size=(10,)):
     # classify the digit
@@ -211,7 +213,5 @@ for i in np.random.choice(np.arange(0, len(testLabels)), size=(10,)):
     #             cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
     # cv2.imshow("Digit", image)
     # cv2.waitKey(0)
-
-
 np.random.seed()
 
