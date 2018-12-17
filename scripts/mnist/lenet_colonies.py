@@ -15,6 +15,9 @@ import matplotlib.pyplot as plt  # tk not on hpcc
 matplotlib.use('Agg')  # not display on hpcc
 import cv2  # not on hpcc
 
+print('example training: python lenet_colonies.py -db mid.strict.npy.gz -s 1 -w ./output/mid.strict.hdf5')
+print('example loading: python lenet_colonies.py -db mid.strict.npy.gz -l 1 -w ./output/mid.strict.hdf5')
+
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-db", "--blobs-db", type=str,
@@ -103,12 +106,12 @@ print(type(trainData), trainData.shape)
 print(type(trainLabels), trainLabels.shape)
 
 
-# check image
-for i in range(0,10):
-    plt.imshow(trainData[i], 'gray')
-    plt.title('trainData'+str(i) + ' label=' + str(Labels[i]))
-    out_png = 'trainData' + args["blobs_db"] + str(i) + '.label_' + str(Labels[i]) + '.png'
-    plt.savefig(out_png, dpi=150)
+# # check image
+# for i in range(0,10):
+#     plt.imshow(trainData[i], 'gray')
+#     plt.title('trainData'+str(i) + ' label=' + str(Labels[i]))
+#     out_png = 'trainData' + args["blobs_db"] + str(i) + '.label_' + str(Labels[i]) + '.png'
+#     plt.savefig(out_png, dpi=150)
 
 print(trainData.shape, trainLabels.shape)
 
@@ -147,7 +150,7 @@ model.compile(loss="categorical_crossentropy", optimizer=opt,
 # pre-existing model
 if args["load_model"] < 0:
     print("[INFO] training...")
-    model.fit(trainData, trainLabels, batch_size=64, epochs=40,  # test epoch should be 20, verbose should be 1
+    model.fit(trainData, trainLabels, batch_size=64, epochs=50,  # test epoch should be 20, verbose should be 1
               verbose=verbose)
 
 # show the accuracy on the testing set
