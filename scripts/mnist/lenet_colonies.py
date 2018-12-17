@@ -39,7 +39,7 @@ verbose = 1  # {0, 1}
 scaling_factor = 4  # input scale down
 training_ratio = 0.7  # proportion of data to be in training set
 r_extension_ratio = 1.4  # larger (1.4) for better view under augmentation
-epochs = 200  # default 50
+epochs = 50  # default 50
 learning_rate = 0.0001  # default 0.0001 (Adam)
 
 
@@ -93,6 +93,7 @@ valImagesMsk = np.array([mask_image(image, r=valRs[ind]) for ind, image in enume
 
 trainImages = trainImages.reshape((trainImages.shape[0], 2*w, 2*w, 1))
 valImagesMsk = valImagesMsk.reshape((valImagesMsk.shape[0], 2*w, 2*w, 1))
+valImages = valImages.reshape((valImages.shape[0], 2*w, 2*w, 1))
 print("max pixel value: ", np.max(trainImages))
 print("min pixel value: ", np.min(trainImages))
 
@@ -139,29 +140,24 @@ if args["save_model"] > 0:
 
 
 # randomly select a few testing digits
-# todo: not working on HPCC, but works on mac
+# todo: fix tk in hpcc
 # _tkinter.TclError: couldn't connect to display ":0.0"
+print('Showing samples from validation set')
 np.random.seed(1)
-for i in np.random.choice(np.arange(0, len(testLabels)), size=(30,)):
+for i in np.random.choice(np.arange(0, len(valLabels)), size=(10,)):
     # classify the digit
-    probs = model.predict(testData[np.newaxis, i])
+    probs = model.predict(valImages[np.newaxis, i])
     prediction = probs.argmax(axis=1)
-    print("[INFO] Predicted: {}, Actual: {}".format(prediction[0], np.argmax(testLabels[i])))
+    print("[INFO] Predicted: {}, Actual: {}".format(prediction[0], np.argmax(valLabels[i])))
 
-    # extract the image from the testData if using "channels_first"
-    # ordering
-    if K.image_data_format() == "channels_first":
-        image = (testData[i][0] * 255).astype("uint8")
-    else:
-        # otherwise we are using "channels_last" ordering
-        image = (testData[i] * 255).astype("uint8")
+    image = (valImages[i] * 255).astype("uint8")
 
     # python-tk not on hpcc
     print(image.shape)
     image = np.reshape(image, image.shape[0:2])
     plt.imshow(image, 'gray')
     plt.title("Label:" + str(np.argmax(testLabels[i])) + '; Prediction:' + str(prediction[0]))
-    out_png = 'testData.' + args["blobs_db"] + str(i) + \
+    out_png = 'valImage.' + args["blobs_db"] + str(i) + \
     '.label_' + str(Labels[i]) + '.pred_' + str(prediction[0]) + '.png'
     plt.savefig(out_png, dpi=150)
 np.random.seed()
