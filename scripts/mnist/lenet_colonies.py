@@ -1,17 +1,18 @@
 # import the necessary packages
 from pyimagesearch.cnn.networks.lenet import LeNet
+from ccount import *
 from sklearn.model_selection import train_test_split
+from skimage.transform import rescale, resize, downscale_local_mean
 from keras.datasets import mnist
-from keras.optimizers import SGD
+from keras.optimizers import SGD, Adam
 from keras.utils import np_utils
 from keras import backend as K
 from collections import Counter
 import numpy as np
 import argparse
-from ccount import *
 
-# import matplotlib.pyplot as plt # tk not on hpcc
-# import cv2 # not on hpcc
+import matplotlib.pyplot as plt # tk not on hpcc
+import cv2 # not on hpcc
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -29,25 +30,61 @@ args = vars(ap.parse_args())
 
 # Parameters
 verbose = 1  # {0, 1}
+scaling_factor = 4  # input scale down
+training_ratio = 0.7  # proportion of data to be in training set
 
 
 # Load Labeled blobs_db
 blobs = load_blobs_db(args["blobs_db"])
-blobs = blobs[blobs[:, 3] >= 0, :]  # remove unlabeled and uncertain
+# Remove unlabeled and uncertain
+blobs = blobs[blobs[:, 3] >= 0, :]
+# Remove bias by reducing No
+# idx_yes = blobs[:, 3] == 1
+# idx_no = blobs[:, 3] == 0
+# N_Yes = sum(idx_yes)
+# N_No = sum(idx_no)
+# idx_no = np.random.choice(idx_no, N_Yes, replace=False)
+# blobs = blobs[idx_yes+idx_no,]
+# blobs = blobs[np.random.choice(range(0, 2*N_Yes), replace=False)]
+# print('after subsampling No')
+# Counter(blobs[:, 3])
 
+
+# Input stats
 N = blobs.shape[0]
 w = int(sqrt(blobs.shape[1]-6) / 2)  # width of img
 
-# todo: equalization
+# todo: hpcc open-cv2
 # todo: masking
+# todo: augmentation
+# todo: unbalanced data
 
+
+
+# Reshape into 2D images
 flats = blobs[:, 6:]
 Data = flats.reshape(N, 2*w, 2*w)
 Labels = blobs[:, 3]
+Rs = blobs[:, 2]
 Labels = Labels.astype(int)
 
+
+
+# Downscale images
+print("Downscaling images by ", scaling_factor)
+Data = np.array([down_scale(image, scaling_factor=scaling_factor) for image in Data])
+w = int(w/scaling_factor)
+Rs = Rs/scaling_factor * 1.2
+# Equalize images
+print("Equalizing images...")
+Data = np.array([equalize(image) for image in Data])
+# Mask images
+print("Masking images...")
+Data = np.array([mask_image(image, r=Rs[ind]) for ind, image in enumerate(Data)])
+
 # Split
-N_train = int(N*0.7)
+print("Data split into {} training and testing".format(training_ratio))
+N_train = int(N*training_ratio)
 trainData = Data[0:N_train]
 testData = Data[N_train:]
 trainLabels = Labels[0:N_train]
@@ -59,11 +96,10 @@ print(type(trainLabels), trainLabels.shape)
 
 
 # check image
-import matplotlib.pyplot as plt # tk not on hpcc
-i = 0
-plt.imshow(trainData[i], 'gray')
-plt.title('trainData:' + str(Labels[i]))
-plt.show()
+for i in range(0,10):
+    plt.imshow(trainData[i], 'gray')
+    plt.title('trainData'+str(i) + ' label=' + str(Labels[i]))
+    plt.show()
 
 
 print(trainData.shape, trainLabels.shape)
@@ -86,20 +122,24 @@ print("min pixel value: ", np.min(trainData))
 trainLabels = np_utils.to_categorical(trainLabels, 2)
 testLabels = np_utils.to_categorical(testLabels, 2)
 
+
 # initialize the optimizer and model
+# todo: use F1 score and accuracy
+# todo: early stopping
+# todo: Adam
 print("[INFO] compiling model...")
-opt = SGD(lr=0.01)
+opt = SGD(lr=0.01)  # todo: ADAM
 model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w,
                     numClasses=2,
                     weightsPath=args["weights"] if args["load_model"] > 0 else None)
 model.compile(loss="categorical_crossentropy", optimizer=opt,
-              metrics=["accuracy"])
+              metrics=["accuracy"])  # todo: F1
 
 # only train and evaluate the model if we *are not* loading a
 # pre-existing model
 if args["load_model"] < 0:
     print("[INFO] training...")
-    model.fit(trainData, trainLabels, batch_size=100, epochs=1,  # test epoch should be 20, verbose should be 1
+    model.fit(trainData, trainLabels, batch_size=100, epochs=5,  # test epoch should be 20, verbose should be 1
               verbose=verbose)
 
 # show the accuracy on the testing set
@@ -137,21 +177,19 @@ for i in np.random.choice(np.arange(0, len(testLabels)), size=(10,)):
         # otherwise we are using "channels_last" ordering
         image = (testData[i] * 255).astype("uint8")
 
+    # open-csv not on hpcc
+    # merge the channels into one image
+    image = cv2.merge([image] * 3)
 
+    # resize the image from a 28 x 28 image to a 96 x 96 image so we
+    # can better see it
+    image = cv2.resize(image, (400, 400), interpolation=cv2.INTER_LINEAR)
 
-    # # open-csv not on hpcc
-	# # merge the channels into one image
-	# image = cv2.merge([image] * 3)
-	#
-	# # resize the image from a 28 x 28 image to a 96 x 96 image so we
-	# # can better see it
-	# image = cv2.resize(image, (96, 96), interpolation=cv2.INTER_LINEAR)
-	#
-	# # show the image and prediction
-	# cv2.putText(image, str(prediction[0]), (5, 20),
-	# 			cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
-    # cv2.imshow("Digit", image)
-    # cv2.waitKey(0)
+    # show the image and prediction
+    cv2.putText(image, str(prediction[0]), (5, 20),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+    cv2.imshow("Digit", image)
+    cv2.waitKey(0)
 
 
     # # python-tk not on hpcc
