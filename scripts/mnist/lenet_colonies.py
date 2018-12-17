@@ -39,16 +39,23 @@ training_ratio = 0.7  # proportion of data to be in training set
 blobs = load_blobs_db(args["blobs_db"])
 # Remove unlabeled and uncertain
 blobs = blobs[blobs[:, 3] >= 0, :]
-# Remove bias by reducing No
-# idx_yes = blobs[:, 3] == 1
-# idx_no = blobs[:, 3] == 0
-# N_Yes = sum(idx_yes)
-# N_No = sum(idx_no)
-# idx_no = np.random.choice(idx_no, N_Yes, replace=False)
-# blobs = blobs[idx_yes+idx_no,]
-# blobs = blobs[np.random.choice(range(0, 2*N_Yes), replace=False)]
-# print('after subsampling No')
-# Counter(blobs[:, 3])
+# Remove bias by reducing No (in all inputs)
+idx_yes = np.arange(0, blobs.shape[0])[blobs[:, 3] == 1]
+idx_no =  np.arange(0, blobs.shape[0])[blobs[:, 3] == 0]
+N_Yes = len(idx_yes)
+N_No = len(idx_no)
+
+if N_No > N_Yes:
+    print('number of No matched to yes by sub-sampling')
+    idx_no = np.random.choice(idx_no, N_Yes, replace=False)
+    idx_choice = np.concatenate([idx_yes, idx_no])
+    np.random.seed(2)
+    np.random.shuffle(idx_choice)
+    np.random.seed()
+    blobs = blobs[idx_choice,]
+
+print('after subsampling Counter')
+Counter(blobs[:, 3])
 
 
 # Input stats
@@ -129,7 +136,7 @@ testLabels = np_utils.to_categorical(testLabels, 2)
 # todo: early stopping
 # todo: Adam
 print("[INFO] compiling model...")
-opt = SGD(lr=0.01)  # todo: ADAM
+opt = Adam(lr=0.0001)  # todo: ADAM
 model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w,
                     numClasses=2,
                     weightsPath=args["weights"] if args["load_model"] > 0 else None)
@@ -140,7 +147,7 @@ model.compile(loss="categorical_crossentropy", optimizer=opt,
 # pre-existing model
 if args["load_model"] < 0:
     print("[INFO] training...")
-    model.fit(trainData, trainLabels, batch_size=100, epochs=5,  # test epoch should be 20, verbose should be 1
+    model.fit(trainData, trainLabels, batch_size=64, epochs=40,  # test epoch should be 20, verbose should be 1
               verbose=verbose)
 
 # show the accuracy on the testing set
@@ -186,7 +193,7 @@ for i in np.random.choice(np.arange(0, len(testLabels)), size=(10,)):
     plt.title("Label:" + str(np.argmax(testLabels[i])) + '; Prediction:' + str(prediction[0]))
     out_png = 'testData.' + args["blobs_db"] + str(i) + \
     '.label_' + str(Labels[i]) + '.pred_' + str(prediction[0]) + '.png'
-    plt.savefig(out_png, dpi=300)
+    plt.savefig(out_png, dpi=150)
 
     # # open-csv not on hpcc
     # # merge the channels into one image
