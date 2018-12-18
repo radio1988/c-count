@@ -22,7 +22,7 @@ class LeNet:
             inputShape = (numChannels, imgRows, imgCols)
 
         # define the first set of CONV => ACTIVATION => POOL layers
-        model.add(Conv2D(20, 5, padding="same",  # 20 filters of 5x5
+        model.add(Conv2D(20, 5, padding="same",  # 20 filters of 5x5 todo: larger conv
                          input_shape=inputShape))
         model.add(Dropout(0.5))
         model.add(Activation(activation))
@@ -35,9 +35,21 @@ class LeNet:
         model.add(Activation(activation))
         model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
+        # define the third set of CONV => ACTIVATION => POOL layers
+        # It’s common to see the number of CONV  filters learned increase in deeper layers of the network.
+        model.add(Conv2D(100, 5, padding="same"))
+        model.add(Dropout(0.5))
+        model.add(Activation(activation))
+        model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
         # define the first FC => ACTIVATION layers
         model.add(Flatten())
         model.add(Dense(500))
+        model.add(Dropout(0.5))
+        model.add(Activation(activation))
+
+        # define the second FC => ACTIVATION layers
+        model.add(Dense(200))
         model.add(Dropout(0.5))
         model.add(Activation(activation))
 
