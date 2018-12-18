@@ -16,8 +16,6 @@ matplotlib.use('Agg')  # not display on hpcc
 import cv2  # not on hpcc
 
 
-
-
 # Show CPU/GPU info
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
@@ -136,8 +134,8 @@ model.compile(loss="categorical_crossentropy", optimizer=opt,
 if args["load_model"] < 0:
     print("[INFO] training...")
     # todo: add radius to model
-    model.fit(trainImages, trainLabels,
-              batch_size=64, epochs=epochs,  # test epoch should be 20, verbose should be 1
+    model.fit(trainImages, trainLabels, validation_data=(valImagesMsk, valLabels),
+              batch_size=64, epochs=epochs,
               verbose=verbose)
 
 # Evaluation of the model
