@@ -41,11 +41,11 @@ args = vars(ap.parse_args())
 
 
 # Parameters
-verbose = 1  # {0, 1}
+verbose = 2  # {0, 1, 2}
 scaling_factor = 2  # input scale down
 training_ratio = 0.7  # proportion of data to be in training set
 r_extension_ratio = 1.4  # larger (1.4) for better view under augmentation
-epochs = 50  # default 50 todo: show validation F1
+epochs = 50  # default 50
 learning_rate = 0.0001  # default 0.0001 (Adam)
 
 
@@ -120,7 +120,6 @@ trainLabels = np_utils.to_categorical(trainLabels, 2)
 valLabels = np_utils.to_categorical(valLabels, 2)
 
 # Initialize the optimizer and model
-# todo: use F1 score and accuracy
 # todo: early stopping
 # todo: feature normalization (optional)
 print("[INFO] compiling model...")
@@ -204,13 +203,11 @@ if args["load_model"] > 0:
         image_ = np.reshape(image_, image_.shape[0:2])
 
         r = Rs[i]
-        r_ = Rs_[i] # todo: fix r at the blob detection stage and don't extend r after wards
+        r_ = Rs_[i]  # todo: fix r at the blob detection stage and don't extend r after wards
         prediction = predictions[i]
         label = Labels[i]
 
-        # python-tk not on hpcc
-        # todo: show two images: original and masked
-
+        # visualize original and masked/euqalized blobs
         fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=False, sharey=False)
         ax = axes.ravel()
         ax[0].set_title('For human\nprediction:{}\nradius:{}'.format(int(prediction), r))
