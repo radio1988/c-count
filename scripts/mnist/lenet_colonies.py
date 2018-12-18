@@ -153,13 +153,13 @@ if args["load_model"] > 0:
     blobs = load_blobs_db(args["blobs_db"])
     w = int(sqrt(blobs.shape[1] - 6) / 2)  # width of img
     # parse
-    Images, Labels, Rs = parse_blobs(blobs)
+    Images, Labels, Rs = parse_blobs(blobs)  # for human
     # equalize
     Images_ = np.array([equalize(image) for image in Images])
     # scale down
     Images_ = np.array([down_scale(image, scaling_factor=scaling_factor) for image in Images_])
     w_ = int(w / scaling_factor)
-    Rs_ = Rs / scaling_factor
+    Rs_ = Rs / scaling_factor * r_extension_ratio  # for machine
     # mask
     Images_ = np.array([mask_image(image, r=Rs_[ind]) for ind, image in enumerate(Images_)])
     # reshape for model
@@ -169,10 +169,13 @@ if args["load_model"] > 0:
     print('Making predictions...')
     probs = model.predict(Images_)
     predictions = probs.argmax(axis=1)
-    print("Predictions:", np.mean(predictions), predictions)
-    idx_yes = predictions == 1
+    print("Predictions: mean: {}, count_yes: {}, count_blobs: {};".format(
+        np.mean(predictions), np.sum(predictions), len(predictions)))
+    blobs[:, 3] = predictions
+    print("saving predictions")
+    np.save('predictions.npy', blobs)
 
-
+    # Visualizing random predictions
     print('Showing rand samples from', args['blobs_db'])
     while True:
         i = np.random.choice(np.arange(0, len(Images_)))
@@ -187,7 +190,7 @@ if args["load_model"] > 0:
         image_ = np.reshape(image_, image_.shape[0:2])
 
         r = Rs[i]
-        r_ = Rs_[i] * r_extension_ratio
+        r_ = Rs_[i] # todo: fix r at the blob detection stage and don't extend r after wards
         prediction = predictions[i]
         label = Labels[i]
 
@@ -196,11 +199,11 @@ if args["load_model"] > 0:
 
         fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=False, sharey=False)
         ax = axes.ravel()
-        ax[0].set_title('For human labeling\nprediction:{}\nradius:{}'.format(int(prediction), r))
+        ax[0].set_title('For human\nprediction:{}\nradius:{}'.format(int(prediction), r))
         ax[0].imshow(image, 'gray')
         c = plt.Circle((w - 1, w - 1), r, color='yellow', linewidth=1, fill=False)
         ax[0].add_patch(c)
-        ax[1].set_title('For model training\ncurrent label:{}\nradius:{}'.format(int(prediction), r_))
+        ax[1].set_title('For machine\nprediction:{}\nradius:{}'.format(int(prediction), int(r_)))
         ax[1].imshow(image_, 'gray')
         plt.tight_layout()
         plt.show()
