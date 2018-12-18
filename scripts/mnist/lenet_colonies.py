@@ -16,6 +16,8 @@ matplotlib.use('Agg')  # not display on hpcc
 import cv2  # not on hpcc
 
 
+
+
 # Show CPU/GPU info
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
@@ -45,7 +47,7 @@ verbose = 1  # {0, 1}
 scaling_factor = 2  # input scale down
 training_ratio = 0.7  # proportion of data to be in training set
 r_extension_ratio = 1.4  # larger (1.4) for better view under augmentation
-epochs = 50  # default 50 todo: show validation accuracy
+epochs = 50  # default 50 todo: show validation F1
 learning_rate = 0.0001  # default 0.0001 (Adam)
 
 
@@ -128,7 +130,7 @@ opt = Adam(lr=learning_rate)
 model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w, numClasses=2,
                     weightsPath=args["weights"] if args["load_model"] > 0 else None)
 model.compile(loss="categorical_crossentropy", optimizer=opt,
-              metrics=["accuracy"])  # todo: F1
+              metrics=[f1])  # todo: F1
 
 # Train if not loading pre-trained weights
 if args["load_model"] < 0:
@@ -140,14 +142,14 @@ if args["load_model"] < 0:
 
 # Evaluation of the model
 print("[INFO] evaluating...")
-(loss, accuracy) = model.evaluate(trainImages, trainLabels,
+(loss, f1) = model.evaluate(trainImages, trainLabels,
                                   batch_size=20, verbose=verbose)
-print("[INFO] training accuracy: {:.2f}%".format(accuracy * 100))
+print("[INFO] training F1: {:.2f}%".format(f1 * 100))
 
 print("[INFO] evaluating...")
-(loss, accuracy) = model.evaluate(valImagesMsk, valLabels,
+(loss,  f1) = model.evaluate(valImagesMsk, valLabels,
                                   batch_size=20, verbose=verbose)
-print("[INFO] validation accuracy: {:.2f}%".format(accuracy * 100))
+print("[INFO] validation F1: {:.2f}%".format(f1 * 100))
 
 
 # check to see if the model should be saved to file
