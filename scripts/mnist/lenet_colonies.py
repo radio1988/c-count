@@ -15,11 +15,15 @@ import matplotlib.pyplot as plt  # tk not on hpcc
 matplotlib.use('Agg')  # not display on hpcc
 import cv2  # not on hpcc
 
+
+# Show CPU/GPU info
+from tensorflow.python.client import device_lib
+print(device_lib.list_local_devices())
+
 # Communication
 print('example training: python lenet_colonies.py -db mid.strict.npy.gz -s 1 -w ./output/mid.strict.hdf5')
 print('example loading: python lenet_colonies.py -db mid.strict.npy.gz -l 1 -w ./output/mid.strict.hdf5')
-# todo: predict for other datasets (-l 1 -w path -db new -s 0) (for one image in one npy file)
-# todo: change format to
+# todo: change format to pandas to count positives for each scanned image (for now, image-> npy -> count)
 
 
 # Construct the argument parser and parse the arguments
@@ -38,10 +42,10 @@ args = vars(ap.parse_args())
 
 # Parameters
 verbose = 1  # {0, 1}
-scaling_factor = 4  # input scale down  # todo: 2x scaling
+scaling_factor = 2  # input scale down
 training_ratio = 0.7  # proportion of data to be in training set
 r_extension_ratio = 1.4  # larger (1.4) for better view under augmentation
-epochs = 50  # default 50
+epochs = 50  # default 50 todo: show validation accuracy
 learning_rate = 0.0001  # default 0.0001 (Adam)
 
 
@@ -75,6 +79,7 @@ print(trainImages.shape, trainLabels.shape, trainRs.shape)
 
 # Mixed Augmentation
 # todo: augmentation on blob level (keep Data, label, Rs cosistant)
+# todo: augmentation of uncertain ones
 # todo: change R alone with scaling
 # todo: augmentation in batch training
 if args["load_model"] < 0:
@@ -94,6 +99,7 @@ valRs = valRs/scaling_factor * r_extension_ratio
 
 # Equalize images
 print("Equalizing images...")
+# todo:  Possible precision loss when converting from float64 to uint16
 trainImages = np.array([equalize(image) for image in trainImages])
 valImages = np.array([equalize(image) for image in valImages])
 
@@ -127,6 +133,7 @@ model.compile(loss="categorical_crossentropy", optimizer=opt,
 # Train if not loading pre-trained weights
 if args["load_model"] < 0:
     print("[INFO] training...")
+    # todo: add radius to model
     model.fit(trainImages, trainLabels,
               batch_size=64, epochs=epochs,  # test epoch should be 20, verbose should be 1
               verbose=verbose)
@@ -183,9 +190,9 @@ if args["load_model"] > 0:
 
     # Visualizing random predictions
     print('Showing rand samples from', args['blobs_db'])
-    while True:
+    for j in range(len(positive_idx)):
         # i = np.random.choice(np.arange(0, len(Images_))) # all samples
-        i = np.random.choice(positive_idx)  # only show samples predicted to be positive
+        i = positive_idx[j]  # only show samples predicted to be positive
         # classify the digit
         prob = model.predict(Images_[np.newaxis, i])
         prediction = prob.argmax(axis=1)
