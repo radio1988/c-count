@@ -634,6 +634,7 @@ def augment_images(Images):
                 pad_cval=(0, 1)
             )),
             sometimes(iaa.Affine(
+                # todo: more strict; no scaling down
                 scale={"x": (0.9, 1.1), "y": (0.9, 1.1)}, # scale images to 80-120% of their size, individually per axis
                 translate_percent={"x": (-0.02, 0.02), "y": (-0.02, 0.02)}, # translate by -20 to +20 percent (per axis)
                 rotate=(-45, 45), # rotate by -45 to +45 degrees

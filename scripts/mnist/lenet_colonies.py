@@ -39,7 +39,7 @@ args = vars(ap.parse_args())
 
 # Parameters
 verbose = 1  # {0, 1}
-scaling_factor = 4  # input scale down
+scaling_factor = 4  # input scale down  # todo: 2x scaling
 training_ratio = 0.7  # proportion of data to be in training set
 r_extension_ratio = 1.4  # larger (1.4) for better view under augmentation
 epochs = 50  # default 50
@@ -50,8 +50,9 @@ learning_rate = 0.0001  # default 0.0001 (Adam)
 blobs = load_blobs_db(args["blobs_db"])
 w = int(sqrt(blobs.shape[1]-6) / 2)  # width of img
 
-# Remove unlabeled and uncertain
-blobs = blobs[blobs[:, 3] >= 0, :]
+# Remove unlabeled and uncertain (only when training)
+if args["load_model"] < 0:
+    blobs = blobs[blobs[:, 3] >= 0, :]
 
 # Split train/valid
 [trainBlobs, valBlobs] = split_train_valid(blobs, training_ratio)
@@ -103,11 +104,9 @@ valImages = valImages.reshape((valImages.shape[0], 2*w, 2*w, 1))
 print("max pixel value: ", np.max(trainImages))
 print("min pixel value: ", np.min(trainImages))
 
-
 # Categorize labels for softmax
 trainLabels = np_utils.to_categorical(trainLabels, 2)
 valLabels = np_utils.to_categorical(valLabels, 2)
-
 
 # Initialize the optimizer and model
 # todo: use F1 score and accuracy
@@ -159,28 +158,51 @@ if args["load_model"] > 0:
     Images_ = np.array([equalize(image) for image in Images])
     # scale down
     Images_ = np.array([down_scale(image, scaling_factor=scaling_factor) for image in Images_])
-    w = int(w / scaling_factor)
-    Rs = Rs / scaling_factor * r_extension_ratio
+    w_ = int(w / scaling_factor)
+    Rs_ = Rs / scaling_factor
     # mask
-    Images_ = np.array([mask_image(image, r=Rs[ind]) for ind, image in enumerate(Images_)])
+    Images_ = np.array([mask_image(image, r=Rs_[ind]) for ind, image in enumerate(Images_)])
     # reshape for model
-    Images_ = Images_.reshape((Images_.shape[0], 2 * w, 2 * w, 1))
+    Images_ = Images_.reshape((Images_.shape[0], 2 * w_, 2 * w_, 1))
+
+    # Predictions
+    print('Making predictions...')
+    probs = model.predict(Images_)
+    predictions = probs.argmax(axis=1)
+    print("Predictions:", np.mean(predictions), predictions)
+    idx_yes = predictions == 1
+
 
     print('Showing rand samples from', args['blobs_db'])
     while True:
         i = np.random.choice(np.arange(0, len(Images_)))
         # classify the digit
-        probs = model.predict(Images_[np.newaxis, i])
-        prediction = probs.argmax(axis=1)
+        prob = model.predict(Images_[np.newaxis, i])
+        prediction = prob.argmax(axis=1)
         print("[INFO] Predicted: {}, Actual: {}".format(prediction[0], np.argmax(Labels[i])))
 
         image = (Images[i] * 255).astype("uint8")
+        image_ = (Images_[i] * 255).astype("uint8")
+        image = np.reshape(image, image.shape[0:2])
+        image_ = np.reshape(image_, image_.shape[0:2])
+
+        r = Rs[i]
+        r_ = Rs_[i] * r_extension_ratio
+        prediction = predictions[i]
+        label = Labels[i]
 
         # python-tk not on hpcc
-        print(image.shape)
-        image = np.reshape(image, image.shape[0:2])
-        plt.imshow(image, 'gray')
-        plt.title("Label:" + str(np.argmax(Labels[i])) + '; Prediction:' + str(prediction[0]))
+        # todo: show two images: original and masked
+
+        fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=False, sharey=False)
+        ax = axes.ravel()
+        ax[0].set_title('For human labeling\nprediction:{}\nradius:{}'.format(int(prediction), r))
+        ax[0].imshow(image, 'gray')
+        c = plt.Circle((w - 1, w - 1), r, color='yellow', linewidth=1, fill=False)
+        ax[0].add_patch(c)
+        ax[1].set_title('For model training\ncurrent label:{}\nradius:{}'.format(int(prediction), r_))
+        ax[1].imshow(image_, 'gray')
+        plt.tight_layout()
         plt.show()
 
         # x = input("keep poping images until the input is e\n")
