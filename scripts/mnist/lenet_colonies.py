@@ -51,9 +51,13 @@ w = int(sqrt(blobs.shape[1]-6) / 2)  # width of img
 
 # Remove unlabeled and uncertain (only when training)
 if args["load_model"] < 0:
+    print("removing unlabeled blobs")
     blobs = blobs[blobs[:, 3] >= 0, :]
+    blobs_stat(blobs)
     print("changing uncertain to negatives...")
     blobs[blobs[:, 3] == -2, 3] = 0
+    blobs_stat(blobs)
+
 
 # Split train/valid
 [trainBlobs, valBlobs] = split_train_valid(blobs, training_ratio)
@@ -170,6 +174,7 @@ if args["load_model"] > 0:
     print('Making predictions...')
     probs = model.predict(Images_)
     predictions = probs.argmax(axis=1)
+    positive_idx = [i for i, x in enumerate(predictions) if x==1]
     print("Predictions: mean: {}, count_yes: {}, count_blobs: {};".format(
         np.mean(predictions), np.sum(predictions), len(predictions)))
     blobs[:, 3] = predictions
@@ -179,7 +184,8 @@ if args["load_model"] > 0:
     # Visualizing random predictions
     print('Showing rand samples from', args['blobs_db'])
     while True:
-        i = np.random.choice(np.arange(0, len(Images_)))
+        # i = np.random.choice(np.arange(0, len(Images_))) # all samples
+        i = np.random.choice(positive_idx)  # only show samples predicted to be positive
         # classify the digit
         prob = model.predict(Images_[np.newaxis, i])
         prediction = prob.argmax(axis=1)
