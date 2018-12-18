@@ -18,7 +18,6 @@ import cv2  # not on hpcc
 # Communication
 print('example training: python lenet_colonies.py -db mid.strict.npy.gz -s 1 -w ./output/mid.strict.hdf5')
 print('example loading: python lenet_colonies.py -db mid.strict.npy.gz -l 1 -w ./output/mid.strict.hdf5')
-# todo: uncertain as negative
 # todo: predict for other datasets (-l 1 -w path -db new -s 0) (for one image in one npy file)
 # todo: change format to
 
@@ -53,6 +52,8 @@ w = int(sqrt(blobs.shape[1]-6) / 2)  # width of img
 # Remove unlabeled and uncertain (only when training)
 if args["load_model"] < 0:
     blobs = blobs[blobs[:, 3] >= 0, :]
+    print("changing uncertain to negatives...")
+    blobs[blobs[:, 3] == -2, 3] = 0
 
 # Split train/valid
 [trainBlobs, valBlobs] = split_train_valid(blobs, training_ratio)
