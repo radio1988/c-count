@@ -9,9 +9,9 @@ from skimage.transform import rescale, resize, downscale_local_mean
 from IPython.display import clear_output
 from random import randint
 from time import sleep
+from keras import backend as K
+
 import gzip
-
-
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -21,8 +21,6 @@ import time
 
 import imgaug as ia
 from imgaug import augmenters as iaa
-
-# from ccount import *
 
 def read_czi(fname):
     '''
@@ -635,10 +633,10 @@ def augment_images(Images):
             )),
             sometimes(iaa.Affine(
                 # todo: more strict; no scaling down
-                scale={"x": (0.9, 1.1), "y": (0.9, 1.1)}, # scale images to 80-120% of their size, individually per axis
-                translate_percent={"x": (-0.02, 0.02), "y": (-0.02, 0.02)}, # translate by -20 to +20 percent (per axis)
-                rotate=(-45, 45), # rotate by -45 to +45 degrees
-                shear=(-5, 5), # shear by -16 to +16 degrees
+                scale={"x": (0.9, 1.2), "y": (0.9, 1.2)}, # scale images to 80-120% of their size, individually per axis
+                translate_percent={"x": (-0.03, 0.03), "y": (-0.03, 0.03)}, # translate by -20 to +20 percent (per axis)
+                rotate=(-90, 90), # rotate by -45 to +45 degrees
+                shear=(-16, 16), # shear by -16 to +16 degrees
                 order=[0, 1], # use nearest neighbour or bilinear interpolation (fast)
                 cval=(0, 1), # if mode is constant, use a cval between 0 and 255
                 mode=ia.ALL # use any of scikit-image's warping modes (see 2nd image from the top for examples)
@@ -652,7 +650,6 @@ def augment_images(Images):
     Images = np.array([normalize_img(image) for image in Images])
     return Images
 
-from keras import backend as K
 
 def f1(y_true, y_pred):
     def recall(y_true, y_pred):

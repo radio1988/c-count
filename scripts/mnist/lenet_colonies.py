@@ -180,7 +180,7 @@ if args["load_model"] > 0:
     print('Making predictions...')
     probs = model.predict(Images_)
     predictions = probs.argmax(axis=1)
-    positive_idx = [i for i, x in enumerate(predictions) if x==1]
+    positive_idx = [i for i, x in enumerate(predictions) if x==1]# todo only shown wrong ones
     print("Predictions: mean: {}, count_yes: {}, count_blobs: {};".format(
         np.mean(predictions), np.sum(predictions), len(predictions)))
     blobs[:, 3] = predictions
@@ -226,6 +226,6 @@ if args["load_model"] > 0:
         # out_png = 'valImage.' + args["blobs_db"] + str(i) + \
         # '.label_' + str(Labels[i]) + '.pred_' + str(prediction[0]) + '.png'
         # plt.savefig(out_png, dpi=150)
-
+        # todo: add feedback to mark wrong classifications for improvement
 
     # todo: prediction for other db (npy)
