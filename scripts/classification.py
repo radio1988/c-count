@@ -92,12 +92,9 @@ valImages, valLabels, valRs = parse_blobs(valBlobs)
 trainRs = trainRs * r_ext_ratio + r_ext_pixels
 valRs = valRs * r_ext_ratio + r_ext_pixels
 
-# Mixed Augmentation
-# todo: augmentation on blob level (keep Data, label, Rs consistent)
-# todo: augmentation of uncertain ones
-# todo: change R alone with scaling
+# Mixed Augmentation (todo: aug into more samples)
 if args["load_model"] < 0:
-    trainImagesAug = augment_images(trainImages)
+    trainImages = augment_images(trainImages)  # todo: augment to more samples
     print("trainImagesAug:", trainImages.shape)
     print('max data', np.max(trainImages), 'min', np.min(trainImages))
 
@@ -105,13 +102,13 @@ if args["load_model"] < 0:
 print("Downscaling images by ", scaling_factor)
 trainImages = np.array([down_scale(image, scaling_factor=scaling_factor) for image in trainImages])
 valImages = np.array([down_scale(image, scaling_factor=scaling_factor) for image in valImages])
-
-# Downscale w and R
+## Downscale w and R
 w = int(w/scaling_factor)
 trainRs = trainRs/scaling_factor
 valRs = valRs/scaling_factor
 
-# Equalize images
+# Equalize images (todo: test equalization -> scaling)
+# todo: more channels (scaled + equalized + original)
 print("Equalizing images...")
 # todo:  Possible precision loss when converting from float64 to uint16
 trainImages = np.array([equalize(image) for image in trainImages])
@@ -119,30 +116,29 @@ valImages = np.array([equalize(image) for image in valImages])
 
 # Mask images
 print("Masking images...")
-trainImages = np.array([mask_image(image, r=trainRs[ind]) for ind, image in enumerate(trainImages)])  # todo: later code only used unmasked
-valImagesMsk = np.array([mask_image(image, r=valRs[ind]) for ind, image in enumerate(valImages)])
+trainImages = np.array([mask_image(image, r=trainRs[ind]) for ind, image in enumerate(trainImages)])
+valImages = np.array([mask_image(image, r=valRs[ind]) for ind, image in enumerate(valImages)])
 
 
 # Show Images for model training
 for i in range(20):
     fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=True, sharey=True)
     ax = axes.ravel()
-    ## Original
-    ax[0].set_title("original")
-    ax[0].imshow(valImages[i], 'gray', clim=(0.0, 1.0))
-    c = plt.Circle((w - 1, w - 1), valRs[i], color='yellow', linewidth=1, fill=False)
+
+    ax[0].set_title("Original contrast")
+    ax[0].imshow(trainImages[i], 'gray', clim=(0.0, 1.0))
+    c = plt.Circle((w - 1, w - 1), trainRs[i], color='yellow', linewidth=1, fill=False)
     ax[0].add_patch(c)
-    ## Equalized and masked
-    ax[1].set_title('Equalized and masked')
-    ax[1].imshow(valImagesMsk[i], 'gray', clim=(0.0, 1.0))
-    c = plt.Circle((w - 1, w - 1), valRs[i], color='yellow', linewidth=1, fill=False)
+
+    ax[1].set_title('HDR')
+    ax[1].imshow(trainImages[i], 'gray')
+    c = plt.Circle((w - 1, w - 1), trainRs[i], color='yellow', linewidth=1, fill=False)
     ax[1].add_patch(c)
     print('save fig', i)
     plt.savefig(str(i)+'.png')
 
 # Reshape for model
 trainImages = trainImages.reshape((trainImages.shape[0], 2*w, 2*w, 1))
-valImagesMsk = valImagesMsk.reshape((valImagesMsk.shape[0], 2*w, 2*w, 1))
 valImages = valImages.reshape((valImages.shape[0], 2*w, 2*w, 1))
 print("max pixel value: ", np.max(trainImages))
 print("min pixel value: ", np.min(trainImages))
@@ -177,8 +173,8 @@ if args["load_model"] < 0:
     datagen = ImageDataGenerator(
         featurewise_std_normalization=False,
         rotation_range=90,
-        shear_range=0.16,
-        zoom_range=0.1,
+        shear_range=0.1,
+        zoom_range=0.05,
         width_shift_range=0.03, height_shift_range=0.03,
         horizontal_flip=True, vertical_flip=True
         #todo: blur focus
@@ -191,7 +187,7 @@ if args["load_model"] < 0:
     #           verbose=verbose)
 
     model.fit_generator(datagen.flow(trainImages, trainLabels, batch_size=64),
-                        validation_data=(valImagesMsk, valLabels),
+                        validation_data=(valImages, valLabels),
                         steps_per_epoch=len(trainImages) / 64, epochs=epochs,
                         callbacks=callbacks_list,
                         verbose=verbose)
@@ -204,7 +200,7 @@ print("[INFO] evaluating...")
 print("[INFO] training F1: {:.2f}%".format(f1 * 100))
 
 print("[INFO] evaluating...")
-(loss,  f1) = model.evaluate(valImagesMsk, valLabels,
+(loss,  f1) = model.evaluate(valImages, valLabels,
                                   batch_size=64, verbose=verbose)
 print("[INFO] validation F1: {:.2f}%".format(f1 * 100))
 
