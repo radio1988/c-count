@@ -21,8 +21,8 @@ import cv2  # not on hpcc
 
 
 # Show CPU/GPU info
-from tensorflow.python.client import device_lib
-print(device_lib.list_local_devices())
+# from tensorflow.python.client import device_lib
+# print(device_lib.list_local_devices())
 
 # Communication
 print('example training: python lenet_colonies.py -db mid.strict.npy.gz -s 1 -w ./output/mid.strict.hdf5')
@@ -46,17 +46,23 @@ args = vars(ap.parse_args())
 # todo: get wrong ones, reload and refine train
 
 # Parameters
-verbose = 2  # {0, 1, 2}
-scaling_factor = 2  # input scale down
+scaling_factor = 2  # input scale down for model training
+
 training_ratio = 0.7  # proportion of data to be in training set
-r_extension_ratio = 1.4  # larger (1.4) for better view under augmentation
+
+r_ext_ratio = 1.4  # larger (1.4) for better view under augmentation
+r_ext_pixels = 30
+
+numClasses=2
 epochs = 50  # default 50
+patience = 5  # default 5
 learning_rate = 0.0001  # default 0.0001 (Adam)
+verbose = 2  # {0, 1, 2}
 
 
 # Load Labeled blobs_db
 blobs = load_blobs_db(args["blobs_db"])
-w = int(sqrt(blobs.shape[1]-6) / 2)  # width of img
+w = int(sqrt(blobs.shape[1]-6) / 2)  # width/2 of img
 
 # Remove unlabeled and uncertain (only when training)
 if args["load_model"] < 0:
@@ -76,11 +82,15 @@ print("{} Split ratio, split Data into {} training and {} testing".\
 # Balancing Yes/No ratio
 if args["load_model"] < 0:
     trainBlobs = balancing_by_duplicating_yes(trainBlobs)
+    valBlobs = balancing_by_duplicating_yes(valBlobs)
 
 # Parse blobs
 trainImages, trainLabels, trainRs = parse_blobs(trainBlobs)
 valImages, valLabels, valRs = parse_blobs(valBlobs)
-print(trainImages.shape, trainLabels.shape, trainRs.shape)
+
+# Extend Rs
+trainRs = trainRs * r_ext_ratio + r_ext_pixels
+valRs = valRs * r_ext_ratio + r_ext_pixels
 
 # # Mixed Augmentation
 # # todo: augmentation on blob level (keep Data, label, Rs consistent)
@@ -98,8 +108,9 @@ valImages = np.array([down_scale(image, scaling_factor=scaling_factor) for image
 
 # Downscale w and R
 w = int(w/scaling_factor)
-trainRs = trainRs/scaling_factor * r_extension_ratio
-valRs = valRs/scaling_factor * r_extension_ratio
+trainRs = trainRs/scaling_factor
+valRs = valRs/scaling_factor
+
 
 # Equalize images
 print("Equalizing images...")
@@ -133,8 +144,8 @@ model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w, numClasses=2,
 model.compile(loss="categorical_crossentropy", optimizer=opt,
               metrics=[F1])  # todo: F1
 earlystop = keras.callbacks.EarlyStopping(monitor='val_loss',
-                                          min_delta=0, patience=5,
-                                          verbose=2, mode='auto',
+                                          min_delta=0, patience=patience,
+                                          verbose=verbose, mode='auto',
                                           baseline=None, restore_best_weights=True)
 callbacks_list = [earlystop]
 
