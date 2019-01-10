@@ -10,7 +10,11 @@
 
 
 # Usage
-- open blbo_detection.ipynb
+1. blob_detection
+2. filter_merge
+3. labeling
+4. classification
+
 
 
 # Todo:
