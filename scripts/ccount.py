@@ -9,8 +9,9 @@ from skimage.transform import rescale, resize, downscale_local_mean
 from IPython.display import clear_output
 from random import randint
 from time import sleep
-import gzip
+from keras import backend as K
 
+import gzip
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -18,17 +19,32 @@ import os.path
 import re
 import time
 
-# from ccount import *
+import imgaug as ia
+from imgaug import augmenters as iaa
 
 def read_czi(fname):
     '''
     input: fname of czi file
     output: 2d numpy array
     '''
-    with CziFile(fname) as czi:
-        image_arrays = czi.asarray()
+    if fname.endswith('czi'):
+        with CziFile(fname) as czi:
+            image_arrays = czi.asarray()
+            print(image_arrays.shape)
+
+
+    elif fname.endswith('czi.gz'):
+        raise Exception("todo")
+        with gzip.open(fname, 'rb') as f:
+            with CziFile(f) as czi:
+                image_arrays = czi.asarray()
+
+    else:
+        raise Exception("input czi/czi.gz file type error\n")
+
     image = image_arrays[0, 1, 0, 0, :, :, 0]  # real image
     print("{}: {}\n".format(fname, image.shape))
+
     return image
 
 
@@ -50,6 +66,20 @@ def down_scale(img, scaling_factor=2):
     e.g.: block_small = down_scale(block, scaling_factor)  
     '''
     return resize(img, (img.shape[0] // scaling_factor, img.shape[1] // scaling_factor))
+
+
+def blobs_stat(blobs):
+    '''
+    print summary of labels in blobs
+    :param blobs:
+    :return:
+    '''
+    print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
+        sum(blobs[:, 3] == 1),
+        sum(blobs[:, 3] == 0),
+        sum(blobs[:, 3] == -2),
+        sum(blobs[:, 3] == -1),
+    ))
 
 
 def find_blob(image_bright_blob_on_dark, scaling_factor = 2, 
@@ -188,6 +218,23 @@ def crop_blobs(blobs, block_img, block_row=-1, block_column=-1, crop_width=100,
     return flat_crops
 
 
+def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
+    '''
+    input: one image [100, 100], and radius of the blob
+    return: hard-masked image
+    '''
+    r_ = r * blob_extention_ratio + blob_extention_radius
+    w = int(image.shape[0]/2)
+
+    # hard mask creating training data
+    mask = np.zeros((2 * w, 2 * w))  # zeros are masked to be black
+    rr, cc = circle(w - 1, w - 1, min(r_, w - 1))
+    mask[rr, cc] = 1  # 1 is white
+    hard_masked = (1 - (1 - image) * mask)
+
+    return hard_masked
+
+
 def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0):
     '''
     input: one padded crop of a blob
@@ -202,27 +249,38 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0):
     flat = flat_crop[6:]
     w = int(sqrt(len(flat)) / 2)
     image = np.reshape(flat, (w + w, w + w))
+    print(round(np.max(image), 3))
+
+    # Equalized
+    equalized = equalize(image)
 
     # hard mask creating training data
-    mask = np.zeros((2 * w, 2 * w))  # zeros are masked to be black
-    rr, cc = circle(w - 1, w - 1, min(r_, w - 1))
-    mask[rr, cc] = 1  # 1 is white
-    hard_masked = (1 - (1 - image) * mask)
+    # hard_masked = mask_image(equalized, r=r_)
 
-    fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(8, 24), sharex=True, sharey=True)
     ax = axes.ravel()
-    ax[0].set_title('For human labeling\ncurrent label:{}\nradius:{}'.format(int(label), r_))
+    ## Auto Contrast For labeler
+    ax[0].set_title('For Labeling\ncurrent label:{},    r:{}'.format(int(label), r))
     ax[0].imshow(image, 'gray')
     c = plt.Circle((w - 1, w - 1), r_, color='yellow', linewidth=1, fill=False)
     ax[0].add_patch(c)
-    ax[1].set_title('For model training\ncurrent label:{}\nradius:{}'.format(int(label), r_))
-    ax[1].imshow(hard_masked, 'gray', clim=(0.0, 1.0))
+
+    ## Original for QC
+    ax[1].set_title('Native Contrast\n')
+    ax[1].imshow(image, 'gray', clim=(0.0, 1.0))
+    c = plt.Circle((w - 1, w - 1), r_, color='yellow', linewidth=1, fill=False)
+    ax[1].add_patch(c)
+
+    ## Equalized for QC
+    ax[2].set_title('Equalized\n')
+    ax[2].imshow(equalized, 'gray', clim=(0.0, 1.0))
+    c = plt.Circle((w - 1, w - 1), r_, color='yellow', linewidth=1, fill=False)
+    ax[2].add_patch(c)
     plt.tight_layout()
     plt.show()
     fig.canvas.draw()
 
-    return image, hard_masked
-
+    return 'done'
 
 def plot_flat_crops(flat_crops, blob_extention_ratio=1, blob_extention_radius=0):
     '''
@@ -375,13 +433,13 @@ def pop_label_flat_crops(flat_crops, random=True, seed=1, skip_labeled=True):
         plot_flat_crop(flat_crops[idx[i], :])
 
         label = input('''labeling for the {}/{} unlabeled blob, 
-yes=1, no=0, undistinguishable=u, skip=s, go-back=b, excape=e: '''.format(i + 1, num_unlabeled))
+yes=1, no=0, undistinguishable=3, skip=s, go-back=b, excape=e: '''.format(i + 1, num_unlabeled))
 
         if label == '1':
             flat_crops[idx[i], 3] = 1  # yes
         elif label == '0':
             flat_crops[idx[i], 3] = 0  # no
-        elif label == 'u':
+        elif label == '3':
             flat_crops[idx[i], 3] = -2  # undistinguishable
         elif label == 's':
             pass
@@ -427,13 +485,7 @@ def load_blobs_db(in_db_name):
             print("{} read into RAM".format(in_db_name))
             print("{} cropped blobs, {} pixcels in each blob".format(len(image_flat_crops),
                                                                      image_flat_crops.shape[1] - 6))
-            print("{} unlabeled blobs".format(sum(image_flat_crops[:, 3] == -1)))
-            print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
-                sum(image_flat_crops[:, 3] == 1),
-                sum(image_flat_crops[:, 3] == 0),
-                sum(image_flat_crops[:, 3] == -2),
-                sum(image_flat_crops[:, 3] == -1),
-            ))
+            blobs_stat(image_flat_crops)
             break
         else:
             print("{} file not found".format(in_db_name))
@@ -472,10 +524,196 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
 # print ("resized image: ", block_equ_small.shape)
 
 # fig, axes = plt.subplots(1, 3, figsize=(20, 60), sharex=False, sharey=False)
-# ax = axes.ravel()
+# ax = axes.ravel()show_rand_crops
 # ax[0].set_title('input block')
 # ax[0].imshow(block, 'gray')
 # ax[1].set_title('equalized block')
 # ax[1].imshow(block_equ, 'gray')
 # ax[2].set_title('scaled block')
 # ax[2].imshow(block_equ_small, 'gray')
+
+def split_train_valid(array, training_ratio):
+    """
+    Split into train and valid
+    :param array: 2D array, each row is a sample
+    :param ratio: ratio of train in all, e.g. 0.7
+    :return: two arrays
+    """
+    N = array.shape[0]
+    N1 = int(N * training_ratio)
+    np.random.seed(3)
+    np.random.shuffle(array)
+    np.random.seed()
+    train = array[0:N1]
+    valid = array[N1:]
+    return train, valid
+
+def normalize_img(image):
+    '''
+    Normalize images into [0,1]
+    :param image:
+    :return:
+    '''
+    image = image - np.min(image)
+    image = image / np.max(image)
+    return image
+
+
+def balancing_by_removing_no(blobs):
+    '''
+    balance yes/no ratio to 1, by removing excess NO samples
+    :return: balanced blobs (with less samples)
+    '''
+    print('Before balancing:')
+    blobs_stat(blobs)
+
+    idx_yes = np.arange(0, blobs.shape[0])[blobs[:, 3] == 1]
+    idx_no = np.arange(0, blobs.shape[0])[blobs[:, 3] == 0]
+    N_Yes = len(idx_yes)
+    N_No = len(idx_no)
+
+    if N_No > N_Yes:
+        print('number of No matched to yes by sub-sampling')
+        idx_no = np.random.choice(idx_no, N_Yes, replace=False)
+        idx_choice = np.concatenate([idx_yes, idx_no])
+        np.random.seed(2)
+        np.random.shuffle(idx_choice)
+        np.random.seed()
+        blobs = blobs[idx_choice,]
+
+    print("After balancing by removing neg samples")
+    blobs_stat(blobs)
+
+    return blobs
+
+
+def balancing_by_duplicating_yes(blobs):
+    '''
+    balance yes/no ratio to 1, by duplicating lacked Yes blobs
+    :return: balanced blobs (with less samples)
+    '''
+    print('Before balancing:')
+    blobs_stat(blobs)
+
+    idx_yes = np.arange(0, blobs.shape[0])[blobs[:, 3] == 1]
+    idx_no = np.arange(0, blobs.shape[0])[blobs[:, 3] == 0]
+    N_Yes = len(idx_yes)
+    N_No = len(idx_no)
+
+    if N_No > N_Yes:
+        print('number of No matched to yes by sub-sampling')
+        idx_yes = np.random.choice(idx_yes, N_No, replace=True)
+        idx_choice = np.concatenate([idx_yes, idx_no])
+        np.random.seed(2)
+        np.random.shuffle(idx_choice)
+        np.random.seed()
+        blobs = blobs[idx_choice,]
+
+    print("After balancing by adding positive samples")
+    blobs_stat(blobs)
+
+    return blobs
+
+
+def parse_blobs(blobs):
+    '''
+    parse blobs into Images, Labels, Rs
+    :param blobs:
+    :return:  Images, Labels, Rs
+    '''
+    Flats = blobs[:, 6:]
+    w = int(sqrt(blobs.shape[1] - 6) / 2)  # width of img
+    Images = Flats.reshape(len(Flats), 2*w, 2*w)
+    Labels = blobs[:, 3]
+    Rs = blobs[:, 2]
+
+    return Images, Labels, Rs
+
+
+def augment_images(Images):
+    '''
+    Input images (n_samples, 2*w, 2*w)
+    Process: Augmentation; Normalization back to [0, 1]
+    Output augmented images of the same shape
+    :param Images:
+    :return: augImages
+    '''
+    # Sometimes(0.5, ...) applies the given augmenter in 50% of all cases,
+    # e.g. Sometimes(0.5, GaussianBlur(0.3)) would blur roughly every second image.
+    sometimes = lambda aug: iaa.Sometimes(0.9, aug)
+
+    w2 = Images.shape[1]
+    Images = Images.reshape(len(Images), w2, w2, 1) # formatting
+
+    seq = iaa.Sequential(
+        [
+            # apply the following augmenters to most images
+            iaa.Fliplr(0.5), # horizontally flip 50% of all images
+            iaa.Flipud(0.5), # vertically flip 20% of all images
+            sometimes(iaa.Affine(
+                # todo: more strict; no scaling down
+                scale={"x": (0.9, 1.2), "y": (0.9, 1.2)}, # scale images to 80-120% of their size, individually per axis
+                translate_percent={"x": (-0.03, 0.03), "y": (-0.03, 0.03)}, # translate by -20 to +20 percent (per axis)
+                rotate=(-90, 90), # rotate by -45 to +45 degrees
+                shear=(-16, 16), # shear by -16 to +16 degrees
+                order=[0, 1], # use nearest neighbour or bilinear interpolation (fast)
+                cval=(0, 1), # if mode is constant, use a cval between 0 and 255
+                mode=ia.ALL # use any of scikit-image's warping modes (see 2nd image from the top for examples)
+            )),
+        ],
+        random_order=True
+    )
+
+    Images = seq.augment_images(Images)
+    Images = Images.reshape(len(Images), w2, w2)  # formatting back
+    Images = np.array([normalize_img(image) for image in Images])
+    return Images
+
+
+def F1(y_pred, y_true):
+    def recall(y_true, y_pred):
+        """Recall metric.
+
+        Only computes a batch-wise average of recall.
+
+        Computes the recall, a metric for multi-label classification of
+        how many relevant items are selected.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
+
+    def precision(y_true, y_pred):
+        """Precision metric.
+
+        Only computes a batch-wise average of precision.
+
+        Computes the precision, a metric for multi-label classification of
+        how many selected items are relevant.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+    precision = precision(y_true, y_pred)
+    recall = recall(y_true, y_pred)
+    f1 = 2*((precision*recall)/(precision+recall+K.epsilon()))
+    return recall
+
+def f1_score(precision, recall):
+    return 2*(precision*recall/(precision+recall+1e-07))
+
+def F1_calculation(predictions, labels):
+    TP = np.sum(np.round(predictions * labels))
+    PP = np.sum(np.round(labels))
+    recall = TP / (PP + 1e-7)
+
+    PP2 = np.sum(np.round(predictions))
+    precision = TP/(PP2 + 1e-7)
+
+    F1 = 2*((precision*recall)/(precision+recall+1e-7))
+
+    print('Precition: {:.2f}%, Recall: {:.2f}%, F1: {:.2f}%'.format(precision*100, recall*100, F1*100))
+
+    return F1

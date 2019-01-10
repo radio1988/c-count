@@ -1,9 +1,0 @@
-|--- output
-|--- pyimagesearch
-|    |--- __init__.py
-|    |--- cnn
-|    |    |--- __init__.py
-|    |    |--- networks
-|    |    |    |--- __init__.py
-|    |    |    |--- lenet.py
-|--- lenet_mnist.py
