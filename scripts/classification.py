@@ -92,14 +92,14 @@ valImages, valLabels, valRs = parse_blobs(valBlobs)
 trainRs = trainRs * r_ext_ratio + r_ext_pixels
 valRs = valRs * r_ext_ratio + r_ext_pixels
 
-# # Mixed Augmentation
-# # todo: augmentation on blob level (keep Data, label, Rs consistent)
-# # todo: augmentation of uncertain ones
-# # todo: change R alone with scaling
-# if args["load_model"] < 0:
-#     trainImages = augment_images(trainImages)
-#     print("trainImagesAug:", trainImages.shape)
-#     print('max data', np.max(trainImages), 'min', np.min(trainImages))
+# Mixed Augmentation
+# todo: augmentation on blob level (keep Data, label, Rs consistent)
+# todo: augmentation of uncertain ones
+# todo: change R alone with scaling
+if args["load_model"] < 0:
+    trainImagesAug = augment_images(trainImages)
+    print("trainImagesAug:", trainImages.shape)
+    print('max data', np.max(trainImages), 'min', np.min(trainImages))
 
 # Downscale images
 print("Downscaling images by ", scaling_factor)
@@ -111,7 +111,6 @@ w = int(w/scaling_factor)
 trainRs = trainRs/scaling_factor
 valRs = valRs/scaling_factor
 
-
 # Equalize images
 print("Equalizing images...")
 # todo:  Possible precision loss when converting from float64 to uint16
@@ -120,8 +119,26 @@ valImages = np.array([equalize(image) for image in valImages])
 
 # Mask images
 print("Masking images...")
-trainImages = np.array([mask_image(image, r=trainRs[ind]) for ind, image in enumerate(trainImages)])
+trainImages = np.array([mask_image(image, r=trainRs[ind]) for ind, image in enumerate(trainImages)])  # todo: later code only used unmasked
 valImagesMsk = np.array([mask_image(image, r=valRs[ind]) for ind, image in enumerate(valImages)])
+
+
+# Show Images for model training
+for i in range(20):
+    fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=True, sharey=True)
+    ax = axes.ravel()
+    ## Original
+    ax[0].set_title("original")
+    ax[0].imshow(valImages[i], 'gray', clim=(0.0, 1.0))
+    c = plt.Circle((w - 1, w - 1), valRs[i], color='yellow', linewidth=1, fill=False)
+    ax[0].add_patch(c)
+    ## Equalized and masked
+    ax[1].set_title('Equalized and masked')
+    ax[1].imshow(valImagesMsk[i], 'gray', clim=(0.0, 1.0))
+    c = plt.Circle((w - 1, w - 1), valRs[i], color='yellow', linewidth=1, fill=False)
+    ax[1].add_patch(c)
+    print('save fig', i)
+    plt.savefig(str(i)+'.png')
 
 # Reshape for model
 trainImages = trainImages.reshape((trainImages.shape[0], 2*w, 2*w, 1))
@@ -131,15 +148,15 @@ print("max pixel value: ", np.max(trainImages))
 print("min pixel value: ", np.min(trainImages))
 
 # Categorize labels for softmax
-trainLabels = np_utils.to_categorical(trainLabels, 2)
-valLabels = np_utils.to_categorical(valLabels, 2)
+trainLabels = np_utils.to_categorical(trainLabels, numClasses)
+valLabels = np_utils.to_categorical(valLabels, numClasses)
 
 # Initialize the optimizer and model
 # todo: early stopping
 # todo: feature normalization (optional)
 print("[INFO] compiling model...")
 opt = Adam(lr=learning_rate)
-model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w, numClasses=2,
+model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w, numClasses=numClasses,
                     weightsPath=args["weights"] if args["load_model"] > 0 else None)
 model.compile(loss="categorical_crossentropy", optimizer=opt,
               metrics=[F1])  # todo: F1
@@ -156,6 +173,7 @@ if args["load_model"] < 0:
     # todo: add radius to model
     # todo: augmentation in batch training
 
+    # todo augmentation here is bad, mask issue
     datagen = ImageDataGenerator(
         featurewise_std_normalization=False,
         rotation_range=90,
