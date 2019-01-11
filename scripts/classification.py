@@ -55,10 +55,10 @@ training_ratio = 0.7  # proportion of data to be in training set
 r_ext_ratio = 1.4  # larger (1.4) for better view under augmentation
 r_ext_pixels = 30
 
-numClasses=2
+numClasses=3
 batch_size=64
 epochs = 500  # default 50
-patience = 50  # default 5
+patience = 10  # default 5
 learning_rate = 0.0001  # default 0.0001 (Adam)
 verbose = 2  # {0, 1, 2}
 
@@ -72,9 +72,9 @@ if args["load_model"] < 0:
     print("removing unlabeled blobs")
     blobs = blobs[blobs[:, 3] >= 0, :]
     blobs_stat(blobs)
-    print("Remove uncertains")
-    blobs = blobs[blobs[:, 3] >= -2, :]
-    blobs_stat(blobs)
+    # print("Remove uncertains")
+    # blobs = blobs[blobs[:, 3] >= -2, :]
+    # blobs_stat(blobs)
 
 
 # Split train/valid
