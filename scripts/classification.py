@@ -68,9 +68,9 @@ blobs = load_blobs_db(args["blobs_db"])
 w = int(sqrt(blobs.shape[1]-6) / 2)  # width/2 of img
 
 # Remove unlabeled and uncertain (only when training)
-if args["load_model"] < 0:
-    print("removing unlabeled blobs")
-    blobs = blobs[blobs[:, 3] >= 0, :]
+if args["load_model"] <= 0:
+    print("removing unlabeled blobs (only in training mode)")
+    blobs = blobs[blobs[:, 3] != -1, :]
     blobs_stat(blobs)
     # print("Remove uncertains")
     # blobs = blobs[blobs[:, 3] >= -2, :]
@@ -83,7 +83,7 @@ print("{} Split ratio, split Data into {} training and {} testing".\
       format(training_ratio, trainBlobs.shape[0], valBlobs.shape[0]))
 
 # Balancing Yes/No ratio
-if args["load_model"] < 0:
+if args["load_model"] <= 0:
     trainBlobs = balancing_by_duplicating_yes(trainBlobs)
     valBlobs = balancing_by_duplicating_yes(valBlobs)
 
@@ -186,7 +186,7 @@ callbacks_list = [earlystop]
 
 
 # Train if not loading pre-trained weights
-if args["load_model"] < 0:
+if args["load_model"] <= 0:
     print("[INFO] training...")
     # todo: add radius to model
     # todo: augmentation in batch training
