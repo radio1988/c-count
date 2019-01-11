@@ -166,8 +166,8 @@ print("max pixel value: ", np.max(trainImages))
 print("min pixel value: ", np.min(trainImages))
 
 # Categorize labels for softmax
-trainLabels = np_utils.to_categorical(trainLabels, numClasses)
-valLabels = np_utils.to_categorical(valLabels, numClasses)
+trainLabels2 = np_utils.to_categorical(trainLabels, numClasses)
+valLabels2 = np_utils.to_categorical(valLabels, numClasses)
 
 # Initialize the optimizer and model
 # todo: early stopping
@@ -208,57 +208,61 @@ if args["load_model"] <= 0:
     #           batch_size=batch_size, epochs=epochs,
     #           verbose=verbose)
 
-    model.fit_generator(datagen.flow(trainImages, trainLabels, batch_size=batch_size),
-                        validation_data=(valImages, valLabels),
+    model.fit_generator(datagen.flow(trainImages, trainLabels2, batch_size=batch_size),
+                        validation_data=(valImages, valLabels2),
                         steps_per_epoch=len(trainImages) / batch_size, epochs=epochs,
                         callbacks=callbacks_list,
                         verbose=verbose)
 
 
-# Evaluation of the model
-print("[INFO] evaluating...")
-(loss, f1) = model.evaluate(trainImages, trainLabels,
-                                  batch_size=batch_size, verbose=verbose)
-print("[INFO] training F1: {:.2f}%".format(f1 * 100))
+    # Evaluation of the model
+    print("[INFO] evaluating...")
+    (loss, f1) = model.evaluate(trainImages, trainLabels2,
+                                      batch_size=batch_size, verbose=verbose)
+    print("[INFO] training F1: {:.2f}%".format(f1 * 100))
 
-print("[INFO] evaluating...")
-(loss,  f1) = model.evaluate(valImages, valLabels,
-                                  batch_size=batch_size, verbose=verbose)
-print("[INFO] validation F1: {:.2f}%".format(f1 * 100))
+    print("[INFO] evaluating...")
+    (loss,  f1) = model.evaluate(valImages, valLabels2,
+                                      batch_size=batch_size, verbose=verbose)
+    print("[INFO] validation F1: {:.2f}%".format(f1 * 100))
 
 
-# check to see if the model should be saved to file
-if args["save_model"] > 0:
-    print("[INFO] dumping weights to file...")
-    model.save_weights(args["weights"], overwrite=True)
+    # check to see if the model should be saved to file
+    if args["save_model"] > 0:
+        print("[INFO] dumping weights to file...")
+        model.save_weights(args["weights"], overwrite=True)
 
-# Prediction at load mode
-if args["load_model"] > 0:
+elif args["load_model"] > 0:
     # randomly select a few testing digits
     # todo: fix tk in hpcc
     # _tkinter.TclError: couldn't connect to display ":0.0"
     # load
-    print('loading...', args["blobs_db"])
-    blobs = load_blobs_db(args["blobs_db"])
-    # unlabeled and uncertain to negative
-    print("set unlabeled and uncertain to negative for correct F1 calculation and popping up")
-    blobs[blobs[:, 3] == -1] = 0
-    blobs[blobs[:, 3] == -2] = 0
+    # print('loading...', args["blobs_db"])
+    # blobs = load_blobs_db(args["blobs_db"])
+    # # unlabeled and uncertain to negative
+    # print("set unlabeled and uncertain to negative for correct F1 calculation and popping up")
+    # blobs[blobs[:, 3] == -1] = 0
+    # blobs[blobs[:, 3] == -2] = 0
 
-    w = int(sqrt(blobs.shape[1] - 6) / 2)  # width of img
-    # parse
-    Images, Labels, Rs = parse_blobs(blobs)  # for human
-    # equalize
-    Images_ = np.array([equalize(image) for image in Images])
-    # scale down
-    Images_ = np.array([down_scale(image, scaling_factor=scaling_factor) for image in Images_])
-    w_ = int(w / scaling_factor)
-    Rs_ = Rs / scaling_factor * r_extension_ratio  # for machine
-    # mask
-    Images_ = np.array([mask_image(image, r=Rs_[ind]) for ind, image in enumerate(Images_)])
-    # reshape for model
-    Images_ = Images_.reshape((Images_.shape[0], 2 * w_, 2 * w_, 1))
+    # w = int(sqrt(blobs.shape[1] - 6) / 2)  # width of img
+    # # parse
+    # Images, Labels, Rs = parse_blobs(blobs)  # for human
+    # # equalize
+    # Images_ = np.array([equalize(image) for image in Images])
+    # # scale down
+    # Images_ = np.array([down_scale(image, scaling_factor=scaling_factor) for image in Images_])
+    # w_ = int(w / scaling_factor)
+    # Rs_ = Rs / scaling_factor * r_extension_ratio  # for machine
+    # # mask
+    # Images_ = np.array([mask_image(image, r=Rs_[ind]) for ind, image in enumerate(Images_)])
+    # # reshape for model
+    # Images_ = Images_.reshape((Images_.shape[0], 2 * w_, 2 * w_, 1))
 
+    Images_ = np.vstack((trainImages, valImages))
+    Images_ = valImages
+    Labels = valLabels
+
+    print("Images_.shape:", Images_.shape)
     # Predictions
     print('Making predictions...')
     probs = model.predict(Images_)

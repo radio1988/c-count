@@ -727,3 +727,29 @@ def F1_calculation(predictions, labels):
     print('Precition: {:.2f}%, Recall: {:.2f}%, F1: {:.2f}%'.format(precision*100, recall*100, F1*100))
 
     return F1
+
+
+def preprocessing_imgs(Images, Rs, Labels, scaling_factor):
+    # Downscale images (todo: downscale as the first step)
+    print("Downscaling images by ", scaling_factor)
+    Images = np.array([down_scale(image, scaling_factor=scaling_factor) for image in Images])
+    ## Downscale w and R
+    print('w after scaling:', w)
+    Rs = Rs/scaling_factor
+
+    # Equalize images (todo: test equalization -> scaling)
+    # todo: more channels (scaled + equalized + original)
+    print("Equalizing images...")
+    # todo:  Possible precision loss when converting from float64 to uint16
+    Images = np.array([equalize(image) for image in Images])
+
+    # Mask images
+    print("Masking images...")
+    Images = np.array([mask_image(image, r=Rs[ind]) for ind, image in enumerate(Images)])
+
+    # Normalizing images
+    print("Normalizing images...")
+    # todo:  Possible precision loss when converting from float64 to uint16
+    Images = np.array([normalize_img(image) for image in Images])
+
+    return Images, Rs, Labels, w
