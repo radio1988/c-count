@@ -54,8 +54,9 @@ r_ext_ratio = 1.4  # larger (1.4) for better view under augmentation
 r_ext_pixels = 30
 
 numClasses=2
-epochs = 50  # default 50
-patience = 5  # default 5
+batch_size=64
+epochs = 500  # default 50
+patience = 50  # default 5
 learning_rate = 0.0001  # default 0.0001 (Adam)
 verbose = 2  # {0, 1, 2}
 
@@ -69,8 +70,8 @@ if args["load_model"] < 0:
     print("removing unlabeled blobs")
     blobs = blobs[blobs[:, 3] >= 0, :]
     blobs_stat(blobs)
-    print("changing uncertain to negatives...")
-    blobs[blobs[:, 3] == -2, 3] = 0
+    print("Remove uncertains")
+    blobs = blobs[blobs[:, 3] >= -2, :]
     blobs_stat(blobs)
 
 
@@ -93,6 +94,7 @@ trainRs = trainRs * r_ext_ratio + r_ext_pixels
 valRs = valRs * r_ext_ratio + r_ext_pixels
 
 # Mixed Augmentation (todo: aug into more samples)
+## todo: contrast, exposure changes
 if args["load_model"] < 0:
     trainImages = augment_images(trainImages)  # todo: augment to more samples
     print("trainImagesAug:", trainImages.shape)
@@ -107,35 +109,41 @@ w = int(w/scaling_factor)
 trainRs = trainRs/scaling_factor
 valRs = valRs/scaling_factor
 
-# Equalize images (todo: test equalization -> scaling)
-# todo: more channels (scaled + equalized + original)
-print("Equalizing images...")
-# todo:  Possible precision loss when converting from float64 to uint16
-trainImages = np.array([equalize(image) for image in trainImages])
-valImages = np.array([equalize(image) for image in valImages])
+# # Equalize images (todo: test equalization -> scaling)
+# # todo: more channels (scaled + equalized + original)
+# print("Equalizing images...")
+# # todo:  Possible precision loss when converting from float64 to uint16
+# trainImages = np.array([equalize(image) for image in trainImages])
+# valImages = np.array([equalize(image) for image in valImages])
 
 # Mask images
 print("Masking images...")
 trainImages = np.array([mask_image(image, r=trainRs[ind]) for ind, image in enumerate(trainImages)])
 valImages = np.array([mask_image(image, r=valRs[ind]) for ind, image in enumerate(valImages)])
 
+# Normalizing images
+print("Normalizing images...")
+# todo:  Possible precision loss when converting from float64 to uint16
+trainImages = np.array([normalize_img(image) for image in trainImages])
+valImages = np.array([normalize_img(image) for image in valImages])
 
-# Show Images for model training
-for i in range(20):
-    fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=True, sharey=True)
-    ax = axes.ravel()
 
-    ax[0].set_title("Original contrast")
-    ax[0].imshow(trainImages[i], 'gray', clim=(0.0, 1.0))
-    c = plt.Circle((w - 1, w - 1), trainRs[i], color='yellow', linewidth=1, fill=False)
-    ax[0].add_patch(c)
+# # Show Images for model training
+# for i in range(20):
+#     fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=True, sharey=True)
+#     ax = axes.ravel()
 
-    ax[1].set_title('HDR')
-    ax[1].imshow(trainImages[i], 'gray')
-    c = plt.Circle((w - 1, w - 1), trainRs[i], color='yellow', linewidth=1, fill=False)
-    ax[1].add_patch(c)
-    print('save fig', i)
-    plt.savefig(str(i)+'.png')
+#     ax[0].set_title("Original contrast")
+#     ax[0].imshow(trainImages[i], 'gray', clim=(0.0, 1.0))
+#     c = plt.Circle((w - 1, w - 1), trainRs[i], color='yellow', linewidth=1, fill=False)
+#     ax[0].add_patch(c)
+
+#     ax[1].set_title('HDR')
+#     ax[1].imshow(trainImages[i], 'gray')
+#     c = plt.Circle((w - 1, w - 1), trainRs[i], color='yellow', linewidth=1, fill=False)
+#     ax[1].add_patch(c)
+#     print('save fig', i)
+#     plt.savefig(str(i)+'.png')
 
 # Reshape for model
 trainImages = trainImages.reshape((trainImages.shape[0], 2*w, 2*w, 1))
@@ -173,8 +181,8 @@ if args["load_model"] < 0:
     datagen = ImageDataGenerator(
         featurewise_std_normalization=False,
         rotation_range=90,
-        shear_range=0.1,
-        zoom_range=0.05,
+        shear_range=0.16,
+        zoom_range=0.1,
         width_shift_range=0.03, height_shift_range=0.03,
         horizontal_flip=True, vertical_flip=True
         #todo: blur focus
@@ -183,12 +191,12 @@ if args["load_model"] < 0:
     datagen.fit(trainImages)
 
     # model.fit(trainImages, trainLabels, validation_data=(valImagesMsk, valLabels),
-    #           batch_size=64, epochs=epochs,
+    #           batch_size=batch_size, epochs=epochs,
     #           verbose=verbose)
 
-    model.fit_generator(datagen.flow(trainImages, trainLabels, batch_size=64),
+    model.fit_generator(datagen.flow(trainImages, trainLabels, batch_size=batch_size),
                         validation_data=(valImages, valLabels),
-                        steps_per_epoch=len(trainImages) / 64, epochs=epochs,
+                        steps_per_epoch=len(trainImages) / batch_size, epochs=epochs,
                         callbacks=callbacks_list,
                         verbose=verbose)
 
@@ -196,12 +204,12 @@ if args["load_model"] < 0:
 # Evaluation of the model
 print("[INFO] evaluating...")
 (loss, f1) = model.evaluate(trainImages, trainLabels,
-                                  batch_size=64, verbose=verbose)
+                                  batch_size=batch_size, verbose=verbose)
 print("[INFO] training F1: {:.2f}%".format(f1 * 100))
 
 print("[INFO] evaluating...")
 (loss,  f1) = model.evaluate(valImages, valLabels,
-                                  batch_size=64, verbose=verbose)
+                                  batch_size=batch_size, verbose=verbose)
 print("[INFO] validation F1: {:.2f}%".format(f1 * 100))
 
 
