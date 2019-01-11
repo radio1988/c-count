@@ -55,7 +55,7 @@ training_ratio = 0.7  # proportion of data to be in training set
 r_ext_ratio = 1.4  # larger (1.4) for better view under augmentation
 r_ext_pixels = 30
 
-numClasses=3
+numClasses=2
 batch_size=64
 epochs = 500  # default 50
 patience = 10  # default 5
@@ -72,9 +72,12 @@ if args["load_model"] <= 0:
     print("removing unlabeled blobs (only in training mode)")
     blobs = blobs[blobs[:, 3] != -1, :]
     blobs_stat(blobs)
-    # print("Remove uncertains")
-    # blobs = blobs[blobs[:, 3] >= -2, :]
-    # blobs_stat(blobs)
+
+# if numClasses == 2:
+#     print("Remove uncertains")
+#     blobs = blobs[blobs[:, 3] != -2, :]
+#     blobs_stat(blobs)
+
 
 
 # Split train/valid
@@ -258,9 +261,12 @@ elif args["load_model"] > 0:
     # # reshape for model
     # Images_ = Images_.reshape((Images_.shape[0], 2 * w_, 2 * w_, 1))
 
-    Images_ = np.vstack((trainImages, valImages))
-    Images_ = valImages
-    Labels = valLabels
+    Images = np.vstack((trainImages, valImages))
+    Images_ = Images
+    Labels = np.concatenate((trainLabels, valLabels))
+    Labels_ = Labels
+    Rs = np.concatenate((trainRs, valRs))
+    Rs_ = Rs
 
     print("Images_.shape:", Images_.shape)
     # Predictions
@@ -275,7 +281,7 @@ elif args["load_model"] > 0:
 
 
     wrong_idx = [i for i, x in enumerate(predictions) if (int(predictions[i]) - int(Labels[i])) != 0]
-    print("Predictions: mean: {}, count_yes: {}, count_blobs: {};".format(
+    print("Predictions: mean: {}, count_yes: {} / {};".format(
         np.mean(predictions), np.sum(predictions), len(predictions)))
     print("Wrong predictions: {}".format(len(wrong_idx)))
 
@@ -289,49 +295,37 @@ elif args["load_model"] > 0:
     import os
     os.system('gzip ' + args['blobs_db']+'.pred.npy')
 
-    # Visualizing random predictions
-    print('Showing wrong samples from', args['blobs_db'])
-    for j in range(len(wrong_idx)):
-        i = wrong_idx[j]  # only show samples predicted to be positive
+    # # Visualizing random predictions
+    # print('Showing samples from', args['blobs_db'])
+    # for j in range(len(wrong_idx)):
+    #     i = wrong_idx[j]  # only show samples predicted to be positive
+        
+    #     image = Images_[i]
+    #     image_ = Images_[i]
+    #     prediction = predictions[i]
+    #     label = int(Labels[i])
+    #     r = Rs[i]
+    #     r_ = Rs_[i]  # todo: fix r at the blob detection stage and don't extend r after wards
 
-        image = Images[i]
-        image_ = Images_[i]
-        prediction = predictions[i]
-        label = int(Labels[i])
-        r = Rs[i]
-        r_ = Rs_[i]  # todo: fix r at the blob detection stage and don't extend r after wards
+    #     image = np.reshape(image, image.shape[0:2])
+    #     image_ = np.reshape(image_, image_.shape[0:2])
 
-        image = np.reshape(image, image.shape[0:2])
-        image_ = np.reshape(image_, image_.shape[0:2])
+    #     print("[INFO] Predicted: {}, Label: {}".format(prediction, label))
 
-        print("[INFO] Predicted: {}, Label: {}".format(prediction, label))
+    #     # image = (Images[i] * 255).astype("uint8")
+    #     # image_ = (Images_[i] * 255).astype("uint8")
 
-        # image = (Images[i] * 255).astype("uint8")
-        # image_ = (Images_[i] * 255).astype("uint8")
+    #     # visualize original and masked/euqalized blobs
+    #     fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=False, sharey=False)
+    #     ax = axes.ravel()
+    #     ax[0].set_title('Pred:{} Label:{}\nradius:{}'.\
+    #                     format(int(prediction), int(label), r))
+    #     ax[0].imshow(image, 'gray')
+    #     c = plt.Circle((w - 1, w - 1), r, color='yellow', linewidth=1, fill=False)
+    #     ax[0].add_patch(c)
+    #     ax[1].set_title('Pred:{} Label:{}\nradius:{}'.\
+    #                     format(int(prediction), int(label), int(r_)))
+    #     ax[1].imshow(image_, 'gray')
+    #     plt.tight_layout()
+    #     plt.show()
 
-        # visualize original and masked/euqalized blobs
-        fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=False, sharey=False)
-        ax = axes.ravel()
-        ax[0].set_title('For human\nPred:{} Label:{}\nradius:{}'.\
-                        format(int(prediction), int(label), r))
-        ax[0].imshow(image, 'gray')
-        c = plt.Circle((w - 1, w - 1), r, color='yellow', linewidth=1, fill=False)
-        ax[0].add_patch(c)
-        ax[1].set_title('For machine\nPred:{} Label:{}\nradius:{}'.\
-                        format(int(prediction), int(label), int(r_)))
-        ax[1].imshow(image_, 'gray')
-        plt.tight_layout()
-        plt.show()
-
-        # x = input("keep poping images until the input is e\n")
-        # if x == 'e':
-        #     break
-
-        # out_png = 'valImage.' + args["blobs_db"] + str(i) + \
-        # '.label_' + str(Labels[i]) + '.pred_' + str(prediction[0]) + '.png'
-        # plt.savefig(out_png, dpi=150)
-        # todo: add feedback to mark wrong classifications for improvement
-        # todo: add precision and recall
-        # todo: add test set for finding best parameters
-
-    # todo: prediction for other db (npy)
