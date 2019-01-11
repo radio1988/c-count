@@ -48,6 +48,8 @@ args = vars(ap.parse_args())
 # Parameters
 scaling_factor = 2  # input scale down for model training
 
+aug_sample_size = 4000
+
 training_ratio = 0.7  # proportion of data to be in training set
 
 r_ext_ratio = 1.4  # larger (1.4) for better view under augmentation
@@ -96,9 +98,21 @@ valRs = valRs * r_ext_ratio + r_ext_pixels
 # Mixed Augmentation (todo: aug into more samples)
 ## todo: contrast, exposure changes
 if args["load_model"] < 0:
-    trainImages = augment_images(trainImages)  # todo: augment to more samples
-    print("trainImagesAug:", trainImages.shape)
+    print("Before Aug:", trainImages.shape, trainRs.shape, trainLabels.shape)
+    trainImages = augment_images(trainImages, aug_sample_size)  # todo: augment to more samples
+
+    ## match sample size of labels and Rs with augmented images
+    while trainRs.shape[0] < aug_sample_size:
+        trainRs = np.concatenate((trainRs, trainRs))
+        trainLabels = np.concatenate((trainLabels, trainLabels))
+
+    trainRs = trainRs[0:aug_sample_size]
+    trainLabels = trainLabels[0:aug_sample_size]
+    #todo: randomize again
+
+    print("After Aug:", trainImages.shape, trainRs.shape, trainLabels.shape)
     print('max data', np.max(trainImages), 'min', np.min(trainImages))
+
 
 # Downscale images
 print("Downscaling images by ", scaling_factor)
@@ -109,12 +123,12 @@ w = int(w/scaling_factor)
 trainRs = trainRs/scaling_factor
 valRs = valRs/scaling_factor
 
-# # Equalize images (todo: test equalization -> scaling)
-# # todo: more channels (scaled + equalized + original)
-# print("Equalizing images...")
-# # todo:  Possible precision loss when converting from float64 to uint16
-# trainImages = np.array([equalize(image) for image in trainImages])
-# valImages = np.array([equalize(image) for image in valImages])
+# Equalize images (todo: test equalization -> scaling)
+# todo: more channels (scaled + equalized + original)
+print("Equalizing images...")
+# todo:  Possible precision loss when converting from float64 to uint16
+trainImages = np.array([equalize(image) for image in trainImages])
+valImages = np.array([equalize(image) for image in valImages])
 
 # Mask images
 print("Masking images...")

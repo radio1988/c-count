@@ -630,7 +630,7 @@ def parse_blobs(blobs):
     return Images, Labels, Rs
 
 
-def augment_images(Images):
+def augment_images(Images, aug_sample_size):
     '''
     Input images (n_samples, 2*w, 2*w)
     Process: Augmentation; Normalization back to [0, 1]
@@ -652,8 +652,8 @@ def augment_images(Images):
             iaa.Flipud(0.5), # vertically flip 20% of all images
             sometimes(iaa.Affine(
                 # todo: more strict; no scaling down
-                scale={"x": (0.9, 1.2), "y": (0.9, 1.2)}, # scale images to 80-120% of their size, individually per axis
-                translate_percent={"x": (-0.03, 0.03), "y": (-0.03, 0.03)}, # translate by -20 to +20 percent (per axis)
+                scale={"x": (0.9, 1.1), "y": (0.9, 1.1)},
+                translate_percent={"x": (-0.03, 0.03), "y": (-0.03, 0.03)},
                 rotate=(-90, 90), # rotate by -45 to +45 degrees
                 shear=(-16, 16), # shear by -16 to +16 degrees
                 order=[0, 1], # use nearest neighbour or bilinear interpolation (fast)
@@ -664,7 +664,13 @@ def augment_images(Images):
         random_order=True
     )
 
-    Images = seq.augment_images(Images)
+    Images_ = seq.augment_images(Images)
+    while Images_.shape[0] < aug_sample_size:
+        _ = seq.augment_images(Images)
+        Images_ = np.vstack((Images_, _))
+    Images = Images_[0:aug_sample_size, :]
+    print('now there are ', Images.shape, 'images after aug')
+
     Images = Images.reshape(len(Images), w2, w2)  # formatting back
     Images = np.array([normalize_img(image) for image in Images])
     return Images
