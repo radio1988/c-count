@@ -434,7 +434,7 @@ def pop_label_flat_crops(flat_crops, random=True, seed=1, skip_labeled=True):
         plot_flat_crop(flat_crops[idx[i], :])
 
         label = input('''labeling for the {}/{} unlabeled blob, 
-yes=1, no=0, undistinguishable=3, skip=s, go-back=b, excape=e: '''.format(i + 1, num_unlabeled))
+yes=1, no=0, undistinguishable=3, skip=s, go-back=b, excape(pause)=e: '''.format(i + 1, num_unlabeled))
 
         if label == '1':
             flat_crops[idx[i], 3] = 1  # yes
