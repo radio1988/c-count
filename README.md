@@ -10,13 +10,19 @@
 
 
 # Usage
-- copy ccount.py and the code into the working dir
+## Labeling
+- copy ccount.py and labeling.ipynb into the working dir, alone with a xxx.npy.gz file containing the detected blobs
 - source activate py35
+- jupyter-notebook
+- open labeling.ipynb and work from there
+
+
+
+## Usage Notes
 - start jupyter-notebook and work from there (blob_detection, filter_merge, labeling)
 - work from termial (classification)
 
-
-
+# Workflow
 1. blob_detection
 2. filter_merge
 3. labeling
