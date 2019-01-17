@@ -6,7 +6,7 @@
 - install anoconda
 - install jupyter-notebook
 - install packages
-    - `pip install czifile scikit-image`
+    - `pip install czifile scikit-image keras tensorflow pandas numpy matplotlib imgaug`
 
 
 # Usage
