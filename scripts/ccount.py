@@ -36,9 +36,9 @@ def read_czi(fname):
 
     elif fname.endswith('czi.gz'):
         raise Exception("todo")
-        with gzip.open(fname, 'rb') as f:
-            with CziFile(f) as czi:
-                image_arrays = czi.asarray()
+        # with gzip.open(fname, 'rb') as f:
+        #     with CziFile(f) as czi:
+        #         image_arrays = czi.asarray()
 
     else:
         raise Exception("input czi/czi.gz file type error\n")
@@ -56,6 +56,8 @@ def equalize(image):
     Contrast Limited Adaptive Histogram Equalization (CLAHE).
     An algorithm for local contrast enhancement, that uses histograms computed over different tile regions of the image. Local details can therefore be enhanced even in regions that are darker or lighter than most of the image.
     '''
+    import warnings
+    warnings.filterwarnings("ignore")
     return exposure.equalize_adapthist(image, clip_limit=0.03)
 
 
@@ -494,8 +496,45 @@ def load_blobs_db(in_db_name):
     return image_flat_crops
 
 
+def area_calculation(img, r, plotting=False):
+    from skimage import io, filters
+    from scipy import ndimage
+    import matplotlib.pyplot as plt
+    
+    # automatic thresholding method such as Otsu's (avaible in scikit-image)
+    img = equalize(img)  # no use
+    img = normalize_img(img)  # bad
+    # val = filters.threshold_otsu(img)
+    val = filters.threshold_yen(img)
+    # val = filters.threshold_li(img)
+
+    drops = ndimage.binary_fill_holes(img < val)  # cells as 1 (white), bg as 0
+    
+    # create mask 
+    w = int(img.shape[0]/2)
+    mask = np.zeros((2 * w, 2 * w))  # zeros are masked to be black
+    rr, cc = circle(w - 1, w - 1, min(r, w - 1))
+    mask[rr, cc] = 1  # 1 is white
+    
+    # apply mask on binary image
+    drops = abs(drops * mask)
+    
+    if (plotting):
+        plt.subplot(1, 2, 1)
+        plt.imshow(img, 'gray', clim=(0, 1))
+        plt.subplot(1, 2, 2)
+        plt.imshow(drops, cmap='gray')
+        plt.show()
+#         plt.hist(drops.flatten())
+#         plt.show()
+        print('intensity cut-off is', round(val, 3), '; pixcel count is %d' %(int(drops.sum())))
+    
+    return int(drops.sum())
+
+
 def show_rand_crops(crops, label_filter="na", num_shown=5, 
-    blob_extention_ratio=1, blob_extention_radius=0):
+    blob_extention_ratio=1, blob_extention_radius=0, 
+    plot_area=False):
     '''
     blobs: the blobs crops
     label_filter: 0, 1, -1; "na" means no filter
@@ -509,8 +548,17 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
         randidx = np.random.choice(range(len(crops)), num_shown, replace=False)
         plot_flat_crops(crops[randidx, :], 
             blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
+
+        if (plot_area):
+            Images, Labels, Rs = parse_blobs(crops[randidx, :])
+            [area_calculation(image, r=Rs[ind], plotting=True) for ind, image in enumerate(Images)]
+
     elif (len(crops) > 0):
         plot_flat_crops(crops)
+
+        if (plot_area):
+            Images, Labels, Rs = parse_blobs(crops)
+            [area_calculation(image, r=Rs[ind], plotting=True) for ind, image in enumerate(Images)]
     else:
         print('num_blobs after filtering is 0')
 
