@@ -3,29 +3,26 @@
 # Description
 
 # Installation
-- install anoconda
-- install jupyter-notebook
-- install packages
-    - `pip install czifile scikit-image keras tensorflow pandas numpy matplotlib imgaug`
+- install anoconda (with jupyter-notebook installed)
+- `conda create -n py35 python=3.5 anaconda`
+- `source activate py35`
+- `pip install czifile scikit-image imgaug opencv-python    tensorflow keras    cmake MulticoreTSNE`
 
 
 # Usage
+## Labeling
+- copy ccount.py and labeling.ipynb into the working dir, alone with a xxx.npy.gz file containing the detected blobs
+- source activate py35
+- jupyter-notebook
+- open labeling.ipynb and work from there
+
+
+## Usage Notes
+- start jupyter-notebook and work from there (blob_detection, filter_merge, labeling)
+- work from terminal (classification)
+
+# Workflow
 1. blob_detection
 2. filter_merge
 3. labeling
 4. classification
-
-
-
-# Todo:
-## Block Edge blobs
-- Blob detector detects false positives around edges when blocks are merged
-    - seperate blocks and discard edge blobs can solve this
-    - adjusting blob_detector parameters can't, discards true positives
-- To rescue edge blobs, and avoid double counting, need to remove blobs that overlaps, but it's a pain
-- need to use branches in github to save the current progress on whole image processing
-
-## Speed
-- scaled version for detection, original for cropping blobs
-- 
-

@@ -260,7 +260,7 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0):
     # hard mask creating training data
     # hard_masked = mask_image(equalized, r=r_)
 
-    fig, axes = plt.subplots(1, 3, figsize=(8, 24), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(8, 24), sharex=False, sharey=False)
     ax = axes.ravel()
     ## Auto Contrast For labeler
     ax[0].set_title('For Labeling\ncurrent label:{},    r:{}'.format(int(label), r))
