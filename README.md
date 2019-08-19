@@ -4,9 +4,13 @@
 
 # Installation
 - install anoconda (with jupyter-notebook installed)
-- `conda create -n py35 python=3.5 anaconda`
-- `source activate py35`
-- `pip install czifile scikit-image imgaug opencv-python    tensorflow keras    cmake MulticoreTSNE`
+- `conda create -n py36 python=3.6 anaconda`
+- `source activate py36`
+- `conda update -y -n base -c defaults conda`
+- `conda install -y -c conda-forge imgaug opencv scikit-image jupyter `
+- `conda install -c anaconda -y tensorflow keras opencv cmake`
+- `pip install czifile`
+- `git clone https://github.com/DmitryUlyanov/Multicore-TSNE.git; cd Multicore-TSNE/; pip install .`
 
 
 # Usage
