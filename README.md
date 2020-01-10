@@ -8,8 +8,8 @@
 - `source activate py36`
 - `conda update -y -n base -c defaults conda`
 - `conda install -y -c conda-forge imgaug opencv scikit-image jupyter `
-- `conda install -c anaconda -y tensorflow keras opencv cmake`
-- `pip install czifile opencv-python sklearn`
+- `conda install -c anaconda -y tensorflow keras opencv cmake scikit-learn`
+- `pip install czifile opencv-python #sklearn`
 - `git clone https://github.com/DmitryUlyanov/Multicore-TSNE.git; cd Multicore-TSNE/; pip install .`
 
 
