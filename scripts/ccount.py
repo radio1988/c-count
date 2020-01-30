@@ -16,14 +16,17 @@ import pandas as pd
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+import cv2
 import os.path
 import re
 import time
 
+
 import imgaug as ia
 from imgaug import augmenters as iaa
 
-def read_czi(fname):
+
+def read_czi(fname, format="2018"):
     '''
     input: fname of czi file
     output: 2d numpy array
@@ -43,10 +46,47 @@ def read_czi(fname):
     else:
         raise Exception("input czi/czi.gz file type error\n")
 
-    image = image_arrays[0, 1, 0, 0, :, :, 0]  # real image
-    print("{}: {}\n".format(fname, image.shape))
+    if format == "2018":
+        image = image_arrays[0, 1, 0, 0, :, :, 0]  # real image
+        print("{}: {}\n".format(fname, image.shape))
+    elif format == "2019":
+        # summing four black included images takes ~64G of RAM
+        # scaling down by 1/4 takes ~14GB
+        # trimming black regions takes 
+        [_, _, dim0, dim1, _] = image_arrays.shape
+        
+        # stitched image cropping parameters
+        # Rows
+        row_step = int(dim0/6.3*1)
+        begin1 = 0
+        begin2 = begin1 + row_step
+        mid1 = int(dim0/6.3*2.5)
+        mid2 = mid1 + row_step
+        end1 = dim0 - row_step
+        end2 = dim0
+        # Columns
+        col_step = int(dim1/5.9*1.2)
+        Begin1 = 0
+        Begin2 = Begin1 + col_step
+        Mid1 = int(dim1/5.9*2.4)
+        Mid2 = Mid1 + col_step
+        End1 = dim1 - col_step
+        End2 = dim1
+        
+        # todo: control size to put together?
+        image0 = image_arrays[0, 0, begin1:begin2,  Mid1:Mid2, 0]
+        image1 = image_arrays[1, 0, mid1:mid2,  Begin1:Begin2, 0]
+        image2 = image_arrays[2, 0, mid1:mid2,  End1:End2, 0]
+        image3 = image_arrays[3, 0, end1:end2,  Mid1:Mid2, 0]
+        
+        print("shape of each image:", image0.shape, image1.shape, image2.shape, image3.shape)
+        
+        image_top = np.concatenate((image0, image1), axis = 1)
+        image_bottom = np.concatenate((image2, image3), axis = 1)
+        image = np.concatenate((image_top, image_bottom), axis = 0)
+        print("shape of whole picture {}: {}\n".format(fname, image.shape))
 
-    return image
+    return image # test, should be image, not image0
 
 
 def equalize(image):
@@ -58,7 +98,8 @@ def equalize(image):
     '''
     import warnings
     warnings.filterwarnings("ignore")
-    return exposure.equalize_adapthist(image, clip_limit=0.03)
+    #print("Equalizing img of size:", image.shape)
+    return exposure.equalize_adapthist(image, clip_limit=0.01)  # Aug, 2019, cleaner image than 0.03
 
 
 def down_scale(img, scaling_factor=2):
@@ -123,28 +164,39 @@ def find_blob(image_bright_blob_on_dark, scaling_factor = 2,
 
 
 def vis_blob_on_block(blobs, block_img_equ, block_img_ori, 
-    blob_extention_ratio=1.4, blob_extention_radius=2):
+    blob_extention_ratio=1.4, blob_extention_radius=2, scaling = 8):
     '''
     blobs: blob info array [n, 3]
     block_img_equ: corresponding block_img equalized
     block_img_ori: block_img before equalization
     plot: plot block_img with blobs in yellow circles
     '''
+    print('scaling of visualization is ', scaling)
+    blobs = blobs/scaling
+    block_img_equ = down_scale(block_img_equ, scaling)
+    block_img_ori = down_scale(block_img_ori, scaling)
+    
 
-    fig, axes = plt.subplots(2, 1, figsize=(60, 30), sharex=True, sharey=True)
+    fig, axes = plt.subplots(2, 1, figsize=(40, 20), sharex=True, sharey=True)
     ax = axes.ravel()
 
-    ax[0].set_title('Blobs detected')
+    ax[0].set_title('Equalized Image')
     ax[0].imshow(block_img_equ, 'gray', interpolation='nearest', clim=(0.0, 1.0))
     for blob in blobs:
         y, x, r = blob
-        c = plt.Circle((x, y), r * blob_extention_ratio + blob_extention_radius, color='yellow', linewidth=1,
+        c = plt.Circle((x, y), r * blob_extention_ratio + blob_extention_radius, color=(0.9, 0.9, 0, 0.5), linewidth=1,
                        fill=False)  # r*1.3 to get whole blob
         ax[0].add_patch(c)
     # ax[0].set_axis_off()
 
-    ax[1].set_title("Input")
-    ax[1].imshow(block_img_ori, 'gray', clim=(0.0, 1.0))
+    ax[1].set_title("Original Image")
+    ax[1].imshow(block_img_ori, 'gray', interpolation='nearest', clim=(0.0, 1.0))
+    for blob in blobs:
+        y, x, r = blob
+        d = plt.Circle((x, y), r * blob_extention_ratio + blob_extention_radius, color=(0.9, 0.9, 0, 0.5), linewidth=1,
+                       fill=False)  # r*1.3 to get whole blob
+        ax[1].add_patch(d)
+    # ax[0].set_axis_off()
 
     plt.tight_layout()
     plt.show()
@@ -175,7 +227,14 @@ def filter_blobs(blobs, r_min, r_max):
     '''
     flitered_blobs = blobs[blobs[:, 2] >= r_min,]
     flitered_blobs = flitered_blobs[flitered_blobs[:, 2] < r_max,]
+    print("Filtered blobs:", len(flitered_blobs))
     return flitered_blobs
+
+def flat_label_filter(flats, label_filter = 1):
+    if (label_filter != 'na'):
+        filtered_idx = flats[:, 3] == label_filter
+        flats = flats[filtered_idx, :]
+    return (flats)
 
 
 def crop_blobs(blobs, block_img, block_row=-1, block_column=-1, crop_width=100,
@@ -238,6 +297,13 @@ def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
     return hard_masked
 
 
+def reshape_img_from_flat(flat_crop):
+    flat = flat_crop[6:]
+    w = int(sqrt(len(flat)) / 2)
+    image = np.reshape(flat, (w + w, w + w))
+    return image
+
+
 def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0):
     '''
     input: one padded crop of a blob
@@ -252,7 +318,7 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0):
     flat = flat_crop[6:]
     w = int(sqrt(len(flat)) / 2)
     image = np.reshape(flat, (w + w, w + w))
-    print(round(np.max(image), 3))
+    #print("max_pixel value:", round(np.max(image), 3))
 
     # Equalized
     equalized = equalize(image)
@@ -265,19 +331,19 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0):
     ## Auto Contrast For labeler
     ax[0].set_title('For Labeling\ncurrent label:{},    r:{}'.format(int(label), r))
     ax[0].imshow(image, 'gray')
-    c = plt.Circle((w - 1, w - 1), r_, color='yellow', linewidth=1, fill=False)
+    c = plt.Circle((w - 1, w - 1), r_, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
     ax[0].add_patch(c)
 
     ## Original for QC
     ax[1].set_title('Native Contrast\n')
     ax[1].imshow(image, 'gray', clim=(0.0, 1.0))
-    c = plt.Circle((w - 1, w - 1), r_, color='yellow', linewidth=1, fill=False)
+    c = plt.Circle((w - 1, w - 1), r_, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
     ax[1].add_patch(c)
 
     ## Equalized for QC
     ax[2].set_title('Equalized\n')
     ax[2].imshow(equalized, 'gray', clim=(0.0, 1.0))
-    c = plt.Circle((w - 1, w - 1), r_, color='yellow', linewidth=1, fill=False)
+    c = plt.Circle((w - 1, w - 1), r_, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
     ax[2].add_patch(c)
     plt.tight_layout()
     plt.show()
@@ -369,11 +435,42 @@ def block_equalize(image, block_height=2048, block_width=2048):
             # get each block
             left = c * block_width
             right = (c + 1) * block_width
-            # equalization (good for blob detection, not nessessarily good for classifier) (todo)
-            image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
-            # print('block row:', r, '; column:', c, '; bottom-right pixcel:', bottom, right)              
+            if bottom - top < 10 or right - left < 10:
+                image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
+            else:
+                image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
             c += 1
+        
+        # For right most columns
+        left = c * block_width
+        right = image.shape[1]
+        if bottom - top < 10 or right - left < 10:
+            image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
+        else:
+            image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
+        
         r += 1
+    
+    # For bottom row
+    top = r * block_height
+    bottom = image.shape[0]
+    c = 0
+    while (c + 1) * block_width <= image.shape[1]:
+        # get each block
+        left = c * block_width
+        right = (c + 1) * block_width
+        if bottom - top < 10 or right - left < 10:
+            image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
+        else:
+            image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
+        c += 1
+
+    left = c * block_width
+    right = image.shape[1]
+    if bottom - top < 10 or right - left < 10:
+        image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
+    else:
+        image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
 
     return image_equ
 
@@ -385,18 +482,29 @@ def find_blobs_and_crop(image, image_equ,
     blob_extention_ratio=1.4, blob_extention_radius=2,
     ):
     '''
+    detect with image_equ
+    return blobs with image
     '''
+    print("scaling factor for findinb_blobs is ", scaling_factor)
+    
     image_flat_crops = np.empty((0, int(6 + 2 * crop_width * 2 * crop_width)))
 
+    print("Finding blobs")
     blobs = find_blob(
         (1 - image_equ), scaling_factor=scaling_factor,
-        max_sigma=max_sigma, min_sigma=min_sigma, num_sigma=num_sigma, threshold=threshold, overlap=overlap
+        max_sigma=max_sigma, min_sigma=min_sigma, 
+        num_sigma=num_sigma, threshold=threshold, overlap=overlap
     )  # reverse color, get bright blobs
+    
+    print(blobs.shape, "detected")
 
+    print("Visualizing blobs")
     vis_blob_on_block(blobs, image_equ, image, 
-        blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
+        blob_extention_ratio=blob_extention_ratio, 
+        blob_extention_radius=blob_extention_radius)
 
     # create crop from blob
+    print("Creating crops from blobs")
     image_flat_crops = crop_blobs(blobs, image, crop_width=crop_width) # image before
     print("{} image_flat_crops".format(len(image_flat_crops)))
 
@@ -496,6 +604,49 @@ def load_blobs_db(in_db_name):
     return image_flat_crops
 
 
+def remove_edge_crops(flat_blobs):
+    """
+    some crops of blobs contain edges, because they are from the edge of scanned areas or on the edge of the well
+    use this function to remove blobs with obvious long straight black/white lines
+    """
+    good_flats = []
+    for i in range(0, flat_blobs.shape[0]):
+        flat = flat_blobs[i,]
+        crop = reshape_img_from_flat(flat)
+        crop = crop * 255
+        crop = crop.astype(np.uint8)
+    
+        crop = cv2.blur(crop,(4,4))
+    
+        edges = cv2.Canny(crop,50,150,apertureSize = 3)
+
+        minLineLength = 40
+        maxLineGap = 10
+        lines = cv2.HoughLinesP(edges,1,np.pi/180,50,minLineLength,maxLineGap)
+    
+        if lines is not None: # has lines
+            pass
+#             print(lines.shape)
+#             for i in range(0, lines.shape[0]):
+#                 for x1,y1,x2,y2 in lines[i]:
+#                     cv2.line(edges,(x1,y1),(x2,y2),(255,255,0, 0.8),6)
+#             plt.title("Bad")
+#             plt.imshow(crop)
+#             plt.show()
+        else: # no lines
+            good_flats.append(flat)
+#             plt.title(str(i))
+#             plt.imshow(crop, 'gray')
+#             plt.show()
+    #         plt.imshow(edges, "gray")
+    #         plt.title(str(i))
+    #         plt.show()
+    #         print("Good")
+    
+    good_flats = np.stack(good_flats)
+    return (good_flats)
+
+
 def area_calculation(img, r, plotting=False):
     from skimage import io, filters
     from scipy import ndimage
@@ -532,6 +683,14 @@ def area_calculation(img, r, plotting=False):
     return int(drops.sum())
 
 
+def sample_crops(crops, proportion, seed):
+    np.random.seed(seed)
+    crops = np.random.permutation(crops)
+    sample = crops[range(int(len(crops)*proportion)), :]
+    print(len(sample), "samples taken")
+    return sample
+    
+
 def show_rand_crops(crops, label_filter="na", num_shown=5, 
     blob_extention_ratio=1, blob_extention_radius=0, 
     plot_area=False):
@@ -561,6 +720,8 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
             [area_calculation(image, r=Rs[ind], plotting=True) for ind, image in enumerate(Images)]
     else:
         print('num_blobs after filtering is 0')
+        
+    return (crops)
 
 # TEST SCALING and Equalization
 # i = 0; j = 0; l = 2048
@@ -636,9 +797,12 @@ def balancing_by_removing_no(blobs):
     return blobs
 
 
-def balancing_by_duplicating_yes(blobs):
+def balancing_by_duplicating(blobs):
     '''
-    balance yes/no ratio to 1, by duplicating lacked Yes blobs
+    balance yes/no ratio to 1, by duplicating blobs in the under-represented group
+    only yes/no considered
+    undistinguishable not altered
+    result randomized to avoid problems in training
     :return: balanced blobs (with less samples)
     '''
     print('Before balancing:')
@@ -722,7 +886,7 @@ def augment_images(Images, aug_sample_size):
         _ = seq.augment_images(Images)
         Images_ = np.vstack((Images_, _))
     Images = Images_[0:aug_sample_size, :]
-    print('now there are ', Images.shape, 'images after aug')
+    print('shape:', Images.shape, 'after augment_images')
 
     Images = Images.reshape(len(Images), w2, w2)  # formatting back
     Images = np.array([normalize_img(image) for image in Images])
@@ -758,12 +922,18 @@ def F1(y_pred, y_true):
     precision = precision(y_true, y_pred)
     recall = recall(y_true, y_pred)
     f1 = 2*((precision*recall)/(precision+recall+K.epsilon()))
-    return recall
+    return f1
 
 def f1_score(precision, recall):
     return 2*(precision*recall/(precision+recall+1e-07))
 
 def F1_calculation(predictions, labels):
+    print("F1_calculation for sure labels only")
+    idx = (labels == 1) | (labels == 0)  # sure only
+    labels = labels[idx, ]
+    predictions = predictions[idx, ]
+
+
     TP = np.sum(np.round(predictions * labels))
     PP = np.sum(np.round(labels))
     recall = TP / (PP + 1e-7)
@@ -805,8 +975,8 @@ def preprocessing_imgs(Images, Rs, Labels, scaling_factor):
 
 
 from sklearn.decomposition import PCA
-# from sklearn.manifold import TSNE  # single core
-from MulticoreTSNE import MulticoreTSNE as TSNE  # MCORE
+from sklearn.manifold import TSNE  # single core
+#from MulticoreTSNE import MulticoreTSNE as TSNE  # MCORE
 
 def cluster_scatterplot(df2d, labels, title):
     '''
@@ -888,17 +1058,17 @@ def pca_tsne(df_gene_col, cluster_info=None, title='data', dir='plots',
     df_pc_ = df_pc_df.reindex(colors.index)  # only plot labeled data?
     cluster_scatterplot(df_pc_, colors.values.astype(str), title=title + ' (PCA)')
 
-    # tSNE
-    print('MCORE-TSNE, with ', ncores, ' cores')
-    df_tsne = TSNE(n_components=num_tsne, n_jobs=ncores).fit_transform(df_pc_)
-    print('tsne done')
-    df_tsne_df = pd.DataFrame(data=df_tsne, index=df_pc_.index)
-    print('wait to output tsne')
-    df_tsne_df.to_csv(title + '.tsne.csv')
-    print('wrote tsne to output')
-    cluster_scatterplot(df_tsne_df, colors.values.astype(str), title=title + ' ('
-                                                                             't-SNE)')
+#     # tSNE
+#     print('MCORE-TSNE, with ', ncores, ' cores')
+#     df_tsne = TSNE(n_components=num_tsne, n_jobs=ncores).fit_transform(df_pc_)
+#     print('tsne done')
+#     df_tsne_df = pd.DataFrame(data=df_tsne, index=df_pc_.index)
+#     print('wait to output tsne')
+#     df_tsne_df.to_csv(title + '.tsne.csv')
+#     print('wrote tsne to output')
+#     cluster_scatterplot(df_tsne_df, colors.values.astype(str), title=title + ' ('
+#                                                                              't-SNE)')
     toc = time.time()
-    print('PCA and tSNE took {:.1f} seconds\n'.format(toc - tic))
+    print('took {:.1f} seconds\n'.format(toc - tic))
 
-    return df_tsne_df
+    return df_pc_df
