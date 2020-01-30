@@ -12,11 +12,14 @@
 - `pip install czifile opencv-python #sklearn`
 - `git clone https://github.com/DmitryUlyanov/Multicore-TSNE.git; cd Multicore-TSNE/; pip install .`
 
+# 2020 install
+conda install tensorflow keras scikit-image czifile  runipy imgaug
+
 
 # Usage
 ## Labeling
 - copy ccount.py and labeling.ipynb into the working dir, alone with a xxx.npy.gz file containing the detected blobs
-- source activate py35
+- source activate py36/tf
 - jupyter-notebook
 - open labeling.ipynb and work from there
 
