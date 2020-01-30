@@ -10,9 +10,10 @@ from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
 from collections import Counter
 
-import numpy as np
-import argparse
 import sys
+import os
+import argparse
+import numpy as np
 import keras
 
 import matplotlib.pyplot as plt  # tk not on hpcc
@@ -35,20 +36,27 @@ print('cmd:', sys.argv)
 ap = argparse.ArgumentParser()
 ap.add_argument("-db", "--blobs-db", type=str,
                 help="path to blobs-db file, e.g. xxx.labeled.npy.gz")
-ap.add_argument("-s", "--save-model", type=int, default=-1,
+ap.add_argument("-s", "--save-model", type=int, default=0,
                 help="(optional) whether or not model should be saved to disk")
-ap.add_argument("-l", "--load-model", type=int, default=-1,
+ap.add_argument("-l", "--load-model", type=int, default=0,
                 help="(optional) whether or not pre-trained model should be loaded")
 ap.add_argument("-w", "--weights", type=str,
                 help="(optional) path to weights file")
+ap.add_argument("-u", "--undistinguishable", type=str, default="delete",
+                help="(optional) treat undistinguishable by delete/convert_to_yes/convert_to_no")
+ap.add_argument("-e", "--epochs", type=int, default=500,
+                help="(optional) max-epochs, default 500")
 
 args = vars(ap.parse_args())
+name = os.path.basename(args['blobs_db'])
+name = name.replace(".npy", "")
+name = name.replace(".gz", "")
 # todo: get wrong ones, reload and refine train
 
 # Parameters
 scaling_factor = 2  # input scale down for model training
 
-aug_sample_size = 4000
+aug_sample_size = 2000
 
 training_ratio = 0.7  # proportion of data to be in training set
 
@@ -56,9 +64,9 @@ r_ext_ratio = 1.4  # larger (1.4) for better view under augmentation
 r_ext_pixels = 30
 
 numClasses=2
-batch_size=64
-epochs = 500  # default 50
-patience = 10  # default 5
+batch_size=64  # default 64
+epochs = args["epochs"]  # default 500
+patience = 10  # default 50
 learning_rate = 0.0001  # default 0.0001 (Adam)
 verbose = 2  # {0, 1, 2}
 
@@ -67,17 +75,18 @@ verbose = 2  # {0, 1, 2}
 blobs = load_blobs_db(args["blobs_db"])
 w = int(sqrt(blobs.shape[1]-6) / 2)  # width/2 of img
 
+
 # Remove unlabeled and uncertain (only when training)
 if args["load_model"] <= 0:
-    print("removing unlabeled blobs (only in training mode)")
+    print("In training mode")
+    print("Removing unlabeled blobs")
     blobs = blobs[blobs[:, 3] != -1, :]
     blobs_stat(blobs)
 
-# if numClasses == 2:
-#     print("Remove uncertains")
-#     blobs = blobs[blobs[:, 3] != -2, :]
-#     blobs_stat(blobs)
-
+    if numClasses == 2:
+        print("Remove undistinguishable")  # todo: user decide
+        blobs = blobs[blobs[:, 3] != -2, :]
+        blobs_stat(blobs)
 
 
 # Split train/valid
@@ -87,8 +96,10 @@ print("{} Split ratio, split Data into {} training and {} testing".\
 
 # Balancing Yes/No ratio
 if args["load_model"] <= 0:
-    trainBlobs = balancing_by_duplicating_yes(trainBlobs)
-    valBlobs = balancing_by_duplicating_yes(valBlobs)
+    print('For training split:')
+    trainBlobs = balancing_by_duplicating(trainBlobs)
+    print('For validation split:')
+    valBlobs = balancing_by_duplicating(valBlobs)  #todo: skip this if F1 working well
 
 # Parse blobs
 trainImages, trainLabels, trainRs = parse_blobs(trainBlobs)
@@ -129,7 +140,6 @@ valRs = valRs/scaling_factor
 # Equalize images (todo: test equalization -> scaling)
 # todo: more channels (scaled + equalized + original)
 print("Equalizing images...")
-# todo:  Possible precision loss when converting from float64 to uint16
 trainImages = np.array([equalize(image) for image in trainImages])
 valImages = np.array([equalize(image) for image in valImages])
 
@@ -140,7 +150,6 @@ valImages = np.array([mask_image(image, r=valRs[ind]) for ind, image in enumerat
 
 # Normalizing images
 print("Normalizing images...")
-# todo:  Possible precision loss when converting from float64 to uint16
 trainImages = np.array([normalize_img(image) for image in trainImages])
 valImages = np.array([normalize_img(image) for image in valImages])
 
@@ -173,7 +182,6 @@ trainLabels2 = np_utils.to_categorical(trainLabels, numClasses)
 valLabels2 = np_utils.to_categorical(valLabels, numClasses)
 
 # Initialize the optimizer and model
-# todo: early stopping
 # todo: feature normalization (optional)
 print("[INFO] compiling model...")
 opt = Adam(lr=learning_rate)
@@ -235,6 +243,8 @@ if args["load_model"] <= 0:
         print("[INFO] dumping weights to file...")
         model.save_weights(args["weights"], overwrite=True)
 
+
+# For prediction mode
 elif args["load_model"] > 0:
     # randomly select a few testing digits
     # todo: fix tk in hpcc
@@ -261,7 +271,7 @@ elif args["load_model"] > 0:
     # # reshape for model
     # Images_ = Images_.reshape((Images_.shape[0], 2 * w_, 2 * w_, 1))
 
-    Images = np.vstack((trainImages, valImages))
+    Images = np.vstack((trainImages, valImages))  # todo, don't get complicated code
     Images_ = Images
     Labels = np.concatenate((trainLabels, valLabels))
     Labels_ = Labels
@@ -288,12 +298,16 @@ elif args["load_model"] > 0:
     # save predictions
     # blobs[:, 3] = predictions  # have effect on Labels[i]
     print("saving predictions")
-    np.savetxt(args['blobs_db']+'pred.txt', predictions.astype(int))
+    np.savetxt(name +'.pred.txt', predictions.astype(int))
     blobs_predict = np.copy(blobs)
     blobs_predict[:, 3] = predictions
-    np.save(args['blobs_db']+'.pred.npy', blobs_predict)
-    import os
-    os.system('gzip ' + args['blobs_db']+'.pred.npy')
+    np.save(name+'.pred.npy', blobs_predict)
+    os.system('gzip  -f ' + name+'.pred.npy')
+    
+    # save yes predictions
+    yes_blobs = flat_label_filter(blobs_predict, 1)
+    np.save(name+'.yes.npy', yes_blobs)
+    os.system('gzip  -f ' + name +'.yes.npy')
 
     # # Visualizing random predictions
     # print('Showing samples from', args['blobs_db'])
