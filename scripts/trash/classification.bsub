@@ -1,0 +1,20 @@
+#BSUB -J "Class[1-60]"  # n jobs in array, batch size
+#BSUB -R rusage[mem=6000]  # for each cpu
+#BSUB -n 2  # n cpu
+#BSUB -R "span[hosts=1]" # All hosts on the same chassis"
+mkdir -p ./log
+#BSUB -o ./log/classification.%J.%I.log
+#BSUB -W 4:00
+#BSUB -q short
+source activate py36
+
+i=$(($LSB_JOBINDEX- 1))
+weight=../../run1_good_ram_problem/5_second_round_training/danielAug19.hdf5
+#weight=../../run1_good_ram_problem/2_first_round_training/output/Z_CFUe_1-Stitching-74.hdf5
+
+files=(`ls ../2_blob_detection_edge_removed/blobs/*npy.gz`)
+f=${files[$i]}
+f="test.rui_yes.npy"
+
+echo python classification.py -db $f -l 1 -w $weight
+python classification.py -db $f -l 1 -w $weight # > $f.classification.log 2>&1

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # czi file names must have no spaces
-for file in ../../ccount_data/IL17a_CFUe_24JAN20/*czi
+for file in ../../ccount_data/E2F4_CFUe_14JUN19_stitching/*czi
 do 
 name=$(basename $file)
 name=${name/.czi/}
