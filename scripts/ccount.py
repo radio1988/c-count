@@ -656,7 +656,12 @@ def area_calculation(img, r, plotting=False):
     img = equalize(img)  # no use
     img = normalize_img(img)  # bad
     # val = filters.threshold_otsu(img)
-    val = filters.threshold_yen(img)
+    try:
+        val = filters.threshold_yen(img)
+    except ValueError: 
+        #print("Ops, got blank blob crop")
+        return (0)
+
     # val = filters.threshold_li(img)
 
     drops = ndimage.binary_fill_holes(img < val)  # cells as 1 (white), bg as 0
