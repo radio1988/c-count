@@ -49,3 +49,4 @@
 
 >>> March 20
 - czi2img new format 2019/2020 -> 2019
+- snakemake workflow (cmd version, not ipynb interactive mode)
