@@ -157,8 +157,50 @@ def find_blob(image_bright_blob_on_dark, scaling_factor = 2,
     return blobs
 
 
-def vis_blob_on_block(blobs, block_img_equ, block_img_ori, 
-    blob_extention_ratio=1.4, blob_extention_radius=2, scaling = 8):
+# def vis_blob_on_block(blobs, block_img_equ, block_img_ori, 
+#     blob_extention_ratio=1.4, blob_extention_radius=2, scaling = 8, fname=None):
+#     '''
+#     blobs: blob info array [n, 3]
+#     block_img_equ: corresponding block_img equalized
+#     block_img_ori: block_img before equalization
+#     plot: plot block_img with blobs in yellow circles
+#     '''
+#     print('scaling of visualization is ', scaling)
+#     blobs = blobs/scaling
+#     block_img_equ = down_scale(block_img_equ, scaling)
+#     block_img_ori = down_scale(block_img_ori, scaling)
+    
+
+#     fig, axes = plt.subplots(2, 1, figsize=(40, 20), sharex=True, sharey=True)
+#     ax = axes.ravel()
+
+#     ax[0].set_title('Equalized Image')
+#     ax[0].imshow(block_img_equ, 'gray', interpolation='nearest', clim=(0.0, 1.0))
+#     for blob in blobs:
+#         y, x, r = blob
+#         c = plt.Circle((x, y), r * blob_extention_ratio + blob_extention_radius, color=(0.9, 0.9, 0, 0.5), linewidth=1,
+#                        fill=False)  # r*1.3 to get whole blob
+#         ax[0].add_patch(c)
+#     # ax[0].set_axis_off()
+
+#     ax[1].set_title("Original Image")
+#     ax[1].imshow(block_img_ori, 'gray', interpolation='nearest', clim=(0.0, 1.0))
+#     for blob in blobs:
+#         y, x, r = blob
+#         d = plt.Circle((x, y), r * blob_extention_ratio + blob_extention_radius, color=(0.9, 0.9, 0, 0.5), linewidth=1,
+#                        fill=False)  # r*1.3 to get whole blob
+#         ax[1].add_patch(d)
+#     # ax[0].set_axis_off()
+
+#     plt.tight_layout()
+#     if fname:
+#         plt.savefig(fname)
+#     else:
+#         plt.show()
+
+        
+def vis_blob_on_block2(blobs, block_img_ori, 
+    blob_extention_ratio=1.4, blob_extention_radius=2, scaling = 8, fname=None):
     '''
     blobs: blob info array [n, 3]
     block_img_equ: corresponding block_img equalized
@@ -167,34 +209,28 @@ def vis_blob_on_block(blobs, block_img_equ, block_img_ori,
     '''
     print('scaling of visualization is ', scaling)
     blobs = blobs/scaling
-    block_img_equ = down_scale(block_img_equ, scaling)
     block_img_ori = down_scale(block_img_ori, scaling)
     
-
-    fig, axes = plt.subplots(2, 1, figsize=(40, 20), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 1, 
+                             figsize=(20, 20), 
+                             sharex=True, sharey=True)
     ax = axes.ravel()
-
-    ax[0].set_title('Equalized Image')
-    ax[0].imshow(block_img_equ, 'gray', interpolation='nearest', clim=(0.0, 1.0))
+    ax[0].set_title("Blob Detection Performance")
+    ax[0].imshow(block_img_ori, 
+                 'gray', interpolation='nearest', clim=(0.0, 1.0))
     for blob in blobs:
         y, x, r = blob
-        c = plt.Circle((x, y), r * blob_extention_ratio + blob_extention_radius, color=(0.9, 0.9, 0, 0.5), linewidth=1,
-                       fill=False)  # r*1.3 to get whole blob
-        ax[0].add_patch(c)
-    # ax[0].set_axis_off()
-
-    ax[1].set_title("Original Image")
-    ax[1].imshow(block_img_ori, 'gray', interpolation='nearest', clim=(0.0, 1.0))
-    for blob in blobs:
-        y, x, r = blob
-        d = plt.Circle((x, y), r * blob_extention_ratio + blob_extention_radius, color=(0.9, 0.9, 0, 0.5), linewidth=1,
+        d = plt.Circle((x, y), 
+                       r * blob_extention_ratio + blob_extention_radius, 
+                       color=(0.9, 0.9, 0, 0.5), 
+                       linewidth=1,
                        fill=False)  # r*1.3 to get whole blob
         ax[1].add_patch(d)
-    # ax[0].set_axis_off()
-
     plt.tight_layout()
-    plt.show()
-
+    if fname:
+        plt.savefig(fname)
+    else:
+        plt.show()
 
 def hist_blobsize(blobs):
     '''
@@ -474,10 +510,12 @@ def find_blobs_and_crop(image, image_equ,
     scaling_factor=2,
     max_sigma=40, min_sigma=11, num_sigma=5, threshold=0.1, overlap=.0,
     blob_extention_ratio=1.4, blob_extention_radius=2,
+    fname=None
     ):
     '''
     detect with image_equ
     return blobs with image
+    if fname assigned xx.jpg, will save to jpg rather than plot inline
     '''
     print("scaling factor for findinb_blobs is ", scaling_factor)
     
@@ -492,10 +530,11 @@ def find_blobs_and_crop(image, image_equ,
     
     print(blobs.shape, "detected")
 
-    print("Visualizing blobs")
-    vis_blob_on_block(blobs, image_equ, image, 
-        blob_extention_ratio=blob_extention_ratio, 
-        blob_extention_radius=blob_extention_radius)
+#     print("Visualizing blobs")
+#     vis_blob_on_block(blobs, image_equ, image, 
+#         blob_extention_ratio=blob_extention_ratio, 
+#         blob_extention_radius=blob_extention_radius, 
+#                      fname=fname)
 
     # create crop from blob
     print("Creating crops from blobs")
