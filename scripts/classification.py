@@ -15,6 +15,7 @@ import os
 import argparse
 import numpy as np
 import keras
+from pathlib import Path
 
 import matplotlib.pyplot as plt  # tk not on hpcc
 matplotlib.use('Agg')  # not display on hpcc
@@ -36,6 +37,8 @@ print('cmd:', sys.argv)
 ap = argparse.ArgumentParser()
 ap.add_argument("-db", "--blobs-db", type=str,
                 help="path to blobs-db file, e.g. xxx.labeled.npy.gz")
+ap.add_argument("-odir", "--outdir", type=str,
+                help="outdir, e.g filter1, filter2")
 ap.add_argument("-s", "--save-model", type=int, default=0,
                 help="(optional) whether or not model should be saved to disk")
 ap.add_argument("-l", "--load-model", type=int, default=0,
@@ -51,6 +54,9 @@ args = vars(ap.parse_args())
 name = os.path.basename(args['blobs_db'])
 name = name.replace(".npy", "")
 name = name.replace(".gz", "")
+Path(args['outdir']).mkdir(parents=True, exist_ok=True)
+name = os.path.join(args['outdir'], name)
+print("name", name)
 # todo: get wrong ones, reload and refine train
 
 # Parameters
