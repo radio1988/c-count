@@ -1,0 +1,41 @@
+configfile: "config.yaml"
+SAMPLES=config["SAMPLES"]
+FORMAT=config["FORMAT"]
+
+shell.prefix("""
+            source /home/rl44w/.bash_profile
+            conda activate ccount
+            """)
+
+rule all:
+    input:
+        img=expand("img/jpg/{s}.jpg", s=SAMPLES),
+        blobs=expand("blobs/{s}.npy.gz", s=SAMPLES)
+
+rule czi2img:
+    input:
+        "data/{s}.czi"
+    output:
+        "img/jpg/{s}.jpg"
+    threads:
+        1
+    params:
+        mem='40000'
+    shell:
+        """
+        python czi2img.py -i {input} -f {FORMAT} -odir img
+        """
+    
+rule blob_detection:
+    input:
+        "data/{s}.czi"
+    output:
+        "blobs/{s}.npy.gz"
+    threads:
+        1
+    params:
+        mem="40000"
+    shell:
+        """
+        python blob_detection.py -i {input}
+        """
