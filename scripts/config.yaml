@@ -1,25 +1,5 @@
 SAMPLES:
-    - Epo_0_1_IL17a_Comm_10_Plate1_28FEB20_Stitched
-    - Epo_0_1_IL17a_Comm_10_Plate2_28FEB20_Stitched
-    - Epo_0_1_IL17a_Comm_10_Plate3_28FEB20_Stitched
-    - Epo_0_1_IL17a_Fusion_25_Plate1_28FEB20_Stitched
-    - Epo_0_1_IL17a_Fusion_25_Plate2_28FEB20_Stitched
-    - Epo_0_1_IL17a_Fusion_25_Plate3_28FEB20_Stitched
-    - Epo_0_1_IL17a_Fusion_50_Plate1_28FEB20_Stitched
-    - Epo_0_1_IL17a_Fusion_50_Plate2_28FEB20_Stitched
-    - Epo_0_1_IL17a_Fusion_50_Plate3_28FEB20_Stitched
-    - Epo_0_1_Plate1_28FEB20_Stitched
-    - Epo_0_1_Plate2_28FEB20_Stitched
-    - Epo_0_1_Plate3_28FEB20_Stitched
-    - Epo_0_5_IL17a_Comm_10_Plate1_28FEB20_Stitched
-    - Epo_0_5_IL17a_Comm_10_Plate2_28FEB20_Stitched
-    - Epo_0_5_IL17a_Comm_10_Plate3_28FEB20_Stitched
-    - Epo_0_5_IL17a_Fusion_25_Plate1_28FEB20_Stitched
-    - Epo_0_5_IL17a_Fusion_25_Plate2_28FEB20_Stitched
-    - Epo_0_5_IL17a_Fusion_25_Plate3_28FEB20_Stitched
-   # - Epo_0_5_IL17a_Fusion_50_Plate1_28FEB20_Stitched
-   # - Epo_0_5_IL17a_Fusion_50_Plate1_leftandbottom_28FEB20_Stitched
-   # - Epo_0_5_IL17a_Fusion_50_Plate2_28FEB20_Stitched
+    - placeholder
 
 FORMAT: 2019
 WEIGHT1: ../run1_good_ram_problem/2_first_round_training/output/Z_CFUe_1-Stitching-74.hdf5
