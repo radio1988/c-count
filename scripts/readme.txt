@@ -44,4 +44,8 @@
 - removed tsne
 - added viewing_blobs.sh, updated viewing_blobs.ipynb
 
-conda install tensorflow keras scikit-image czifile  runipy imgaug
+>>> March 04
+- still bash with 3 steps
+
+>>> March 20
+- czi2img new format 2019/2020 -> 2019

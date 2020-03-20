@@ -21,12 +21,10 @@ import os.path
 import re
 import time
 
-
 import imgaug as ia
 from imgaug import augmenters as iaa
 
-
-def read_czi(fname, format="2018"):
+def read_czi(fname, Format="2018"):
     '''
     input: fname of czi file
     output: 2d numpy array
@@ -35,56 +33,52 @@ def read_czi(fname, format="2018"):
         with CziFile(fname) as czi:
             image_arrays = czi.asarray()
             print(image_arrays.shape)
-
-
     elif fname.endswith('czi.gz'):
         raise Exception("todo")
         # with gzip.open(fname, 'rb') as f:
         #     with CziFile(f) as czi:
         #         image_arrays = czi.asarray()
-
     else:
         raise Exception("input czi/czi.gz file type error\n")
+        
+    Format = Format.strip()
 
-    if format == "2018":
+    if Format == "2018":
         image = image_arrays[0, 1, 0, 0, :, :, 0]  # real image
         print("{}: {}\n".format(fname, image.shape))
-    elif format == "2019":
-        # summing four black included images takes ~64G of RAM
-        # scaling down by 1/4 takes ~14GB
-        # trimming black regions takes 
-        [_, _, dim0, dim1, _] = image_arrays.shape
-        
-        # stitched image cropping parameters
-        # Rows
-        row_step = int(dim0/6.3*1)
-        begin1 = 0
-        begin2 = begin1 + row_step
-        mid1 = int(dim0/6.3*2.5)
-        mid2 = mid1 + row_step
-        end1 = dim0 - row_step
-        end2 = dim0
-        # Columns
-        col_step = int(dim1/5.9*1.2)
-        Begin1 = 0
-        Begin2 = Begin1 + col_step
-        Mid1 = int(dim1/5.9*2.4)
-        Mid2 = Mid1 + col_step
-        End1 = dim1 - col_step
-        End2 = dim1
-        
-        # todo: control size to put together?
-        image0 = image_arrays[0, 0, begin1:begin2,  Mid1:Mid2, 0]
-        image1 = image_arrays[1, 0, mid1:mid2,  Begin1:Begin2, 0]
-        image2 = image_arrays[2, 0, mid1:mid2,  End1:End2, 0]
-        image3 = image_arrays[3, 0, end1:end2,  Mid1:Mid2, 0]
-        
-        print("shape of each image:", image0.shape, image1.shape, image2.shape, image3.shape)
-        
-        image_top = np.concatenate((image0, image1), axis = 1)
-        image_bottom = np.concatenate((image2, image3), axis = 1)
+    elif Format == "2019":        
+        # reading (need 38 GB RAM)
+        lst = []
+        for i in range(0,image_arrays.shape[0]):
+            print(i)
+            image = image_arrays[i, 0, :,  :, 0]
+            nz_image = np.nonzero(image)
+            nz0 = np.unique(nz_image[0])
+            nz1 = np.unique(nz_image[1])
+            print(nz0, nz0.shape)
+            print(nz1, nz1.shape)
+            image = image[min(nz0):max(nz0), min(nz1):max(nz1)]
+            lst.append(image) 
+            
+        # padding
+        heights = [x.shape[0] for x in lst]
+        widths = [x.shape[1] for x in lst]
+        max(heights)
+        max(widths)
+        for (i,image) in enumerate(lst):
+            print(image.shape, i)
+            pad_h = max(heights) - image.shape[0]
+            pad_w = max(widths) - image.shape[1]
+            lst[i] = np.pad(image, [[0,pad_h],[0,pad_w]], "constant")
+            
+        # concat
+        image_top = np.concatenate((lst[0], lst[1]), axis = 1)
+        image_bottom = np.concatenate((lst[2], lst[3]), axis = 1)
         image = np.concatenate((image_top, image_bottom), axis = 0)
         print("shape of whole picture {}: {}\n".format(fname, image.shape))
+    else:
+        raise Exception("image format error\n")
+        image = None
 
     return image # test, should be image, not image0
 
