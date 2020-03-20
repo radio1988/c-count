@@ -1,10 +1,11 @@
 from ccount import read_czi, block_equalize, down_scale
-from ccount import find_blobs_and_crop, remove_edge_crops, vis_blob_on_block2
+from ccount import find_blobs_and_crop, remove_edge_crops, vis_blob_on_block
 import argparse, os, re, matplotlib
 matplotlib.use('Agg')  # for plotting without GUI
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
+import subprocess
 
 
 # Parse args
@@ -69,7 +70,7 @@ elif scaling_factor == 4:
     threshold=0.02
 else:
     raise Exception("scaling factor not implemented")
-test = True
+test = False
 
 # Read
 image = read_czi(args.i, Format=args.f)
@@ -117,15 +118,23 @@ print("there are {} blobs passed edge filter".format(len(good_flats)))
 print(good_flats.shape)
 np.save(out_blob_fname, good_flats)
 print('saved into {}'.format(out_blob_fname))
+bashCommand = "gzip -f " + out_blob_fname
+process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+output, error = process.communicate()
 
 # Visualizing filtered blobs
 print("Visualizing blobs")
-vis_blob_on_block2(good_flats, image, 
+vis_blob_on_block(good_flats, image_equ,image, 
     blob_extention_ratio=blob_extention_ratio, 
     blob_extention_radius=blob_extention_radius, 
     fname=out_img_fname)
 
-bashCommand = "gzip " + out_blob_fname
-import subprocess
-process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-output, error = process.communicate()
+if test:
+    Path("./blobs/vis_beforeEdgeFilter").mkdir(parents=True, exist_ok=True)
+    out_img_fnameBefore = os.path.join(args.odir, "vis_beforeEdgeFilter", corename+".jpg")
+    vis_blob_on_block(image_flat_crops, image_equ,image, 
+        blob_extention_ratio=blob_extention_ratio, 
+        blob_extention_radius=blob_extention_radius, 
+        fname=out_img_fnameBefore)
+
+
