@@ -1,21 +1,23 @@
 import argparse
-import os
-import re
-import matplotlib
-from ccount import read_czi, block_equalize, down_scale
-from pathlib import Path
 
 # Parse args
 parser = argparse.ArgumentParser(description='Convert czi to jpg images')
 parser.add_argument('-i', type=str,
                    help='input file name')
 parser.add_argument('-f', type=str, 
-                   help='czi file format: 2018, 2019, 2020')
+                   help='czi file format: 2018, 2019')
 parser.add_argument('-odir', type=str, default="img",
                     help='output dir: e.g. img')
 args = parser.parse_args()
 print('input fname:', args.i)
 print('input format:', args.f)
+
+
+from pathlib import Path
+import os
+import re
+import matplotlib
+from ccount import read_czi, block_equalize, down_scale
 Path("img/jpg").mkdir(parents=True, exist_ok=True)
 Path("img/equ").mkdir(parents=True, exist_ok=True)
 outname = os.path.basename(args.i)
