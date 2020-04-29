@@ -5,10 +5,6 @@ WEIGHT1=config["WEIGHT1"]
 WEIGHT2=config["WEIGHT2"]
 
 shell.prefix("""
-            #module load condas/2018-05-11
-            #/share/pkg/condas/2018-05-11/bin/conda activate ccount
-
-            #source /home/rl44w/.bash_profile
             source ~/anaconda3/etc/profile.d/conda.sh
             source activate ccount
             """)

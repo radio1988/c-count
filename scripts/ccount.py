@@ -44,10 +44,11 @@ def read_czi(fname, Format="2018"):
     Format = Format.strip()
 
     if Format == "2018":
+        # reading (need 38 GB RAM) todo: use int16 if possible
         image = image_arrays[0, 1, 0, 0, :, :, 0]  # real image
         print("{}: {}\n".format(fname, image.shape))
     elif Format == "2019":        
-        # reading (need 38 GB RAM)
+        # Find Box with info: todo faster by https://kite.com/python/docs/PIL.Image.Image.getbbox  
         lst = []
         for i in range(0,image_arrays.shape[0]):
             print(i)
@@ -55,6 +56,8 @@ def read_czi(fname, Format="2018"):
             nz_image = np.nonzero(image)
             nz0 = np.unique(nz_image[0])
             nz1 = np.unique(nz_image[1])
+            if len(nz0) < 2 or len(nz1) < 2: 
+                continue
             print(nz0, nz0.shape)
             print(nz1, nz1.shape)
             image = image[min(nz0):max(nz0), min(nz1):max(nz1)]
@@ -72,9 +75,11 @@ def read_czi(fname, Format="2018"):
             lst[i] = np.pad(image, [[0,pad_h],[0,pad_w]], "constant")
             
         # concat
-        image_top = np.concatenate((lst[0], lst[1]), axis = 1)
-        image_bottom = np.concatenate((lst[2], lst[3]), axis = 1)
-        image = np.concatenate((image_top, image_bottom), axis = 0)
+        # use a long wide image instead to adjust for unknown number of scanns
+        #image_top = np.concatenate((lst[0], lst[1]), axis = 1)
+      #  image_bottom = np.concatenate((lst[2], lst[3]), axis = 1)
+      #  image = np.concatenate((image_top, image_bottom), axis = 0)
+        image = np.hstack(lst)
         print("shape of whole picture {}: {}\n".format(fname, image.shape))
     else:
         raise Exception("image format error\n")
