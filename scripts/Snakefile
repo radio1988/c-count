@@ -5,18 +5,22 @@ WEIGHT1=config["WEIGHT1"]
 WEIGHT2=config["WEIGHT2"]
 
 shell.prefix("""
-            source /home/rl44w/.bash_profile
+            #module load condas/2018-05-11
+            #/share/pkg/condas/2018-05-11/bin/conda activate ccount
+
+            #source /home/rl44w/.bash_profile
+            source ~/anaconda3/etc/profile.d/conda.sh
             conda activate ccount
             """)
 
 rule all:
     input:
         img=expand("img/jpg/{s}.jpg", s=SAMPLES),
-        blobs=expand("blobs/{s}.npy.gz", s=SAMPLES),
-        count1="count/COUNT.txt",
-        count2="count/COUNT.step1_test.txt",
-        view1=expand("filter1/view/{s}.html", s=SAMPLES),
-        view2=expand("filter2/view/{s}.html", s=SAMPLES)
+#        blobs=expand("blobs/{s}.npy.gz", s=SAMPLES),
+#        count1="count/COUNT.txt",
+#        count2="count/COUNT.step1_test.txt",
+#        view1=expand("filter1/view/{s}.html", s=SAMPLES),
+#        view2=expand("filter2/view/{s}.html", s=SAMPLES)
 
 rule czi2img:
     input:
@@ -30,6 +34,8 @@ rule czi2img:
         "log/img/{s}.log"
     benchmark:
         "benchmark/img/{s}.txt"
+    conda:
+        "envs/envs.yaml"
     params:
         mem='40000'
     shell:
