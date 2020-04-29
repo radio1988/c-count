@@ -5,8 +5,12 @@ WEIGHT1=config["WEIGHT1"]
 WEIGHT2=config["WEIGHT2"]
 
 shell.prefix("""
-            source /home/rl44w/.bash_profile
-            conda activate ccount
+            #module load condas/2018-05-11
+            #/share/pkg/condas/2018-05-11/bin/conda activate ccount
+
+            #source /home/rl44w/.bash_profile
+            source ~/anaconda3/etc/profile.d/conda.sh
+            source activate ccount
             """)
 
 rule all:
@@ -15,6 +19,7 @@ rule all:
         blobs=expand("blobs/{s}.npy.gz", s=SAMPLES),
         count1="count/COUNT.txt",
         count2="count/COUNT.step1_test.txt",
+        view0=expand("blobs/view/{s}.html", s=SAMPLES),
         view1=expand("filter1/view/{s}.html", s=SAMPLES),
         view2=expand("filter2/view/{s}.html", s=SAMPLES)
 
@@ -30,6 +35,8 @@ rule czi2img:
         "log/img/{s}.log"
     benchmark:
         "benchmark/img/{s}.txt"
+    conda:
+        "envs/envs.yaml"
     params:
         mem='40000'
     shell:
@@ -49,7 +56,7 @@ rule blob_detection:
     benchmark:
         "benchmark/blobs/{s}.txt"
     params:
-        mem="40000"
+        mem="45000"
     shell:
         """
         python blob_detection.py -i {input} &> {log}
@@ -163,4 +170,22 @@ rule view2:
         jupyter nbconvert --to html {output.nb}
         """
 
-
+rule view0:
+    input:
+        "blobs/{s}.npy.gz"
+    output:
+        nb="blobs/view/{s}.ipynb",
+        html="blobs/view/{s}.html"
+    log:
+        "log/blobs/view/{s}.log"
+    threads:
+        1
+    params:
+        mem="8000"
+    benchmark:
+        "benchmark/blobs/view/{s}.txt"
+    shell:
+        """
+        fname={input} runipy viewing_blobs.ipynb {output.nb}
+        jupyter nbconvert --to html {output.nb}
+        """
