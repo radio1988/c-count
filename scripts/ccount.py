@@ -579,30 +579,40 @@ yes=1, no=0, undistinguishable=3, skip=s, go-back=b, excape(pause)=e: '''.format
     return flat_crops
 
 
-def load_blobs_db(in_db_name):
+def sub_sample(A, n):
+    if n < A.shape[0]:
+        A = A[np.random.choice(A.shape[0], n, replace=False), :]
+    else:
+        pass
+    return (A)
+    
+
+def load_blobs_db(in_db_name, n_subsample=False):
     '''
     use parameters: db_name
     input: db fname from user (xxx.npy)
     output: array (crops format)
     '''
-    while 1:
-        # in_db_name = in_db_name.strip()
-        if os.path.isfile(in_db_name):
-            if in_db_name.endswith('npy'):
-                image_flat_crops = np.load(in_db_name)
-            elif in_db_name.endswith('npy.gz'):
-                f = gzip.GzipFile(in_db_name, "r")
-                image_flat_crops = np.load(f)
-            else:
-                raise Exception ("db suffix not npy nor npy.gz")
-                
-            print("{} read into RAM".format(in_db_name))
-            print("{} cropped blobs, {} pixcels in each blob".format(len(image_flat_crops),
-                                                                     image_flat_crops.shape[1] - 6))
-            blobs_stat(image_flat_crops)
-            break
+
+    if os.path.isfile(in_db_name):
+        if in_db_name.endswith('npy'):
+            image_flat_crops = np.load(in_db_name)
+        elif in_db_name.endswith('npy.gz'):
+            f = gzip.GzipFile(in_db_name, "r")
+            image_flat_crops = np.load(f)
         else:
-            print("{} file not found".format(in_db_name))
+            raise Exception ("db suffix not npy nor npy.gz")
+
+        print("{} read into RAM".format(in_db_name))
+        print("{} cropped blobs, {} pixcels in each blob".format(len(image_flat_crops),
+                                                                 image_flat_crops.shape[1] - 6))
+        blobs_stat(image_flat_crops)
+        
+        if n_subsample:
+            print("subsampling to", n_subsample, "blobs")
+            image_flat_crops = sub_sample(image_flat_crops, n_subsample)  
+    else:
+        print("{} file not found".format(in_db_name))
 
     return image_flat_crops
 
