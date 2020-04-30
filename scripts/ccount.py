@@ -584,15 +584,17 @@ yes=1, no=0, undistinguishable=3, skip=s, go-back=b, excape(pause)=e: '''.format
     return flat_crops
 
 
-def sub_sample(A, n):
+def sub_sample(A, n, seed=1):
     if n < A.shape[0]:
+        np.random.seed(seed=seed)
         A = A[np.random.choice(A.shape[0], n, replace=False), :]
+        np.random.seed(seed=None)
     else:
         pass
     return (A)
     
 
-def load_blobs_db(in_db_name, n_subsample=False):
+def load_blobs_db(in_db_name, n_subsample=False, seed=1):
     '''
     use parameters: db_name
     input: db fname from user (xxx.npy)
@@ -615,11 +617,17 @@ def load_blobs_db(in_db_name, n_subsample=False):
         
         if n_subsample:
             print("subsampling to", n_subsample, "blobs")
-            image_flat_crops = sub_sample(image_flat_crops, n_subsample)  
+            image_flat_crops = sub_sample(image_flat_crops, n_subsample, seed=seed)  
     else:
         print("{} file not found".format(in_db_name))
 
     return image_flat_crops
+
+def save_blobs_db(crops, fname):
+    import subprocess
+    fname = fname.replace(".npy.gz", ".npy")
+    np.save(fname, crops)
+    subprocess.run("gzip -f " + fname, shell=True, check=True)
 
 
 def remove_edge_crops(flat_blobs):
@@ -666,6 +674,7 @@ def remove_edge_crops(flat_blobs):
 
 
 def area_calculation(img, r, plotting=False):
+    #todo: increase speed
     from skimage import io, filters
     from scipy import ndimage
     import matplotlib.pyplot as plt
@@ -710,6 +719,7 @@ def sample_crops(crops, proportion, seed):
     np.random.seed(seed)
     crops = np.random.permutation(crops)
     sample = crops[range(int(len(crops)*proportion)), :]
+    np.random.seed(seed=None)
     print(len(sample), "samples taken")
     return sample
     
@@ -1034,12 +1044,13 @@ def cluster_scatterplot(df2d, labels, title):
     plt.title(title)
     plt.xlabel('legend format:  cluster_id:num-cells')
 
-    plt.savefig(title + '.png', bbox_inches='tight')
+    #plt.savefig(title + '.png', bbox_inches='tight')
     plt.show()
     plt.close('all')
 
 
-def pca_tsne(df_gene_col, cluster_info=None, title='data', dir='plots',
+def pca_tsne(df_gene_col, cluster_info=None, title='data', 
+             #dir='plots',
              num_pc=50, num_tsne=2, ncores=8):
     '''
     PCA and tSNE plots for DF_cell_row, save projections.csv
@@ -1051,10 +1062,10 @@ def pca_tsne(df_gene_col, cluster_info=None, title='data', dir='plots',
     :return: tsne_df, plots saved, pc_projection.csv, tsne_projection.csv saved
     '''
 
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+#     if not os.path.exists(dir):
+#         os.makedirs(dir)
 
-    title = './' + dir + '/' + title
+#     title = './' + dir + '/' + title
 
     df = df_gene_col
     if cluster_info is None:
