@@ -6,7 +6,6 @@ WEIGHT2=config["WEIGHT2"]
 
 shell.prefix("""
             #source ~/anaconda3/etc/profile.d/conda.sh
-            source activate py36
             """)
 
 rule all:
