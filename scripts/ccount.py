@@ -726,7 +726,7 @@ def sample_crops(crops, proportion, seed):
 
 def show_rand_crops(crops, label_filter="na", num_shown=5, 
     blob_extention_ratio=1, blob_extention_radius=0, 
-    plot_area=False):
+    plot_area=False, seed = None):
     '''
     blobs: the blobs crops
     label_filter: 0, 1, -1; "na" means no filter
@@ -737,7 +737,10 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
         crops = crops[filtered_idx, :]
 
     if (len(crops) >= num_shown):
+        if seed:
+            np.random.seed(seed)
         randidx = np.random.choice(range(len(crops)), num_shown, replace=False)
+        np.random.seed()
         plot_flat_crops(crops[randidx, :], 
             blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
 
