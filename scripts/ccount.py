@@ -1081,7 +1081,7 @@ def pca_tsne(df_gene_col, cluster_info=None, title='data',
     df_pc_df = pd.DataFrame(data=pc_x, index=df.index, columns=range(num_pc))
     df_pc_df.index.name = 'cell_id'
     df_pc_df.columns.name = 'PC'
-    df_pc_df.to_csv(title + '.pca.csv')
+    #df_pc_df.to_csv(title + '.pca.csv')
     print('dim before PCA', df.shape)
     print('dim after PCA', df_pc_df.shape)
     print('explained variance ratio: {}'.format(

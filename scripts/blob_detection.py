@@ -9,21 +9,28 @@ import subprocess
 
 
 # Parse args
-parser = argparse.ArgumentParser(description='Read czi, output blobs')
-parser.add_argument('-i', type=str,
-                   help='input file name: xxx.czi')
-parser.add_argument('-f', type=str, default="2019",
-                   help='czi file format: 2018, 2019, 2020')
-parser.add_argument('-odir', type=str, default="blobs",
-                    help='output dir: default blobs')
+parser = argparse.ArgumentParser(
+    description='Read czi, output blobs'
+    )
+parser.add_argument(
+    '-i', type=str,
+    help='input file name: xxx.czi'
+    )
+parser.add_argument(
+    '-f', type=str, default="2019",
+    help='czi file format: 2018/2019/2020')
+parser.add_argument(
+    '-odir', type=str, default="blobs",
+    help='output dir: default blobs'
+    )
+
 args = parser.parse_args()
 print('input fname:', args.i)
 print('input format:', args.f)
+print('output dir:', args.odir)
 
 outname = os.path.basename(args.i)
 corename = re.sub('.czi$', '', outname)
-Path("./blobs/vis").mkdir(parents=True, exist_ok=True)
-Path("./blobs/hist").mkdir(parents=True, exist_ok=True)
 out_blob_fname = os.path.join(args.odir, corename+".npy")
 out_img_fname = os.path.join(args.odir, "vis", corename+".jpg")
 hist_img_fname = os.path.join(args.odir, "hist", corename+".hist.pdf")
@@ -31,14 +38,18 @@ print("output blob:", out_blob_fname)
 print("output histogram:", hist_img_fname)
 print("output_img_fname:", out_img_fname)
 
+# Prep output dir
+Path(os.path.join(args.odir, "vis")).mkdir(parents=True, exist_ok=True)
+Path(os.path.join(args.odir, "hist")).mkdir(parents=True, exist_ok=True)
 
 # User Params (you can adjust these parameters to suit your data)
-if format=='2019':
+if args.f=='2019':
     block_height = 2000
     block_width = 2400 # pixcels, if 0, use whole image as block (still buggy whole image equalization)
     scaling_factor = 4 # 1: original dimension, 2: 1/2, 4: 1/4
 else:
     # todo
+    raise ValueError("format not supported")
     block_height = 2000
     block_width = 2400 # pixcels, if 0, use whole image as block (still buggy whole image equalization)
     scaling_factor = 4 # 1: original dimension, 2: 1/2, 4: 1/4
@@ -103,14 +114,14 @@ image_flat_crops = find_blobs_and_crop(
     fname=out_img_fname  # if None, will plot inline
 )
 
+# Remove blobs containing edges
+good_flats = remove_edge_crops(image_flat_crops)
+
 # Hist
-r_ = image_flat_crops[:,2]
+r_ = good_flats[:,2]
 plt.hist(r_, 40)
 plt.title("Histogram of blob size")
 plt.savefig(hist_img_fname)
-
-# Remove blobs containing edges
-good_flats = remove_edge_crops(image_flat_crops)
 
 # Saving
 print('there are {} blobs detected'.format(len(image_flat_crops)))

@@ -1,109 +1,130 @@
 configfile: "config.yaml"
+import os
+
 SAMPLES=config["SAMPLES"]
 FORMAT=config["FORMAT"]
 WEIGHT1=config["WEIGHT1"]
 WEIGHT2=config["WEIGHT2"]
+WKDIR=os.getcwd()
 
 shell.prefix("""
-            #source ~/anaconda3/etc/profile.d/conda.sh
+            # placeholder
             """)
 
-rule all:
+rule targets:
     input:
-        img=expand("img/jpg/{s}.jpg", s=SAMPLES),
-        blobs=expand("blobs/{s}.npy.gz", s=SAMPLES),
-#        count1="count/COUNT.txt",
-#        count2="count/COUNT.step1_test.txt",
-        view0=expand("blobs/view/{s}.html", s=SAMPLES),
-#        view1=expand("filter1/view/{s}.html", s=SAMPLES),
-#        view2=expand("filter2/view/{s}.html", s=SAMPLES)
+        img=expand("res/img/jpg/{s}.jpg", s=SAMPLES),  # czi2img
+        blobs=expand("res/blobs/{s}.npy.gz", s=SAMPLES),  # blob_detection
+        view0=expand("res/blobs/{s}.html", s=SAMPLES),  # rand samples of detected blobs
+#        count1="count/COUNT.txt",  # count from weight1
+#        count2="count/COUNT.step1_test.txt", # count from weight1-pos -> weight2-pos
+#        view1=expand("filter1/view/{s}.html", s=SAMPLES), # view weight1-pos
+#        view2=expand("filter2/view/{s}.html", s=SAMPLES) # view weight1-weight2-pos
 
 rule czi2img:
     input:
         "data/{s}.czi"
     output:
-        "img/jpg/{s}.jpg",
-        # todo: "img/equ/{s}.equ.jpg",
+        "res/img/jpg/{s}.jpg",
+        "res/img/equ/{s}.equ.jpg",
     priority: 
         0
     threads:
         1
     log:
-        "log/img/{s}.log"
+        "res/img/log/{s}.log"
     benchmark:
-        "benchmark/img/{s}.txt"
-    conda:
-        "envs/envs.yaml"
+        "res/img/log/{s}.tsv"
     params:
         mem='40000'
     shell:
         """
-        python czi2img.py -i {input} -f {FORMAT} -odir img &> {log}
+        python scripts/czi2img.py -i {input} -f {FORMAT} -odir res/img &> {log}
         """
     
 rule blob_detection:
     input:
         "data/{s}.czi"
     output:
-        "blobs/{s}.npy.gz"
+        "res/blobs/{s}.npy.gz"
     priority:
         100
     threads:
         1
     log:
-        "log/blobs/{s}.log"
+        "res/blobs/{s}.log"
     benchmark:
-        "benchmark/blobs/{s}.txt"
+        "res/blobs/{s}.tsv"
     params:
         mem="45000"
     shell:
         """
-        python blob_detection.py -i {input} &> {log}
+        python scripts/blob_detection.py -i {input} -f {FORMAT} -odir res/blobs/ &> {log}
         """
 
-rule filter1:
+rule view0:
     input:
-        "blobs/{s}.npy.gz"
+        "res/blobs/{s}.npy.gz"
     output:
-        yes="filter1/{s}.yes.npy.gz",
-        all="filter1/{s}.pred.npy.gz",
-        log="log/filter1/{s}.1.log"
+        nb="res/blobs/{s}.ipynb",
+        html="res/blobs/{s}.html"
+    log:
+        "res/blobs/{s}.html.log"
     benchmark:
-        "benchmark/filter1/{s}.1.txt"
+        "res/blobs/{s}.html.tsv"
     threads:
         1
     params:
         mem="8000"
     shell:
         """
-        python classification.py  -db {input} -o filter1 -l 1 -w {WEIGHT1} &> {output.log}
+        fname={input} dir={WKDIR} runipy scripts/viewing_blobs.ipynb {output.nb} &> {log}
+        jupyter nbconvert --to html {output.nb} &>> {log}
+        """
+
+rule filter1:
+    input:
+        "res/blobs/{s}.npy.gz"
+    output:
+        yes="res/filter1/{s}.yes.npy.gz",
+        all="res/filter1/{s}.pred.npy.gz",
+        log="res/filter1/{s}.log"
+    benchmark:
+        "res/filter1/{s}.tsv"
+    threads:
+        1
+    params:
+        mem="8000"
+    shell:
+        """
+        python scripts/classification.py  -db {input} -o res/filter1 -l 1 -w {WEIGHT1} &> {output.log}
         """
 
 
 rule filter2:
     input:
-        "filter1/{s}.yes.npy.gz"
+        "res/filter1/{s}.yes.npy.gz"
     output:
-        yes="filter2/{s}.yes.yes.npy.gz",
-        all="filter2/{s}.yes.pred.npy.gz",
-        log="log/filter2/{s}.2.log"
+        yes="res/filter2/{s}.yes.yes.npy.gz",
+        all="res/filter2/{s}.yes.pred.npy.gz",
+        log="res/filter2/{s}.log"
     benchmark:
-        "benchmark/filter2/{s}.2.txt"
+        "res/filter2/{s}.tsv"
     threads:
         1
     params:
         mem="8000"
     shell:
         """
-        python classification.py  -db {input} -o filter2 -l 1 -w {WEIGHT2} &> {output.log}
+        python scripts/classification.py  -db {input} -o res/filter2 -l 1 -w {WEIGHT2} &> {output.log}
         """
 
 
 rule count1:
     input:
-        expand("log/filter1/{s}.1.log", s=SAMPLES)
+        expand("res/filter1/{s}.log", s=SAMPLES)
     output:
-        "count/COUNT.step1_test.txt"
+        "res/filter1/COUNT1.txt"
     threads:
         1
     params:
@@ -115,9 +136,9 @@ rule count1:
 
 rule count2:
     input:
-        expand("log/filter2/{s}.2.log", s=SAMPLES)
+        expand("res/filter2/{s}.log", s=SAMPLES)
     output:
-        "count/COUNT.txt"
+        "res/filter2/COUNT2.txt"
     threads:
         1
     params:
@@ -130,61 +151,43 @@ rule count2:
 
 rule view1:
     input:
-        "filter1/{s}.pred.npy.gz"
+        "res/filter1/{s}.pred.npy.gz"
     output:
-        nb="filter1/view/{s}.ipynb",
-        html="filter1/view/{s}.html"
+        nb="res/filter1/{s}.ipynb",
+        html="res/filter1/{s}.html"
     log:
-        "log/filter1/view/{s}.log"
+        "res/filter1/{s}.html.log"
+    benchmark:
+        "res/filter1/{s}.html.tsv"
     threads:
         1
     params:
         mem="8000"
-    benchmark:
-        "benchmark/filter1/view/{s}.txt"
     shell:
         """
-        fname={input} runipy viewing_blobs.ipynb {output.nb}
-        jupyter nbconvert --to html {output.nb}
+        fname={input} dir={WKDIR} runipy scripts/viewing_blobs.ipynb {output.nb} &> {log}
+        jupyter nbconvert --to html {output.nb} &>> {log}
         """
 
 
 rule view2:
     input:
-        "filter2/{s}.yes.pred.npy.gz"
+        "res/filter2/{s}.yes.pred.npy.gz"
     output:
-        nb="filter2/view/{s}.ipynb",
-        html="filter2/view/{s}.html"
+        nb="res/filter2/{s}.ipynb",
+        html="res/filter2/{s}.html"
     log:
-        "log/filter2/view/{s}.log"
+        "res/filter2/{s}.html.log"
+    benchmark:
+        "res/filter2/{s}.html.tsv"
     threads:
         1
     params:
         mem="8000"
-    benchmark:
-        "benchmark/filter2/view/{s}.txt"
     shell:
         """
-        fname={input} runipy viewing_blobs.ipynb {output.nb}
-        jupyter nbconvert --to html {output.nb}
-        """
-
-rule view0:
-    input:
-        "blobs/{s}.npy.gz"
-    output:
-        nb="blobs/view/{s}.ipynb",
-        html="blobs/view/{s}.html"
-    log:
-        "log/blobs/view/{s}.log"
-    threads:
-        1
-    params:
-        mem="8000"
-    benchmark:
-        "benchmark/blobs/view/{s}.txt"
-    shell:
-        """
-        fname={input} runipy viewing_blobs.ipynb {output.nb} &> {log}
+        fname={input} dir={WKDIR} runipy scripts/viewing_blobs.ipynb {output.nb} &> {log}
         jupyter nbconvert --to html {output.nb} &>> {log}
         """
+
+
