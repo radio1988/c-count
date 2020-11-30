@@ -18,6 +18,7 @@ rule targets:
         view0=expand("res/blobs/{s}.html", s=SAMPLES),  # rand samples of detected blobs
         count1="res/classification1/COUNT1.txt",  # count from weight1
         view1=expand("res/classification1/{s}.html", s=SAMPLES), # view weight1-pos
+        area1=expand("res/classification1/{s}.area.txt", s=SAMPLES),
 
 rule czi2img:
     input:
@@ -132,6 +133,24 @@ rule count1:
     shell:
         """
         grep 'Predictions' {input} > {output}
+        """
+
+rule area_calculation1:
+    input:
+        "res/classification1/{s}.pred.npy.gz"
+    output:
+        "res/classification1/{s}.area.txt"
+    log:
+        "res/classification1/{s}.area.log"
+    benchmark:
+        "res/classification1/{s}.area.tsv"
+    threads:
+        1
+    params:
+        mem="8000"
+    shell:
+        """
+        python scripts/area_calculation.py {input} 1 {output} &> {log}
         """
 
 
