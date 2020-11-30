@@ -24,6 +24,8 @@ rule czi2img:
     output:
         "img/jpg/{s}.jpg",
         # todo: "img/equ/{s}.equ.jpg",
+    priority: 
+        0
     threads:
         1
     log:
@@ -44,6 +46,8 @@ rule blob_detection:
         "data/{s}.czi"
     output:
         "blobs/{s}.npy.gz"
+    priority:
+        100
     threads:
         1
     log:
@@ -181,6 +185,6 @@ rule view0:
         "benchmark/blobs/view/{s}.txt"
     shell:
         """
-        fname={input} runipy viewing_blobs.ipynb {output.nb}
-        jupyter nbconvert --to html {output.nb}
+        fname={input} runipy viewing_blobs.ipynb {output.nb} &> {log}
+        jupyter nbconvert --to html {output.nb} &>> {log}
         """

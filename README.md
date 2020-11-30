@@ -16,8 +16,8 @@
 conda install tensorflow keras scikit-image czifile  runipy imgaug
 
 # Nov 2020 install
-- install: `conda env create -n ccount -f ccount.yaml`
-- update: `conda env update -n ccount -f ccount.yaml`
+- install: `conda env create -n ccount -f env.yaml`
+- update: `conda env update -n ccount -f env.yaml`
 
 
 # Usage
