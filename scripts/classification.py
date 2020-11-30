@@ -47,8 +47,8 @@ ap.add_argument("-w", "--weights", type=str,
                 help="(optional) path to weights file")
 ap.add_argument("-u", "--undistinguishable", type=str, default="delete",
                 help="(optional) treat undistinguishable by delete/convert_to_yes/convert_to_no")
-ap.add_argument("-e", "--epochs", type=int, default=500,
-                help="(optional) max-epochs, default 500")
+ap.add_argument("-e", "--epochs", type=int, default=30,
+                help="(optional) max-epochs, default 30")
 
 args = vars(ap.parse_args())
 name = os.path.basename(args['blobs_db'])
@@ -61,18 +61,14 @@ print("name", name)
 
 # Parameters
 scaling_factor = 2  # input scale down for model training
-
 aug_sample_size = 2000
-
-training_ratio = 0.7  # proportion of data to be in training set
-
+training_ratio = 0.9  # proportion of data to be in training set
 r_ext_ratio = 1.4  # larger (1.4) for better view under augmentation
 r_ext_pixels = 30
-
 numClasses=2
 batch_size=64  # default 64
 epochs = args["epochs"]  # default 500
-patience = 10  # default 50
+patience = 3  # default 50
 learning_rate = 0.0001  # default 0.0001 (Adam)
 verbose = 2  # {0, 1, 2}
 
@@ -82,17 +78,20 @@ blobs = load_blobs_db(args["blobs_db"])
 w = int(sqrt(blobs.shape[1]-6) / 2)  # width/2 of img
 
 
-# Remove unlabeled and uncertain (only when training)
+# Remove unlabeled (only when training)
 if args["load_model"] <= 0:
     print("In training mode")
     print("Removing unlabeled blobs")
     blobs = blobs[blobs[:, 3] != -1, :]
     blobs_stat(blobs)
 
-    if numClasses == 2:
-        print("Remove undistinguishable")  # todo: user decide
-        blobs = blobs[blobs[:, 3] != -2, :]
-        blobs_stat(blobs)
+
+# set other laberls as no
+if numClasses == 2:
+    print("Remove undistinguishable and artifacts")  # todo: user decide
+    blobs[blobs[:, 3] == -2, 3] = 0
+    blobs[blobs[:, 3] == 9, 3] = 0
+    blobs_stat(blobs)
 
 
 # Split train/valid
