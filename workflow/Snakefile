@@ -17,8 +17,8 @@ rule targets:
         blobs=expand("res/blobs/{s}.npy.gz", s=SAMPLES),  # blob_detection
         view0=expand("res/blobs/{s}.html", s=SAMPLES),  # rand samples of detected blobs
         count1="res/classification1/COUNT1.txt",  # count from weight1
-        view1=expand("res/classification1/{s}.html", s=SAMPLES), # view weight1-pos
-        area1=expand("res/classification1/{s}.area.txt", s=SAMPLES),
+        view1=expand("res/classification1/view/{s}.html", s=SAMPLES), # view weight1-pos
+        area1=expand("res/classification1/area/{s}.area.txt", s=SAMPLES),
 
 rule czi2img:
     input:
@@ -38,7 +38,7 @@ rule czi2img:
         mem='40000'
     shell:
         """
-        python scripts/czi2img.py -i {input} -f {FORMAT} -odir res/img &> {log}
+        python workflow/czi2img.py -i {input} -f {FORMAT} -odir res/img &> {log}
         """
     
 rule blob_detection:
@@ -58,7 +58,7 @@ rule blob_detection:
         mem="45000"
     shell:
         """
-        python scripts/blob_detection.py -i {input} -f {FORMAT} -odir res/blobs/ &> {log}
+        python workflow/blob_detection.py -i {input} -f {FORMAT} -odir res/blobs/ &> {log}
         """
 
 rule view0:
@@ -77,7 +77,7 @@ rule view0:
         mem="8000"
     shell:
         """
-        fname={input} dir={WKDIR} runipy scripts/viewing_blobs.ipynb {output.nb} &> {log}
+        fname={input} dir={WKDIR} runipy workflow/viewing_blobs.ipynb {output.nb} &> {log}
         jupyter nbconvert --to html {output.nb} &>> {log}
         """
 
@@ -98,26 +98,27 @@ rule classification1:
         mem="8000"
     shell:
         """
-        python scripts/classification.pred.py  -db {input.db} -o res/classification1 -l 1 -w {input.weight} &> {log}
+        python workflow/classification.pred.py  -db {input.db} -o res/classification1 -l 1 -w {input.weight} &> {log}
         """
 
 rule view1:
     input:
         "res/classification1/{s}.pred.npy.gz"
     output:
-        nb="res/classification1/{s}.ipynb",
-        html="res/classification1/{s}.html"
+        nb="res/classification1/view/{s}.ipynb",
+        html="res/classification1/view/{s}.html"
     log:
-        "res/classification1/{s}.html.log"
+        "res/classification1/view/{s}.html.log"
     benchmark:
-        "res/classification1/{s}.html.tsv"
+        "res/classification1/view/{s}.html.tsv"
     threads:
         1
     params:
         mem="8000"
     shell:
         """
-        fname={input} dir={WKDIR} runipy scripts/viewing_blobs.ipynb {output.nb} &> {log}
+        mkdir -p res res/classification1 res/classification1/view
+        fname={input} dir={WKDIR} runipy workflow/viewing_blobs.ipynb {output.nb} &> {log}
         jupyter nbconvert --to html {output.nb} &>> {log}
         """
 
@@ -130,29 +131,30 @@ rule count1:
         1
     params:
         mem="1000"
+    log:
+        "res/classification1/COUNT1.txt.log"
     shell:
         """
-        grep 'Predictions' {input} > {output}
+        grep 'Predictions' {input} > {output} 2> {log}
         """
 
 rule area_calculation1:
     input:
         "res/classification1/{s}.pred.npy.gz"
     output:
-        "res/classification1/{s}.area.txt"
+        "res/classification1/area/{s}.area.txt"
     log:
-        "res/classification1/{s}.area.log"
+        "res/classification1/area/{s}.area.log"
     benchmark:
-        "res/classification1/{s}.area.tsv"
+        "res/classification1/area/{s}.area.tsv"
     threads:
         1
     params:
         mem="8000"
     shell:
         """
-        python scripts/area_calculation.py {input} 1 {output} &> {log}
+        python workflow/area_calculation.py {input} 1 {output} &> {log}
         """
-
 
 rule filter2:
     input:
@@ -169,7 +171,7 @@ rule filter2:
         mem="8000"
     shell:
         """
-        python scripts/classification.py  -db {input} -o res/filter2 -l 1 -w {WEIGHT2} &> {output.log}
+        python workflow/classification.py  -db {input} -o res/filter2 -l 1 -w {WEIGHT2} &> {output.log}
         """
 
 
@@ -206,7 +208,7 @@ rule view2:
         mem="8000"
     shell:
         """
-        fname={input} dir={WKDIR} runipy scripts/viewing_blobs.ipynb {output.nb} &> {log}
+        fname={input} dir={WKDIR} runipy workflow/viewing_blobs.ipynb {output.nb} &> {log}
         jupyter nbconvert --to html {output.nb} &>> {log}
         """
 
