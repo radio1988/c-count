@@ -84,9 +84,9 @@ rule view0:
 rule classification1:
     input:
         db="res/blobs/{s}.npy.gz",
-	weight=WEIGHT1
+        weight=WEIGHT1
     output:
-        yes="res/classification1/{s}.yes.npy.gz",
+#        yes="res/classification1/{s}.yes.npy.gz",
         all="res/classification1/{s}.pred.npy.gz",
     log:
         "res/classification1/{s}.log"
