@@ -1,16 +1,14 @@
 configfile: "config.yaml"
 import os
-from damid_modules import input_names
+from damid_modules import input_names, get_samples
 
-SAMPLES=config["SAMPLES"]
+DATA_DIR=config["DATA_DIR"]
 FORMAT=config["FORMAT"]
 WEIGHT1=config["WEIGHT1"]
 WEIGHT2=config["WEIGHT2"]
 WKDIR=os.getcwd()
 
-shell.prefix("""
-            # placeholder
-            """)
+SAMPLES=get_samples(DATA_DIR)
 
 rule targets:
     input:
@@ -51,7 +49,7 @@ rule blob_detection:
         "res/blobs/{s}.0.npy.gz", # todo: include all outputs
         touch("res/blobs/{s}.finished")
     priority:
-        100
+        50
     threads:
         1
     log:
@@ -136,6 +134,8 @@ rule count1:
         1
     params:
         mem="1000"
+    priority:
+        100
     log:
         "res/classification1/COUNT1.txt.log"
     shell:

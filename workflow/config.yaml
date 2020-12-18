@@ -1,6 +1,29 @@
+DATA_DIR: data/
 SAMPLES:
-    - placeholder
+        - E2f4_CFUe_KO_1-Stitching-01
+        - E2f4_CFUe_KO_2-Stitching-02
+        - E2f4_CFUe_KO_3-Stitching-03
+        - E2f4_CFUe_NoEpo_1-Stitching-04
+        - E2f4_CFUe_NoEpo_2-Stitching-05
+        - E2f4_CFUe_NoEpo_3-Stitching-06
+        - E2f4_CFUe_WT1_1-Stitching-07
+        - E2f4_CFUe_WT1_2-Stitching-08
+        - E2f4_CFUe_WT1_2_Top-Stitching-09
+        - E2f4_CFUe_WT1_3-Stitching-10
+        - E2f4_CFUe_WT1_3_Top-Stitching-11
+        - E2f4_CFUe_WT2_1-Stitching-12
+        - E2f4_CFUe_WT2_1_Top-Stitching-13
+        - E2f4_CFUe_WT2_2-Stitching-14
+        - E2f4_CFUe_WT2_3-Stitching-15
+        - E2f4_CFUe_WT3_1-Stitching-16
+        - E2f4_CFUe_WT3_1_Top-Stitching-17
+        - E2f4_CFUe_WT3_2-Stitching-18
+        - E2f4_CFUe_WT3_2_Top-Stitching-19
+        - E2f4_CFUe_WT3_3-Stitching-20
+        - E2f4_CFUe_WT3_3_Top-Stitching-21
 
 FORMAT: 2019
-WEIGHT1: ../run1_good_ram_problem/2_first_round_training/output/Z_CFUe_1-Stitching-74.hdf5
-WEIGHT2: ../run1_good_ram_problem/5_second_round_training/danielAug19.hdf5
+WEIGHT1: weights/FL.t.old.hd5
+WEIGHT2: None
+
+
