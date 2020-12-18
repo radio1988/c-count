@@ -1,5 +1,6 @@
 configfile: "config.yaml"
 import os
+from damid_modules import input_names
 
 SAMPLES=config["SAMPLES"]
 FORMAT=config["FORMAT"]
@@ -13,19 +14,21 @@ shell.prefix("""
 
 rule targets:
     input:
-        img=expand("res/img/jpg/{s}.jpg", s=SAMPLES),  # czi2img
-        blobs=expand("res/blobs/{s}.npy.gz", s=SAMPLES),  # blob_detection
-        view0=expand("res/blobs/{s}.html", s=SAMPLES),  # rand samples of detected blobs
+        img=expand("res/img/log/{s}.finished", s=SAMPLES),  # czi2img
+        blobs=expand("res/blobs/{s}.finished", s=SAMPLES),  # blob_detection
+        view0=input_names(SAMPLES),
+        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
+        area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
+            suffix=".area.txt"),
         count1="res/classification1/COUNT1.txt",  # count from weight1
-        view1=expand("res/classification1/view/{s}.html", s=SAMPLES), # view weight1-pos
-        area1=expand("res/classification1/area/{s}.area.txt", s=SAMPLES),
 
 rule czi2img:
     input:
         "data/{s}.czi"
     output:
-        "res/img/jpg/{s}.jpg",
-        "res/img/equ/{s}.equ.jpg",
+        "res/img/jpg/{s}.0.jpg",
+        "res/img/equ/{s}.0.equ.jpg", # only tests if image of the first area
+        touch("res/img/log/{s}.finished") # if not error
     priority: 
         0
     threads:
@@ -45,7 +48,8 @@ rule blob_detection:
     input:
         "data/{s}.czi"
     output:
-        "res/blobs/{s}.npy.gz"
+        "res/blobs/{s}.0.npy.gz", # todo: include all outputs
+        touch("res/blobs/{s}.finished")
     priority:
         100
     threads:
@@ -63,54 +67,55 @@ rule blob_detection:
 
 rule view0:
     input:
-        "res/blobs/{s}.npy.gz"
+        "res/blobs/{s}.finished"
     output:
-        nb="res/blobs/{s}.ipynb",
-        html="res/blobs/{s}.html"
+        nb="res/blobs/view/{s}.{i}.ipynb",
+        html="res/blobs/view/{s}.{i}.html"
     log:
-        "res/blobs/{s}.html.log"
+        "res/blobs/{s}.{i}.html.log"
     benchmark:
-        "res/blobs/{s}.html.tsv"
+        "res/blobs/{s}.{i}.html.tsv"
     threads:
         1
     params:
         mem="8000"
     shell:
         """
-        fname={input} dir={WKDIR} runipy workflow/viewing_blobs.ipynb {output.nb} &> {log}
+        fname="res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" dir={WKDIR} runipy workflow/viewing_blobs.ipynb \
+        {output.nb} &> {log}
         jupyter nbconvert --to html {output.nb} &>> {log}
         """
 
 rule classification1:
     input:
-        db="res/blobs/{s}.npy.gz",
+        blobs="res/blobs/{s}.finished",
         weight=WEIGHT1
     output:
-#        yes="res/classification1/{s}.yes.npy.gz",
-        all="res/classification1/{s}.pred.npy.gz",
+        "res/classification1/{s}.{i}.pred.npy.gz",
     log:
-        "res/classification1/{s}.log"
+        "res/classification1/{s}.{i}.log"
     benchmark:
-        "res/classification1/{s}.tsv"
+        "res/classification1/{s}.{i}.tsv"
     threads:
         1
     params:
         mem="8000"
     shell:
         """
-        python workflow/classification.pred.py  -db {input.db} -o res/classification1 -l 1 -w {input.weight} &> {log}
+        python workflow/classification.pred.py  -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
+        -o res/classification1 -l 1 -w {input.weight} &> {log}
         """
 
 rule view1:
     input:
-        "res/classification1/{s}.pred.npy.gz"
+        "res/classification1/{s}.{i}.pred.npy.gz"  # some will not exist, but just ignore warnings
     output:
-        nb="res/classification1/view/{s}.ipynb",
-        html="res/classification1/view/{s}.html"
+        nb="res/classification1/view/{s}.{i}.ipynb",
+        html="res/classification1/view/{s}.{i}.html"
     log:
-        "res/classification1/view/{s}.html.log"
+        "res/classification1/view/{s}.{i}.html.log"
     benchmark:
-        "res/classification1/view/{s}.html.tsv"
+        "res/classification1/view/{s}.{i}.html.tsv"
     threads:
         1
     params:
@@ -124,7 +129,7 @@ rule view1:
 
 rule count1:
     input:
-        expand("res/classification1/{s}.log", s=SAMPLES)
+        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".log")
     output:
         "res/classification1/COUNT1.txt"
     threads:
@@ -140,13 +145,13 @@ rule count1:
 
 rule area_calculation1:
     input:
-        "res/classification1/{s}.pred.npy.gz"
+        "res/classification1/{s}.{i}.pred.npy.gz"
     output:
-        "res/classification1/area/{s}.area.txt"
+        "res/classification1/area/{s}.{i}.area.txt"
     log:
-        "res/classification1/area/{s}.area.log"
+        "res/classification1/area/{s}.{i}.area.log"
     benchmark:
-        "res/classification1/area/{s}.area.tsv"
+        "res/classification1/area/{s}.{i}.area.tsv"
     threads:
         1
     params:
@@ -156,60 +161,60 @@ rule area_calculation1:
         python workflow/area_calculation.py {input} 1 {output} &> {log}
         """
 
-rule filter2:
-    input:
-        "res/classification1/{s}.yes.npy.gz"
-    output:
-        yes="res/filter2/{s}.yes.yes.npy.gz",
-        all="res/filter2/{s}.yes.pred.npy.gz",
-        log="res/filter2/{s}.log"
-    benchmark:
-        "res/filter2/{s}.tsv"
-    threads:
-        1
-    params:
-        mem="8000"
-    shell:
-        """
-        python workflow/classification.py  -db {input} -o res/filter2 -l 1 -w {WEIGHT2} &> {output.log}
-        """
+# rule filter2:
+#     input:
+#         "res/classification1/{s}.yes.npy.gz"
+#     output:
+#         yes="res/filter2/{s}.yes.yes.npy.gz",
+#         all="res/filter2/{s}.yes.pred.npy.gz",
+#         log="res/filter2/{s}.log"
+#     benchmark:
+#         "res/filter2/{s}.tsv"
+#     threads:
+#         1
+#     params:
+#         mem="8000"
+#     shell:
+#         """
+#         python workflow/classification.py  -db {input} -o res/filter2 -l 1 -w {WEIGHT2} &> {output.log}
+#         """
 
 
 
-rule count2:
-    input:
-        expand("res/filter2/{s}.log", s=SAMPLES)
-    output:
-        "res/filter2/COUNT2.txt"
-    threads:
-        1
-    params:
-        mem="1000"
-    shell:
-        """
-        grep 'Predictions' {input} > {output}
-        """
+# rule count2:
+#     input:
+#         expand("res/filter2/{s}.log", s=SAMPLES)
+#     output:
+#         "res/filter2/COUNT2.txt"
+#     threads:
+#         1
+#     params:
+#         mem="1000"
+#     shell:
+#         """
+#         grep 'Predictions' {input} > {output}
+#         """
 
 
 
-rule view2:
-    input:
-        "res/filter2/{s}.yes.pred.npy.gz"
-    output:
-        nb="res/filter2/{s}.ipynb",
-        html="res/filter2/{s}.html"
-    log:
-        "res/filter2/{s}.html.log"
-    benchmark:
-        "res/filter2/{s}.html.tsv"
-    threads:
-        1
-    params:
-        mem="8000"
-    shell:
-        """
-        fname={input} dir={WKDIR} runipy workflow/viewing_blobs.ipynb {output.nb} &> {log}
-        jupyter nbconvert --to html {output.nb} &>> {log}
-        """
+# rule view2:
+#     input:
+#         "res/filter2/{s}.yes.pred.npy.gz"
+#     output:
+#         nb="res/filter2/{s}.ipynb",
+#         html="res/filter2/{s}.html"
+#     log:
+#         "res/filter2/{s}.html.log"
+#     benchmark:
+#         "res/filter2/{s}.html.tsv"
+#     threads:
+#         1
+#     params:
+#         mem="8000"
+#     shell:
+#         """
+#         fname={input} dir={WKDIR} runipy workflow/viewing_blobs.ipynb {output.nb} &> {log}
+#         jupyter nbconvert --to html {output.nb} &>> {log}
+#         """
 
 

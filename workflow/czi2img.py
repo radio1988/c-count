@@ -39,8 +39,13 @@ Path(os.path.join(args.odir, "jpg")).mkdir(parents=True, exist_ok=True)
 Path(os.path.join(args.odir, "equ")).mkdir(parents=True, exist_ok=True)
 
 # Work and output
-image = read_czi(args.i, Format=args.f)
-matplotlib.image.imsave(oimgname, image, cmap = "gray")
-image_equ = block_equalize(image, block_height=2000, block_width=2400)
-matplotlib.image.imsave(oequname, image_equ, cmap = "gray")
+images = read_czi(args.i, Format=args.f, concatenation=False)
+for i,image in enumerate(images):
+	image_equ = block_equalize(image, block_height=2000, block_width=2400)
+	
+	name1 = re.sub("jpg$", str(i)+".jpg", oimgname)
+	matplotlib.image.imsave(name1, image, cmap = "gray")
+	
+	name2 = re.sub("equ.jpg$", str(i)+".equ.jpg", oequname)
+	matplotlib.image.imsave(name2, image_equ, cmap = "gray")
 
