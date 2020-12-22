@@ -18,7 +18,8 @@ rule targets:
         view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
         area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
             suffix=".area.txt"),
-        count1="res/classification1/COUNT1.txt",  # count from weight1
+        count1="res/COUNT.csv",  # count from weight1
+        area1_agg="res/areas.csv",
 
 rule czi2img:
     input:
@@ -129,7 +130,8 @@ rule count1:
     input:
         input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".log")
     output:
-        "res/classification1/COUNT1.txt"
+        raw="res/classification1/COUNT1.txt",
+        clean="res/COUNT.csv"
     threads:
         1
     params:
@@ -137,10 +139,11 @@ rule count1:
     priority:
         100
     log:
-        "res/classification1/COUNT1.txt.log"
+        "res/COUNT.csv.log"
     shell:
         """
-        grep 'Predictions' {input} > {output} 2> {log}
+        grep 'Predictions' {input} > {output.raw} 2> {log}
+        python workflow/get_counts.py res/classification1/COUNT1.txt res/COUNT.csv &>> {log}
         """
 
 rule area_calculation1:
@@ -159,6 +162,24 @@ rule area_calculation1:
     shell:
         """
         python workflow/area_calculation.py {input} 1 {output} &> {log}
+        """
+
+
+rule area_aggregation:
+    input:
+        input_names(SAMPLES=SAMPLES, 
+                    prefix="res/classification1/area/", suffix=".area.txt")
+    output:
+        "res/areas.csv"
+    log:
+        "res/areas.csv.log"
+    threads:
+        1
+    params:
+        mem="1000"
+    shell:
+        """
+        python workflow/get_areas.py res/classification1/area/ res/areas.csv &> {log}
         """
 
 # rule filter2:
