@@ -1,0 +1,7 @@
+DATA_DIR: data/
+
+FORMAT: 2019
+WEIGHT1: weights/FL.t.old.hd5
+WEIGHT2: None
+
+

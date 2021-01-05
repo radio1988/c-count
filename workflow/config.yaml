@@ -1,6 +1,0 @@
-SAMPLES:
-    - placeholder
-
-FORMAT: 2019
-WEIGHT1: ../run1_good_ram_problem/2_first_round_training/output/Z_CFUe_1-Stitching-74.hdf5
-WEIGHT2: ../run1_good_ram_problem/5_second_round_training/danielAug19.hdf5
