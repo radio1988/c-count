@@ -11,8 +11,8 @@ def get_areaDF_from_area_txts(path="classification1/area/"):
     area_fnames = list(filter(lambda x: x.endswith("txt"), area_fnames))
     print('There are: ', len(area_fnames), 'areas scanned')
 
-    labels = area_fnames.copy()
-    labels = [x.replace(".area.txt", "") for x in labels]
+    labels0 = area_fnames.copy()
+    labels0 = [x.replace(".area.txt", "") for x in labels0]
     # ['E2f4_CFUe_KO_1-Stitching-01.0',
     #  'E2f4_CFUe_KO_1-Stitching-01.1',
     #  'E2f4_CFUe_KO_1-Stitching-01.2']
@@ -23,12 +23,21 @@ def get_areaDF_from_area_txts(path="classification1/area/"):
     #  'classification1/area/E2f4_CFUe_KO_1-Stitching-01.2.area.txt']
     
     areaLSF = []
-    for f in area_fnames:
-        d = pd.read_table(f, header=None)
+    labels = []
+    for i,f in enumerate(area_fnames):
+        try:
+            d = pd.read_table(f, header=None)
+        except pd.errors.EmptyDataError:
+            print(i, f,labels0[i], 'contains no blobs, bad');
+            continue
         areaLSF.append( d.iloc[:, 0].tolist())
+        print(i, f,labels0[i], 'good');
+        labels.append(labels0[i])
+
     areaDF = pd.DataFrame(areaLSF).T
     areaDF = pd.DataFrame(areaDF)
     areaDF.columns = labels
+    print("there are", len(labels), "areas aggregated")
     
     # 	E2f4_CFUe_KO_1-Stitching-01.0	E2f4_CFUe_KO_1-Stitching-01.1	E2f4_CFUe_KO_1-Stitching-01.2
     # 0	10747.0	4693.0	8281.0
