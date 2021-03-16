@@ -31,12 +31,6 @@ print('output dir:', args.odir)
 
 outname = os.path.basename(args.i)
 corename = re.sub('.czi$', '', outname)
-out_blob_fname = os.path.join(args.odir, corename+".npy")
-out_img_fname = os.path.join(args.odir, "vis", corename+".jpg")
-hist_img_fname = os.path.join(args.odir, "hist", corename+".hist.pdf")
-print("output blob:", out_blob_fname)
-print("output histogram:", hist_img_fname)
-print("output_img_fname:", out_img_fname)
 
 # Prep output dir
 Path(os.path.join(args.odir, "vis")).mkdir(parents=True, exist_ok=True)
@@ -84,68 +78,78 @@ else:
 test = False
 
 # Read
-image = read_czi(args.i, Format=args.f)
-image = np.divide(image, np.max(image))  # from 0-255 or any range -> 0-1
-if test:
-    image = image[0:4000, 0:4000]
-    print("in test mode")
+images = read_czi(args.i, Format=args.f)
+for i,image in enumerate(images):
+    i=str(i)
+    print ("\n\nFor image:", i)
+    out_blob_fname = os.path.join(args.odir, corename+"."+i+".npy")
+    out_img_fname = os.path.join(args.odir, "vis", corename+"."+i+".jpg")
+    hist_img_fname = os.path.join(args.odir, "hist", corename+"."+i+".hist.pdf")
+    print("output blob:", out_blob_fname)
+    print("output histogram:", hist_img_fname)
+    print("output_img_fname:", out_img_fname)
 
-# Blob Detection
-print(">>> Equalizing image..")
-if block_width <=0:
-    image_equ = equalize(image)
-else:
-    image_equ = block_equalize(image, block_height=block_height, block_width=block_width)
+    image = np.divide(image, np.max(image))  # from 0-255 or any range -> 0-1
+    if test:
+        image = image[0:4000, 0:4000]
+        print("in test mode")
 
-print(">>> Detecting blobs..")
-image_flat_crops = find_blobs_and_crop(
-    image, image_equ,
-    crop_width=crop_width, 
-    # blob_detection parameters
-    scaling_factor=scaling_factor,
-    max_sigma=max_sigma, 
-    min_sigma=min_sigma, 
-    num_sigma=num_sigma, 
-    threshold=threshold, 
-    overlap=overlap,
-    # blob yellow circle visualization parameters
-    blob_extention_ratio=blob_extention_ratio,
-    blob_extention_radius=blob_extention_radius,
-    fname=out_img_fname  # if None, will plot inline
-)
+    # Blob Detection
+    print(">>> Equalizing image..")
+    if block_width <=0:
+        image_equ = equalize(image)
+    else:
+        image_equ = block_equalize(image, block_height=block_height, block_width=block_width)
 
-# Remove blobs containing edges
-good_flats = remove_edge_crops(image_flat_crops)
+    print(">>> Detecting blobs..")
+    image_flat_crops = find_blobs_and_crop(
+        image, image_equ,
+        crop_width=crop_width, 
+        # blob_detection parameters
+        scaling_factor=scaling_factor,
+        max_sigma=max_sigma, 
+        min_sigma=min_sigma, 
+        num_sigma=num_sigma, 
+        threshold=threshold, 
+        overlap=overlap,
+        # blob yellow circle visualization parameters
+        blob_extention_ratio=blob_extention_ratio,
+        blob_extention_radius=blob_extention_radius,
+        fname=out_img_fname  # if None, will plot inline
+    )
 
-# Hist
-r_ = good_flats[:,2]
-plt.hist(r_, 40)
-plt.title("Histogram of blob size")
-plt.savefig(hist_img_fname)
+    # Remove blobs containing edges
+    good_flats = remove_edge_crops(image_flat_crops)
 
-# Saving
-print('there are {} blobs detected'.format(len(image_flat_crops)))
-print("there are {} blobs passed edge filter".format(len(good_flats)))
-print(good_flats.shape)
-np.save(out_blob_fname, good_flats)
-print('saved into {}'.format(out_blob_fname))
-bashCommand = "gzip -f " + out_blob_fname
-process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-output, error = process.communicate()
+    # Hist
+    r_ = good_flats[:,2]
+    plt.hist(r_, 40)
+    plt.title("Histogram of blob size")
+    plt.savefig(hist_img_fname)
 
-# Visualizing filtered blobs
-print("Visualizing blobs")
-vis_blob_on_block(good_flats, image_equ,image, 
-    blob_extention_ratio=blob_extention_ratio, 
-    blob_extention_radius=blob_extention_radius, 
-    fname=out_img_fname)
+    # Saving
+    print('there are {} blobs detected'.format(len(image_flat_crops)))
+    print("there are {} blobs passed edge filter".format(len(good_flats)))
+    print(good_flats.shape)
+    np.save(out_blob_fname, good_flats)
+    print('saved into {}'.format(out_blob_fname))
+    bashCommand = "gzip -f " + out_blob_fname
+    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
 
-if test:
-    Path("./blobs/vis_beforeEdgeFilter").mkdir(parents=True, exist_ok=True)
-    out_img_fnameBefore = os.path.join(args.odir, "vis_beforeEdgeFilter", corename+".jpg")
-    vis_blob_on_block(image_flat_crops, image_equ,image, 
+    # Visualizing filtered blobs
+    print("Visualizing blobs")
+    vis_blob_on_block(good_flats, image_equ,image, 
         blob_extention_ratio=blob_extention_ratio, 
         blob_extention_radius=blob_extention_radius, 
-        fname=out_img_fnameBefore)
+        fname=out_img_fname)
+
+    if test:
+        Path("./blobs/vis_beforeEdgeFilter").mkdir(parents=True, exist_ok=True)
+        out_img_fnameBefore = os.path.join(args.odir, "vis_beforeEdgeFilter", corename+".jpg")
+        vis_blob_on_block(image_flat_crops, image_equ,image, 
+            blob_extention_ratio=blob_extention_ratio, 
+            blob_extention_radius=blob_extention_radius, 
+            fname=out_img_fnameBefore)
 
 

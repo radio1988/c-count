@@ -1,4 +1,15 @@
-from czifile import CziFile
+import pandas as pd
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import os.path
+import re
+import time
+import tracemalloc
+import gc
+
+
+
 from math import sqrt
 from skimage import data, img_as_float
 from skimage.draw import circle
@@ -9,29 +20,21 @@ from skimage.transform import rescale, resize, downscale_local_mean
 from IPython.display import clear_output
 from random import randint
 from time import sleep
-from keras import backend as K
 
-import gzip
-import pandas as pd
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-import cv2
-import os.path
-import re
-import time
 
-import imgaug as ia
-from imgaug import augmenters as iaa
-
-def read_czi(fname, Format="2018"):
+def read_czi(fname, Format="2018", concatenation=False):
     '''
     input: fname of czi file
     output: 2d numpy array
+    assuming input czi format (n, 1, :, :, 1)
+    e.g. (4, 1, 70759, 65864, 1)
+
     '''
+    from czifile import CziFile
+
     if fname.endswith('czi'):
         with CziFile(fname) as czi:
-            image_arrays = czi.asarray()
+            image_arrays = czi.asarray()  # 129s, Current memory usage is 735.235163MB; Peak was 40143.710599MB
             print(image_arrays.shape)
     elif fname.endswith('czi.gz'):
         raise Exception("todo")
@@ -47,45 +50,49 @@ def read_czi(fname, Format="2018"):
         # reading (need 38 GB RAM) todo: use int16 if possible
         image = image_arrays[0, 1, 0, 0, :, :, 0]  # real image
         print("{}: {}\n".format(fname, image.shape))
+        return image 
     elif Format == "2019":        
         # Find Box with info: todo faster by https://kite.com/python/docs/PIL.Image.Image.getbbox  
+        # todo: int to float slow and large RAM usage, must change, use int16 if possible, done?
         lst = []
-        for i in range(0,image_arrays.shape[0]):
-            print(i)
-            image = image_arrays[i, 0, :,  :, 0]
-            nz_image = np.nonzero(image)
-            nz0 = np.unique(nz_image[0])
-            nz1 = np.unique(nz_image[1])
+        for i in range(0,image_arrays.shape[0]): # loop iter does not change process time 
+            print("For ", i, " area in czi")
+            image = image_arrays[i, 0, :,  :, 0] # 0s
+            nz_image = np.nonzero(image)  # process_time(),36s, most time taken here, 1.4GB RAM with tracemalloc
+            nz0 = np.unique(nz_image[0]) # 1.5s
+            nz1 = np.unique(nz_image[1]) # 2.4s
+            del nz_image
+            n = gc.collect()
+            print("Number of unreachable objects collected by GC:", n)  
             if len(nz0) < 2 or len(nz1) < 2: 
                 continue
             print(nz0, nz0.shape)
             print(nz1, nz1.shape)
-            image = image[min(nz0):max(nz0), min(nz1):max(nz1)]
-            lst.append(image) 
-            
-        # padding
-        heights = [x.shape[0] for x in lst]
-        widths = [x.shape[1] for x in lst]
-        max(heights)
-        max(widths)
-        for (i,image) in enumerate(lst):
-            print(image.shape, i)
-            pad_h = max(heights) - image.shape[0]
-            pad_w = max(widths) - image.shape[1]
-            lst[i] = np.pad(image, [[0,pad_h],[0,pad_w]], "constant")
-            
-        # concat
-        # use a long wide image instead to adjust for unknown number of scanns
-        #image_top = np.concatenate((lst[0], lst[1]), axis = 1)
-      #  image_bottom = np.concatenate((lst[2], lst[3]), axis = 1)
-      #  image = np.concatenate((image_top, image_bottom), axis = 0)
-        image = np.hstack(lst)
-        print("shape of whole picture {}: {}\n".format(fname, image.shape))
+            image = image[min(nz0):max(nz0), min(nz1):max(nz1)]  # 0s
+            lst.append(image) # 0s
+        
+        if concatenation:
+            # padding
+            heights = [x.shape[0] for x in lst]
+            widths = [x.shape[1] for x in lst]
+            max(heights)
+            max(widths)
+            for (i,image) in enumerate(lst):
+                print(image.shape, i)
+                pad_h = max(heights) - image.shape[0]
+                pad_w = max(widths) - image.shape[1]
+                lst[i] = np.pad(image, [[0,pad_h],[0,pad_w]], "constant")
+                
+            # concat: use a long wide image instead to adjust for unknown number of scanns
+            image = np.hstack(lst)
+            print("shape of whole picture {}: {}\n".format(fname, image.shape))
+            return image
+        else:
+            # return a list of single are images
+            return lst #[image0, image1, image2 ..]
     else:
         raise Exception("image format error\n")
-        image = None
-
-    return image # test, should be image, not image0
+        return None
 
 
 def equalize(image):
@@ -600,7 +607,7 @@ def load_blobs_db(in_db_name, n_subsample=False, seed=1):
     input: db fname from user (xxx.npy)
     output: array (crops format)
     '''
-
+    import gzip
     if os.path.isfile(in_db_name):
         if in_db_name.endswith('npy'):
             image_flat_crops = np.load(in_db_name)
@@ -635,6 +642,7 @@ def remove_edge_crops(flat_blobs):
     some crops of blobs contain edges, because they are from the edge of scanned areas or on the edge of the well
     use this function to remove blobs with obvious long straight black/white lines
     """
+    import cv2
     good_flats = []
     for i in range(0, flat_blobs.shape[0]):
         flat = flat_blobs[i,]
@@ -893,6 +901,10 @@ def augment_images(Images, aug_sample_size):
     '''
     # Sometimes(0.5, ...) applies the given augmenter in 50% of all cases,
     # e.g. Sometimes(0.5, GaussianBlur(0.3)) would blur roughly every second image.
+    import imgaug as ia
+    from imgaug import augmenters as iaa
+
+
     sometimes = lambda aug: iaa.Sometimes(0.9, aug)
 
     w2 = Images.shape[1]
@@ -930,6 +942,7 @@ def augment_images(Images, aug_sample_size):
 
 
 def F1(y_pred, y_true):
+    from keras import backend as K
     def recall(y_true, y_pred):
         """Recall metric.
 
