@@ -71,9 +71,9 @@ rule view0:
         nb="res/blobs/view/{s}.{i}.ipynb",
         html="res/blobs/view/{s}.{i}.html"
     log:
-        "res/blobs/{s}.{i}.html.log"
+        "res/blobs/view/{s}.{i}.html.log"
     benchmark:
-        "res/blobs/{s}.{i}.html.tsv"
+        "res/blobs/view/{s}.{i}.html.tsv"
     threads:
         1
     params:
@@ -128,7 +128,7 @@ rule view1:
 
 rule count1:
     input:
-        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".log")
+        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".pred.npy.gz")
     output:
         raw="res/classification1/COUNT1.txt",
         clean="res/COUNT.csv"
