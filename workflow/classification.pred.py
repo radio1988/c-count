@@ -128,7 +128,7 @@ Labels2 = np_utils.to_categorical(Labels, numClasses)
 print("[INFO] compiling model...")
 opt = Adam(lr=learning_rate)
 model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w, numClasses=numClasses,
-                    weightsPath=args["weights"] if args["load_model"] > 0 else None)
+                    weightsPath=args["weights"] if int(args["load_model"]) > 0 else None)
 model.compile(loss="categorical_crossentropy", optimizer=opt,
               metrics=[F1])  # todo: F1
 earlystop = keras.callbacks.EarlyStopping(monitor='val_loss',
