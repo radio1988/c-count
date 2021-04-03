@@ -14,8 +14,8 @@ rule targets:
     input:
         img=expand("res/img/log/{s}.finished", s=SAMPLES),  # czi2img
         blobs=expand("res/blobs/{s}.finished", s=SAMPLES),  # blob_detection
-        view0=input_names(SAMPLES),
-        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
+#        view0=input_names(SAMPLES),
+#        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
         area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
             suffix=".area.txt"),
         count1="res/COUNT.csv",  # count from weight1
@@ -90,9 +90,8 @@ rule classification1:
         blobs="res/blobs/{s}.finished",
         weight=WEIGHT1
     output:
-        "res/classification1/{s}.{i}.pred.npy.gz",
-    log:
-        "res/classification1/{s}.{i}.log"
+        npy="res/classification1/{s}.{i}.pred.npy.gz",
+        log="res/classification1/{s}.{i}.log"
     benchmark:
         "res/classification1/{s}.{i}.tsv"
     threads:
@@ -102,7 +101,7 @@ rule classification1:
     shell:
         """
         python workflow/classification.pred.py  -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
-        -o res/classification1 -l 1 -w {input.weight} &> {log}
+        -o res/classification1 -l 1 -w {input.weight} &> {output.log}
         """
 
 rule view1:
@@ -128,7 +127,7 @@ rule view1:
 
 rule count1:
     input:
-        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".pred.npy.gz")
+        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".log")
     output:
         raw="res/classification1/COUNT1.txt",
         clean="res/COUNT.csv"
