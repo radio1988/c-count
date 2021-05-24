@@ -50,7 +50,7 @@ rule blob_detection:
         "res/blobs/{s}.0.npy.gz", # todo: include all outputs
         touch("res/blobs/{s}.finished")
     priority:
-        50
+        100
     threads:
         1
     log:
