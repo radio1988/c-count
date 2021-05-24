@@ -46,7 +46,6 @@ colony count
 - work from terminal (classification)
 - each blob_detection takes 18G RAM
 
---------
 ##### FOR INTERNAL USE ####
 ccount will input raw image (czi files), and output colony counts, and colony size distribution.
 
@@ -108,6 +107,3 @@ Analysis steps:
 			- type 'top|grep snakemake', see something like '13519 socolov+  20   0  501032  39180  37072 S   0.0  0.1   0:01.03 snakemake'
 			- type 'kill -9 13519' to kill the workflow process, 13519 is the job-ID
 			- type 'top' and kill the last job submitted by the snakemake workflow, e.g. a python process taking 100% of the CPU. This is a bit tricky. If can't figure this out, simply wait for 1 hour before re-submitting a workflow, most old processes will be finished in 1 hour
-	- 
-
-
