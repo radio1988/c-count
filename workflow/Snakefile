@@ -1,6 +1,6 @@
 configfile: "config.yaml"
 import os
-from damid_modules import input_names, get_samples
+from ccount import input_names, get_samples
 
 DATA_DIR=config["DATA_DIR"]
 FORMAT=config["FORMAT"]
