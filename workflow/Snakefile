@@ -14,8 +14,8 @@ rule targets:
     input:
         img=expand("res/img/log/{s}.finished", s=SAMPLES),  # czi2img
         blobs=expand("res/blobs/{s}.finished", s=SAMPLES),  # blob_detection
-        view0=input_names(SAMPLES),
-        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
+#        view0=input_names(SAMPLES),
+#        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
         area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
             suffix=".area.txt"),
         count1="res/COUNT.csv",  # count from weight1
@@ -50,7 +50,7 @@ rule blob_detection:
         "res/blobs/{s}.0.npy.gz", # todo: include all outputs
         touch("res/blobs/{s}.finished")
     priority:
-        50
+        100
     threads:
         1
     log:
