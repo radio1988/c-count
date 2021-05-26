@@ -137,7 +137,7 @@ def find_blob(image_bright_blob_on_dark, scaling_factor = 2,
     max_sigma=40, min_sigma=4, num_sigma=5, threshold=0.1, overlap=.0):
     '''
     input: gray scaled image with bright blob on dark background
-    output: [n, 3] array of blob information, [y-locaiton, x-location, r-blob-radius]
+    output: [n, 3] array of blob information, [y-locaiton, x-location, r-blob-radius] !!!
     plot: original image of plates (dark colonies on light backgound)
     get squares of bright blobs
 
@@ -173,7 +173,7 @@ def find_blob(image_bright_blob_on_dark, scaling_factor = 2,
 def vis_blob_on_block(blobs, block_img_equ, block_img_ori, 
     blob_extention_ratio=1.4, blob_extention_radius=2, scaling = 8, fname=None):
     '''
-    blobs: blob info array [n, 3]
+    blobs: blob info array [n, 0:3]
     block_img_equ: corresponding block_img equalized
     block_img_ori: block_img before equalization
     plot: plot block_img with blobs in yellow circles
@@ -250,20 +250,20 @@ def flat_label_filter(flats, label_filter = 1):
     return (flats)
 
 
-def crop_blobs(blobs, block_img, block_row=-1, block_column=-1, crop_width=100,
+def crop_blobs(blobs, block_img, area=-1, place_holder=-1, crop_width=100,
                blob_extention_ratio=1.4, blob_extention_radius=2):
     '''
-    input1: blobs, blob info [n, 3] [y, x, r]
+    input1: blobs, blob info [n, 0:3] [y, x, r]
     input2: block_img, corresponding block_img
     plt: cropped images
     return: cropped padded images in a flattened 2d-array, with meta data in the first 6 numbers
             - rows: blobs
-            - columns: [y, x, r_, label, block_row, block_column, flattened cropped_blob_img (crop_width^2)]
+            - columns: [y, x, r_, label, area, place_holder, flattened cropped_blob_img (crop_width^2)]
                 - y, x: corrd of centroid on original block_img
                 - r_: extended radius
                 - label: -1 = unlabeled; 1 = yes, 0 = no
-                - block_row: block row num from whole image, start with 0, -1 means NA
-                - block_column: same
+                - area: in pixels, -1 as na
+                - place_holder: for future use
 
     Algorithm:
     1. White padding
@@ -287,7 +287,7 @@ def crop_blobs(blobs, block_img, block_row=-1, block_column=-1, crop_width=100,
                       x_ - crop_width: x_ + crop_width]  # x coordinates use columns to locate, vise versa
 
         flat_crop = np.insert(cropped_img.flatten(), [0, 0, 0, 0, 0, 0],
-                              [y, x, r_, -1, block_row, block_column])  # -1 unlabeled
+                              [y, x, r_, -1, area, place_holder])  # -1 unlabeled
         flat_crop = np.array([flat_crop])
         flat_crops = np.append(flat_crops, flat_crop, axis=0)
     return flat_crops
@@ -321,7 +321,7 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0):
     '''
     input: one padded crop of a blob
     plt: yellow circle and hard-masked side-by-side
-    columns: [y, x, r_, block_row, block_column, flattened cropped_blob_img (crop_width^2)]
+    columns: [y, x, r_, area, place_holder, flattened cropped_blob_img (crop_width^2)]
     return: cropped image and hard-masked image
     '''
     # reshape

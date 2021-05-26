@@ -1,6 +1,6 @@
 configfile: "config.yaml"
 import os
-from ccount import input_names, get_samples
+from damid_modules import input_names, get_samples
 
 DATA_DIR=config["DATA_DIR"]
 FORMAT=config["FORMAT"]
@@ -35,9 +35,9 @@ rule czi2img:
     log:
         "res/img/log/{s}.log"
     benchmark:
-        "res/img/log/{s}.tsv"
-    params:
-        mem='40000'
+        "res/img/log/{s}.benchmark"
+    resources:
+            mem_mb=lambda wildcards, attempt: attempt * 40000
     shell:
         """
         python workflow/czi2img.py -i {input} -f {FORMAT} -odir res/img &> {log}
@@ -50,15 +50,15 @@ rule blob_detection:
         "res/blobs/{s}.0.npy.gz", # todo: include all outputs
         touch("res/blobs/{s}.finished")
     priority:
-        100
+        50
     threads:
         1
+    resources:
+            mem_mb=lambda wildcards, attempt: attempt * 50000
     log:
         "res/blobs/{s}.log"
     benchmark:
-        "res/blobs/{s}.tsv"
-    params:
-        mem="45000"
+        "res/blobs/{s}.benchmark"
     shell:
         """
         python workflow/blob_detection.py -i {input} -f {FORMAT} -odir res/blobs/ &> {log}
@@ -68,21 +68,23 @@ rule view0:
     input:
         "res/blobs/{s}.finished"
     output:
-        nb="res/blobs/view/{s}.{i}.ipynb",
+        #nb="res/blobs/view/{s}.{i}.ipynb",
         html="res/blobs/view/{s}.{i}.html"
+    params:
+        html="../res/blobs/view/{s}.{i}.html"
     log:
         "res/blobs/view/{s}.{i}.html.log"
     benchmark:
-        "res/blobs/view/{s}.{i}.html.tsv"
+        "res/blobs/view/{s}.{i}.html.benchmark"
     threads:
         1
-    params:
-        mem="8000"
+    resources:
+            mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
-        fname="res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" dir={WKDIR} runipy workflow/viewing_blobs.ipynb \
-        {output.nb} &> {log}
-        jupyter nbconvert --to html {output.nb} &>> {log}
+        fname="res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" dir={WKDIR} \
+        jupyter nbconvert --to html --execute workflow/viewing_blobs.ipynb \
+        --output {params.html} &> {log}
         """
 
 rule classification1:
@@ -93,11 +95,11 @@ rule classification1:
         npy="res/classification1/{s}.{i}.pred.npy.gz",
         log="res/classification1/{s}.{i}.log"
     benchmark:
-        "res/classification1/{s}.{i}.tsv"
+        "res/classification1/{s}.{i}.benchmark"
     threads:
         1
-    params:
-        mem="8000"
+    resources:
+            mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
         python workflow/classification.pred.py  -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
@@ -108,21 +110,24 @@ rule view1:
     input:
         "res/classification1/{s}.{i}.pred.npy.gz"  # some will not exist, but just ignore warnings
     output:
-        nb="res/classification1/view/{s}.{i}.ipynb",
+        #nb="res/classification1/view/{s}.{i}.ipynb",
         html="res/classification1/view/{s}.{i}.html"
+    params:
+        html="../res/classification1/view/{s}.{i}.html"
     log:
         "res/classification1/view/{s}.{i}.html.log"
     benchmark:
-        "res/classification1/view/{s}.{i}.html.tsv"
+        "res/classification1/view/{s}.{i}.html.benchmark"
     threads:
         1
-    params:
-        mem="8000"
+    resources:
+            mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
         mkdir -p res res/classification1 res/classification1/view
-        fname={input} dir={WKDIR} runipy workflow/viewing_blobs.ipynb {output.nb} &> {log}
-        jupyter nbconvert --to html {output.nb} &>> {log}
+        fname={input} dir={WKDIR} \
+        jupyter nbconvert --to html --execute workflow/viewing_blobs.ipynb \
+        --output {params.html} &> {log}
         """
 
 rule count1:
@@ -133,8 +138,8 @@ rule count1:
         clean="res/COUNT.csv"
     threads:
         1
-    params:
-        mem="1000"
+    resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1000
     priority:
         100
     log:
@@ -153,18 +158,21 @@ rule area_calculation1:
     log:
         "res/classification1/area/{s}.{i}.area.log"
     benchmark:
-        "res/classification1/area/{s}.{i}.area.tsv"
+        "res/classification1/area/{s}.{i}.area.benchmark"
     threads:
         1
-    params:
-        mem="8000"
+    resources:
+            mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
-        python workflow/area_calculation.py {input} 1 {output} &> {log}
+        python workflow/area_calculation.py {input} {output} &> {log}
         """
 
 
 rule area_aggregation:
+    '''
+    Will aggreated all files under res/classification1/area, regardless of config.yaml
+    '''
     input:
         input_names(SAMPLES=SAMPLES, 
                     prefix="res/classification1/area/", suffix=".area.txt")
@@ -174,8 +182,8 @@ rule area_aggregation:
         "res/areas.csv.log"
     threads:
         1
-    params:
-        mem="1000"
+    resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1000
     shell:
         """
         python workflow/get_areas.py res/classification1/area/ res/areas.csv &> {log}
@@ -189,7 +197,7 @@ rule area_aggregation:
 #         all="res/filter2/{s}.yes.pred.npy.gz",
 #         log="res/filter2/{s}.log"
 #     benchmark:
-#         "res/filter2/{s}.tsv"
+#         "res/filter2/{s}.benchmark"
 #     threads:
 #         1
 #     params:
@@ -226,7 +234,7 @@ rule area_aggregation:
 #     log:
 #         "res/filter2/{s}.html.log"
 #     benchmark:
-#         "res/filter2/{s}.html.tsv"
+#         "res/filter2/{s}.html.benchmark"
 #     threads:
 #         1
 #     params:
