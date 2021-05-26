@@ -317,7 +317,7 @@ def reshape_img_from_flat(flat_crop):
     return image
 
 
-def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0):
+def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, fname=None):
     '''
     input: one padded crop of a blob
     plt: yellow circle and hard-masked side-by-side
@@ -359,18 +359,24 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0):
     c = plt.Circle((w - 1, w - 1), r_, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
     ax[2].add_patch(c)
     plt.tight_layout()
-    plt.show()
+    if fname:
+        plt.savefig(fname+".png")
+    else:
+        plt.show()
     fig.canvas.draw()
 
-    return 'done'
+    return True
 
-def plot_flat_crops(flat_crops, blob_extention_ratio=1, blob_extention_radius=0):
+def plot_flat_crops(flat_crops, blob_extention_ratio=1, blob_extention_radius=0, fname=None):
     '''
     input: flat_crops
     task: plot padded crop and hard-masked crop side-by-side
     '''
-    for flat_crop in flat_crops:
-        plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
+    for i, flat_crop in enumerate(flat_crops):
+        if fname:
+            plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname+'.rnd'+str(i))
+        else:
+            plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
 
 # # Depreciated, use block_equalize + find_blob istread
 # def split_image(image, 
@@ -735,7 +741,7 @@ def sample_crops(crops, proportion, seed):
 
 def show_rand_crops(crops, label_filter="na", num_shown=5, 
     blob_extention_ratio=1, blob_extention_radius=0, 
-    plot_area=False, seed = None):
+    plot_area=False, seed = None, fname=None):
     '''
     blobs: the blobs crops
     label_filter: 0, 1, -1; "na" means no filter
@@ -751,14 +757,15 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
         randidx = np.random.choice(range(len(crops)), num_shown, replace=False)
         np.random.seed()
         plot_flat_crops(crops[randidx, :], 
-            blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
+            blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname)
 
         if (plot_area):
             Images, Labels, Rs = parse_blobs(crops[randidx, :])
             [area_calculation(image, r=Rs[ind], plotting=True) for ind, image in enumerate(Images)]
 
     elif (len(crops) > 0):
-        plot_flat_crops(crops)
+        plot_flat_crops(crops,
+            blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname)
 
         if (plot_area):
             Images, Labels, Rs = parse_blobs(crops)
@@ -766,7 +773,7 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
     else:
         print('num_blobs after filtering is 0')
         
-    return (crops)
+    return (True)
 
 # TEST SCALING and Equalization
 # i = 0; j = 0; l = 2048
