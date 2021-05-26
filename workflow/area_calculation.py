@@ -3,6 +3,8 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from ccount import area_calculation, load_blobs_db, parse_blobs
+import subprocess
+
 
 # no filtering, all reasults saved, bug negative ones should have -1 as output? as the calculation can be wrong for negative ones?? Now it is still calculated for testing
 
@@ -20,7 +22,7 @@ def area_calculation_of_blobs(crops,
                               plotting=True, txt_saving=True, crop_saving=True):
     Images, Labels, Rs = parse_blobs(crops)
     areas = [area_calculation(image, r=Rs[ind], plotting=False) for ind, image in enumerate(Images)]
-    crops[4] = areas
+    crops[:, 4] = areas
     
     if plotting:
         plt.hist(areas, 40)
