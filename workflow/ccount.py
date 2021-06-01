@@ -317,7 +317,7 @@ def reshape_img_from_flat(flat_crop):
     return image
 
 
-def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, fname=None):
+def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, fname=None, plot_area=True):
     '''
     input: one padded crop of a blob
     plt: yellow circle and hard-masked side-by-side
@@ -325,7 +325,7 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, f
     return: cropped image and hard-masked image
     '''
     # reshape
-    [y, x, r, label, row, col] = flat_crop[0:6]
+    [y, x, r, label, area, place_holder] = flat_crop[0:6]
     r_ = r * blob_extention_ratio + blob_extention_radius
 
     flat = flat_crop[6:]
@@ -339,25 +339,34 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, f
     # hard mask creating training data
     # hard_masked = mask_image(equalized, r=r_)
 
-    fig, axes = plt.subplots(1, 3, figsize=(8, 24), sharex=False, sharey=False)
+    area_plot = area_calculation(image, r, plotting=True)
+
+    fig, axes = plt.subplots(1, 4, figsize=(8, 32), sharex=False, sharey=False)
     ax = axes.ravel()
     ## Auto Contrast For labeler
-    ax[0].set_title('For Labeling\ncurrent label:{},    r:{}'.format(int(label), r))
+    ax[0].set_title('For Labeling\ncurrent label:{}'.format(int(label)))
     ax[0].imshow(image, 'gray')
     c = plt.Circle((w - 1, w - 1), r_, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
     ax[0].add_patch(c)
 
     ## Original for QC
-    ax[1].set_title('Native Contrast\n')
+    ax[1].set_title('Native Contrast\nblob_detection radius:{}'.format(r))
     ax[1].imshow(image, 'gray', clim=(0.0, 1.0))
     c = plt.Circle((w - 1, w - 1), r_, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
     ax[1].add_patch(c)
 
     ## Equalized for QC
-    ax[2].set_title('Equalized\n')
+    ax[2].set_title('Equalized\narea (pixels):{}'.format(int(area)))
     ax[2].imshow(equalized, 'gray', clim=(0.0, 1.0))
     c = plt.Circle((w - 1, w - 1), r_, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
     ax[2].add_patch(c)
+
+    ## area calculation
+    ax[3].set_title('Area Calculation\narea (pixels):{}'.format(int(area)))
+    ax[3].imshow(area_plot, 'gray', clim=(0.0, 1.0))
+    c = plt.Circle((w - 1, w - 1), r_, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
+    ax[3].add_patch(c)
+
     plt.tight_layout()
     if fname:
         plt.savefig(fname+".png")
@@ -367,16 +376,109 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, f
 
     return True
 
-def plot_flat_crops(flat_crops, blob_extention_ratio=1, blob_extention_radius=0, fname=None):
+def plot_flat_crops(flat_crops, blob_extention_ratio=1, blob_extention_radius=0, fname=None, plot_area=False):
     '''
     input: flat_crops
     task: plot padded crop and hard-masked crop side-by-side
     '''
     for i, flat_crop in enumerate(flat_crops):
         if fname:
-            plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname+'.rnd'+str(i))
+            plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, 
+                fname=fname+'.rnd'+str(i), plot_area=plot_area)
         else:
-            plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
+            plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius,
+                plot_area=plot_area)
+
+
+
+
+def area_calculation(img, r, plotting=False, fname=None):
+    #todo: increase speed
+    from skimage import io, filters
+    from scipy import ndimage
+    import matplotlib.pyplot as plt
+    
+    # automatic thresholding method such as Otsu's (avaible in scikit-image)
+    img = equalize(img)  # no use
+    img = normalize_img(img)  # bad
+    # val = filters.threshold_otsu(img)
+    try:
+        val = filters.threshold_yen(img)
+    except ValueError: 
+        #print("Ops, got blank blob crop")
+        return (0)
+
+    # val = filters.threshold_li(img)
+
+    drops = ndimage.binary_fill_holes(img < val)  # cells as 1 (white), bg as 0
+    
+    # create mask 
+    w = int(img.shape[0]/2)
+    mask = np.zeros((2 * w, 2 * w))  # zeros are masked to be black
+    rr, cc = circle(w - 1, w - 1, min(r, w - 1))
+    mask[rr, cc] = 1  # 1 is white
+    
+    # apply mask on binary image
+    drops = abs(drops * mask)
+    
+    if (plotting):
+        plt.subplot(1, 2, 1)
+        plt.imshow(img, 'gray', clim=(0, 1))
+        plt.subplot(1, 2, 2)
+        plt.imshow(drops, cmap='gray')
+        if fname:
+            plt.savefig(fname+'.png')
+        else:
+            plt.show()
+    #         plt.hist(drops.flatten())
+    #         plt.show()
+        #print('intensity cut-off is', round(val, 3), '; pixcel count is %d' %(int(drops.sum())))
+        return drops
+    else:
+        return int(drops.sum())
+
+
+def show_rand_crops(crops, label_filter="na", num_shown=5, 
+    blob_extention_ratio=1, blob_extention_radius=0, 
+    plot_area=False, seed = None, fname=None):
+    '''
+    blobs: the blobs crops
+    label_filter: 0, 1, -1; "na" means no filter
+    fname: None, plot.show(); if fname provided, saved to png
+    '''
+    if (label_filter != 'na'):
+        filtered_idx = [str(int(x)) == str(label_filter) for x in crops[:, 3]]
+        #print('labels:',[str(int(x)) for x in crops[:, 3]])
+        #print('filter:', filtered_idx)
+        crops = crops[filtered_idx, :]
+
+
+    if (len(crops) >= num_shown):
+        print(num_shown, "blobs will be plotted")
+        if seed:
+            np.random.seed(seed)
+        randidx = np.random.choice(range(len(crops)), num_shown, replace=False)
+        np.random.seed()
+
+        if (plot_area):
+            Images, Labels, Rs = parse_blobs(crops[randidx, :])
+            [area_calculation(image, r=Rs[ind], plotting=True) for ind, image in enumerate(Images)]
+
+        plot_flat_crops(crops[randidx, :], 
+            blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname)
+    elif (len(crops) > 0):
+        print("Only", len(crops), 'blobs exist, and will be plotted')
+        plot_flat_crops(crops,
+            blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname)
+
+        if (plot_area):
+            Images, Labels, Rs = parse_blobs(crops)
+            [area_calculation(image, r=Rs[ind], plotting=True) for ind, image in enumerate(Images)]
+    else:
+        print('num_blobs after filtering is 0')
+        
+    return (True)
+
 
 # # Depreciated, use block_equalize + find_blob istread
 # def split_image(image, 
@@ -688,46 +790,6 @@ def remove_edge_crops(flat_blobs):
     return (good_flats)
 
 
-def area_calculation(img, r, plotting=False):
-    #todo: increase speed
-    from skimage import io, filters
-    from scipy import ndimage
-    import matplotlib.pyplot as plt
-    
-    # automatic thresholding method such as Otsu's (avaible in scikit-image)
-    img = equalize(img)  # no use
-    img = normalize_img(img)  # bad
-    # val = filters.threshold_otsu(img)
-    try:
-        val = filters.threshold_yen(img)
-    except ValueError: 
-        #print("Ops, got blank blob crop")
-        return (0)
-
-    # val = filters.threshold_li(img)
-
-    drops = ndimage.binary_fill_holes(img < val)  # cells as 1 (white), bg as 0
-    
-    # create mask 
-    w = int(img.shape[0]/2)
-    mask = np.zeros((2 * w, 2 * w))  # zeros are masked to be black
-    rr, cc = circle(w - 1, w - 1, min(r, w - 1))
-    mask[rr, cc] = 1  # 1 is white
-    
-    # apply mask on binary image
-    drops = abs(drops * mask)
-    
-    if (plotting):
-        plt.subplot(1, 2, 1)
-        plt.imshow(img, 'gray', clim=(0, 1))
-        plt.subplot(1, 2, 2)
-        plt.imshow(drops, cmap='gray')
-        plt.show()
-#         plt.hist(drops.flatten())
-#         plt.show()
-        print('intensity cut-off is', round(val, 3), '; pixcel count is %d' %(int(drops.sum())))
-    
-    return int(drops.sum())
 
 
 def sample_crops(crops, proportion, seed):
@@ -738,42 +800,6 @@ def sample_crops(crops, proportion, seed):
     print(len(sample), "samples taken")
     return sample
     
-
-def show_rand_crops(crops, label_filter="na", num_shown=5, 
-    blob_extention_ratio=1, blob_extention_radius=0, 
-    plot_area=False, seed = None, fname=None):
-    '''
-    blobs: the blobs crops
-    label_filter: 0, 1, -1; "na" means no filter
-
-    '''
-    if (label_filter != 'na'):
-        filtered_idx = crops[:, 3] == label_filter
-        crops = crops[filtered_idx, :]
-
-    if (len(crops) >= num_shown):
-        if seed:
-            np.random.seed(seed)
-        randidx = np.random.choice(range(len(crops)), num_shown, replace=False)
-        np.random.seed()
-        plot_flat_crops(crops[randidx, :], 
-            blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname)
-
-        if (plot_area):
-            Images, Labels, Rs = parse_blobs(crops[randidx, :])
-            [area_calculation(image, r=Rs[ind], plotting=True) for ind, image in enumerate(Images)]
-
-    elif (len(crops) > 0):
-        plot_flat_crops(crops,
-            blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname)
-
-        if (plot_area):
-            Images, Labels, Rs = parse_blobs(crops)
-            [area_calculation(image, r=Rs[ind], plotting=True) for ind, image in enumerate(Images)]
-    else:
-        print('num_blobs after filtering is 0')
-        
-    return (True)
 
 # TEST SCALING and Equalization
 # i = 0; j = 0; l = 2048
