@@ -37,7 +37,7 @@ rule czi2img:
     benchmark:
         "res/img/log/{s}.benchmark"
     resources:
-            mem_mb=lambda wildcards, attempt: attempt * 40000
+            mem_mb=lambda wildcards, attempt: attempt * 50000
     shell:
         """
         python workflow/czi2img.py -i {input} -f {FORMAT} -odir res/img &> {log}
@@ -92,7 +92,7 @@ rule classification1:
         blobs="res/blobs/{s}.finished",
         weight=WEIGHT1
     output:
-        npy="res/classification1/{s}.{i}.pred.npy.gz",
+        npy=temp("res/classification1/{s}.{i}.pred.npy.gz"),
         log="res/classification1/{s}.{i}.log"
     benchmark:
         "res/classification1/{s}.{i}.benchmark"
@@ -154,7 +154,8 @@ rule area_calculation1:
     input:
         "res/classification1/{s}.{i}.pred.npy.gz"
     output:
-        "res/classification1/area/{s}.{i}.area.txt"
+        "res/classification1/area/{s}.{i}.area.txt",
+        "res/classification1/area/{s}.{i}.area.txt.npy.gz"
     log:
         "res/classification1/area/{s}.{i}.area.log"
     benchmark:

@@ -18,9 +18,15 @@ print(crops.shape[0], "blobs loaded ")
 
 def area_calculation_of_blobs(crops, 
                               out_txt_name = "blobs.area.txt", 
-                              title="Blob Area In Pixcels", 
+                              title="Blob Area In Pixcels", label_filter=1,
                               plotting=True, txt_saving=True, crop_saving=True):
+    '''only calculate for positive blobs'''
     Images, Labels, Rs = parse_blobs(crops)
+    # filter
+    filtered_idx = [str(int(x)) == str(label_filter) for x in Labels]
+    crops = crops[filtered_idx, :]
+    Images, Labels, Rs = parse_blobs(crops)
+    # cal
     areas = [area_calculation(image, r=Rs[ind], plotting=False) for ind, image in enumerate(Images)]
     crops[:, 4] = areas
     
