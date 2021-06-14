@@ -23,13 +23,13 @@ def area_calculation_of_blobs(crops,
     '''only calculate for positive blobs'''
     Images, Labels, Rs = parse_blobs(crops)
     # filter
-    filtered_idx = [str(int(x)) == str(label_filter) for x in Labels]
-    crops = crops[filtered_idx, :]
-    Images, Labels, Rs = parse_blobs(crops)
+    neg_idx = [str(int(x)) != str(label_filter) for x in Labels]
     # cal
     areas = [area_calculation(image, r=Rs[ind], plotting=False) for ind, image in enumerate(Images)]
     crops[:, 4] = areas
-    
+    crops[neg_idx, 4] = -1
+    areas = crops[neg_idx, 4]
+
     if plotting:
         plt.hist(areas, 40)
         plt.title(title)
