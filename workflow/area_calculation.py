@@ -10,6 +10,8 @@ import subprocess
 
 
 print("python area_calculation.py blob.npy.gz output.area.txt")
+if len(sys.argv) is not 3:
+    sys.exit("cmd error")
 print("only calculate area accurately for positive blobs, negative blobs area calculation not accurate if the blob shape not regular")
 print("cmd:", sys.argv)
 
@@ -22,13 +24,16 @@ def area_calculation_of_blobs(crops,
                               plotting=True, txt_saving=True, crop_saving=True):
     '''only calculate for positive blobs'''
     Images, Labels, Rs = parse_blobs(crops)
+    print("Labels", [ str(int(x)) for x in Labels])
+    print("label_filter", str(int(label_filter)))
     # filter
-    neg_idx = [str(int(x)) != str(label_filter) for x in Labels]
+    neg_idx = [str(int(x)) != str(int(label_filter)) for x in Labels]
+    print("idx", neg_idx)
     # cal
     areas = [area_calculation(image, r=Rs[ind], plotting=False) for ind, image in enumerate(Images)]
     crops[:, 4] = areas
     crops[neg_idx, 4] = -1
-    areas = crops[neg_idx, 4]
+    areas = crops[:, 4]
 
     if plotting:
         plt.hist(areas, 40)

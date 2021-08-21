@@ -10,6 +10,7 @@ import sys, os
 
 
 print("usage: python view_npy.py <path_to_area.npy.gz> <label_filter> <num_shown> <seed>")
+# todo: area filter
 print("<label_filter>: only blobs with the corresponding label (0/1) will be plotted, 'na' will skip filtering")
 print("<num_shown>: num of blobs to be plotted, if this number larger than filtered blobs, all will be plotted")
 print("<seed>: seed to reproduce same ramdom sampling from filtered blobs, e.g. 1, 2, 123, etc")

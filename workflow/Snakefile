@@ -154,8 +154,8 @@ rule area_calculation1:
     input:
         "res/classification1/{s}.{i}.pred.npy.gz"
     output:
-        "res/classification1/area/{s}.{i}.area.txt",
-        "res/classification1/area/{s}.{i}.area.txt.npy.gz"
+        txt="res/classification1/area/{s}.{i}.area.txt",
+        npy="res/classification1/area/{s}.{i}.area.txt.npy.gz"
     log:
         "res/classification1/area/{s}.{i}.area.log"
     benchmark:
@@ -166,7 +166,7 @@ rule area_calculation1:
             mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
-        python workflow/area_calculation.py {input} {output} &> {log}
+        python workflow/area_calculation.py {input} {output.txt} &> {log}
         """
 
 
