@@ -1,5 +1,5 @@
-name: ccount
-# conda env create -f env.yaml
+name: ccount-env
+# conda env create -f ccount.yaml
 
 channels:
         - conda-forge
@@ -26,4 +26,4 @@ dependencies:
 #        - runipy
 
 
-# `git clone https://github.com/DmitryUlyanov/Multicore-TSNE.git; cd Multicore-TSNE/; pip install .` # missed in env.yaml
+# `git clone https://github.com/DmitryUlyanov/Multicore-TSNE.git; cd Multicore-TSNE/; pip install .` # missed in env.yaml, skipped
