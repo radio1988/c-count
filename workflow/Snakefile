@@ -40,7 +40,7 @@ rule czi2img:
             mem_mb=lambda wildcards, attempt: attempt * 50000
     shell:
         """
-        python workflow/czi2img.py -i {input} -f {FORMAT} -odir res/img &> {log}
+        python workflow/scripts/czi2img.py -i {input} -f {FORMAT} -odir res/img &> {log}
         """
     
 rule blob_detection:
@@ -61,7 +61,7 @@ rule blob_detection:
         "res/blobs/{s}.benchmark"
     shell:
         """
-        python workflow/blob_detection.py -i {input} -f {FORMAT} -odir res/blobs/ &> {log}
+        python workflow/scripts/blob_detection.py -i {input} -f {FORMAT} -odir res/blobs/ &> {log}
         """
 
 rule view0:
@@ -83,7 +83,7 @@ rule view0:
     shell:
         """
         fname="res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" dir={WKDIR} \
-        jupyter nbconvert --to html --execute workflow/viewing_blobs.ipynb \
+        jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
         --output {params.html} &> {log}
         """
 
@@ -102,7 +102,7 @@ rule classification1:
             mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
-        python workflow/classification.pred.py  -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
+        python workflow/scripts/classification.pred.py  -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
         -o res/classification1 -l 1 -w {input.weight} &> {output.log}
         """
 
@@ -126,7 +126,7 @@ rule view1:
         """
         mkdir -p res res/classification1 res/classification1/view
         fname={input} dir={WKDIR} \
-        jupyter nbconvert --to html --execute workflow/viewing_blobs.ipynb \
+        jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
         --output {params.html} &> {log}
         """
 
@@ -147,7 +147,7 @@ rule count1:
     shell:
         """
         grep 'Predictions' {input} > {output.raw} 2> {log}
-        python workflow/get_counts.py res/classification1/COUNT1.txt res/COUNT.csv &>> {log}
+        python workflow/scripts/get_counts.py res/classification1/COUNT1.txt res/COUNT.csv &>> {log}
         """
 
 rule area_calculation1:
@@ -166,7 +166,7 @@ rule area_calculation1:
             mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
-        python workflow/area_calculation.py {input} {output.txt} &> {log}
+        python workflow/scripts/area_calculation.py {input} {output.txt} &> {log}
         """
 
 
@@ -187,7 +187,7 @@ rule area_aggregation:
             mem_mb=lambda wildcards, attempt: attempt * 1000
     shell:
         """
-        python workflow/get_areas.py res/classification1/area/ res/areas.csv &> {log}
+        python workflow/scripts/get_areas.py res/classification1/area/ res/areas.csv &> {log}
         """
 
 # rule filter2:
