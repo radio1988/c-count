@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import subprocess
 
-
 # Parse args
 parser = argparse.ArgumentParser(
     description='Read czi, output blobs'
@@ -71,11 +70,11 @@ elif scaling_factor == 2:
 elif scaling_factor == 4:
     max_sigma=20
     min_sigma=8
-    num_sigma=20  # Aug2019: 10 better sensitivity than 5, 1/2 speed
-    threshold=0.02
+    num_sigma=10  # Aug2019: 10 better sensitivity than 5, 1/2 speed
+    threshold=0.04
 else:
     raise Exception("scaling factor not implemented")
-test = False
+test = True
 
 # Read
 images = read_czi(args.i, Format=args.f)
@@ -89,7 +88,8 @@ for i,image in enumerate(images):
     print("output histogram:", hist_img_fname)
     print("output_img_fname:", out_img_fname)
 
-    image = np.divide(image, np.max(image))  # from 0-255 or any range -> 0-1
+    image = image - np.min(image)
+
     if test:
         image = image[0:4000, 0:4000]
         print("in test mode")

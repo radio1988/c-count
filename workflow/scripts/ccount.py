@@ -23,10 +23,10 @@ from random import randint
 from time import sleep
 
 
-def read_czi(fname, Format="2018", concatenation=False):
+def read_czi(fname, Format="2019", concatenation=False):
     '''
     input: fname of czi file
-    output: 2d numpy array
+    output: 2d numpy array, uint8 for 2019
     assuming input czi format (n, 1, :, :, 1)
     e.g. (4, 1, 70759, 65864, 1)
 
@@ -39,14 +39,10 @@ def read_czi(fname, Format="2018", concatenation=False):
             print(image_arrays.shape)
     elif fname.endswith('czi.gz'):
         raise Exception("todo")
-        # with gzip.open(fname, 'rb') as f:
-        #     with CziFile(f) as czi:
-        #         image_arrays = czi.asarray()
     else:
         raise Exception("input czi/czi.gz file type error\n")
         
     Format = Format.strip()
-
     if Format == "2018":
         # reading (need 38 GB RAM) todo: use int16 if possible
         image = image_arrays[0, 1, 0, 0, :, :, 0]  # real image
@@ -57,18 +53,15 @@ def read_czi(fname, Format="2018", concatenation=False):
         # todo: int to float slow and large RAM usage, must change, use int16 if possible, done?
         lst = []
         for i in range(0,image_arrays.shape[0]): # loop iter does not change process time 
-            print("For ", i, " area in czi")
+            print("reading area", i, " from", fname)
             image = image_arrays[i, 0, :,  :, 0] # 0s
             nz_image = np.nonzero(image)  # process_time(),36s, most time taken here, 1.4GB RAM with tracemalloc
             nz0 = np.unique(nz_image[0]) # 1.5s
             nz1 = np.unique(nz_image[1]) # 2.4s
             del nz_image
             n = gc.collect()
-            print("Number of unreachable objects collected by GC:", n)  
             if len(nz0) < 2 or len(nz1) < 2: 
                 continue
-            print(nz0, nz0.shape)
-            print(nz1, nz1.shape)
             image = image[min(nz0):max(nz0), min(nz1):max(nz1)]  # 0s
             lst.append(image) # 0s
         
