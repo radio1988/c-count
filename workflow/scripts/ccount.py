@@ -22,6 +22,7 @@ from IPython.display import clear_output
 from random import randint
 from time import sleep
 
+## Read ## 
 
 def read_czi(fname, Format="2019"):
     '''
@@ -100,6 +101,9 @@ def parse_image_arrays (image_arrays, i = 0,  Format = '2019'):
         return None
 
 
+
+## image transformation ##
+
 def equalize(image):
     '''
     input: image: 2d-array
@@ -113,6 +117,67 @@ def equalize(image):
     return exposure.equalize_adapthist(image, clip_limit=0.01)  # Aug, 2019, cleaner image than 0.03
 
 
+def block_equalize(image, block_height=2048, block_width=2048):
+    '''
+    split
+    equalization
+    stitch and return
+    '''
+    image_equ = np.empty(image.shape)
+
+    if block_width <= 0:
+        return equalize(image)
+
+
+    r = 0
+    while (r + 1) * block_height <= image.shape[0]:
+        top = r * block_height
+        bottom = (r + 1) * block_height
+        c = 0
+        while (c + 1) * block_width <= image.shape[1]:
+            # get each block
+            left = c * block_width
+            right = (c + 1) * block_width
+            if bottom - top < 10 or right - left < 10:
+                image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
+            else:
+                image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
+            c += 1
+        
+        # For right most columns
+        left = c * block_width
+        right = image.shape[1]
+        if bottom - top < 10 or right - left < 10:
+            image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
+        else:
+            image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
+        
+        r += 1
+    
+    # For bottom row
+    top = r * block_height
+    bottom = image.shape[0]
+    c = 0
+    while (c + 1) * block_width <= image.shape[1]:
+        # get each block
+        left = c * block_width
+        right = (c + 1) * block_width
+        if bottom - top < 10 or right - left < 10:
+            image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
+        else:
+            image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
+        c += 1
+
+    left = c * block_width
+    right = image.shape[1]
+    if bottom - top < 10 or right - left < 10:
+        image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
+    else:
+        image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
+
+    return image_equ
+
+
 def down_scale(img, scaling_factor=2):
     '''
     input1: image
@@ -121,112 +186,6 @@ def down_scale(img, scaling_factor=2):
     e.g.: block_small = down_scale(block, scaling_factor)  
     '''
     return resize(img, (img.shape[0] // scaling_factor, img.shape[1] // scaling_factor))
-
-
-def blobs_stat(blobs):
-    '''
-    print summary of labels in blobs
-    :param blobs:
-    :return:
-    '''
-    print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
-        sum(blobs[:, 3] == 1),
-        sum(blobs[:, 3] == 0),
-        sum(blobs[:, 3] == -2),
-        sum(blobs[:, 3] == -1),
-    ))
-
-
-def find_blob(image_neg, scaling_factor = 2, 
-    max_sigma=40, min_sigma=4, num_sigma=5, threshold=0.1, overlap=.0):
-    '''
-    input: gray scaled image with bright blob on dark background
-    output: [n, 3] array of blob information, [y-locaiton, x-location, r-blob-radius] !!!
-    plot: original image of plates (dark colonies on light backgound)
-    get squares of bright blobs
-
-    Algorithm:
-    Laplacian of Gaussian (LoG)
-    This is the most accurate and slowest approach.
-    It computes the Laplacian of Gaussian images with successively increasing standard deviation
-    and stacks them up in a cube. Blobs are local maximas in this cube.
-    Detecting larger blobs is especially slower because of larger kernel sizes during convolution.
-    Only bright blobs on dark backgrounds are detected. See skimage.feature.blob_log for usage.
-    '''
-    print('image size', image_neg.shape)
-    image_neg = down_scale(image_neg, scaling_factor)
-    print('image-blob detection size', image_neg.shape)
-    tic = time.time()
-    blobs = blob_log(
-        image_neg, 
-        max_sigma=max_sigma, min_sigma=min_sigma, num_sigma=num_sigma, 
-        threshold=threshold, overlap=overlap
-        )
-    blobs[:, 2] = blobs[:, 2] * sqrt(2)  # adjust r
-    blobs = blobs * scaling_factor  # scale back coordinates
-    toc = time.time()
-    print("detection time: ", toc - tic)
-    # larger num_sigma: more accurate boundry, slower
-    # larger max_sigma: larger max blob size, slower
-    # threshold: larger, less low contrast stuff
-    # num_sigma=15 important for accuracy, step = 2.5
-    # Compute radii in the 3rd column.
-    return blobs
-
-
-def vis_blob_on_block(blobs, block_img_equ, block_img_ori, 
-    blob_extention_ratio=1.4, blob_extention_radius=2, scaling = 8, fname=None):
-    '''
-    blobs: blob info array [n, 0:3]
-    block_img_equ: corresponding block_img equalized
-    block_img_ori: block_img before equalization
-    plot: plot block_img with blobs in yellow circles
-    '''
-    print('scaling of visualization is ', scaling)
-    blobs = blobs[:, 0:3]
-    blobs = blobs/scaling
-    block_img_equ = down_scale(block_img_equ, scaling)
-    block_img_ori = down_scale(block_img_ori, scaling)
-    
-
-    fig, axes = plt.subplots(2, 1, figsize=(40, 20), sharex=True, sharey=True)
-    ax = axes.ravel()
-
-    ax[0].set_title('Equalized Image')
-    ax[0].imshow(block_img_equ, 'gray', interpolation='nearest', clim=(0.0, 1.0))
-    for blob in blobs:
-        y, x, r = blob
-        c = plt.Circle((x, y), 
-                       r * blob_extention_ratio + blob_extention_radius, 
-                       color=(0.9, 0.9, 0, 0.5), linewidth=1,
-                       fill=False)  # r*1.3 to get whole blob
-        ax[0].add_patch(c)
-    # ax[0].set_axis_off()
-    ax[1].set_title("Original Image")
-    ax[1].imshow(block_img_ori, 'gray', interpolation='nearest', clim=(0.0, 1.0))
-    for blob in blobs:
-        y, x, r = blob
-        d = plt.Circle((x, y), 
-                       r * blob_extention_ratio + blob_extention_radius, 
-                       color=(0.9, 0.9, 0, 0.5), linewidth=1,
-                       fill=False)  # r*1.3 to get whole blob
-        ax[1].add_patch(d)
-    # ax[0].set_axis_off()
-    plt.tight_layout()
-    if fname:
-        plt.savefig(fname)
-    else:
-        plt.show()
-        
-
-def hist_blobsize(blobs):
-    '''
-    show blob size distribution with histogram
-    '''
-    plt.title("Histogram of blob radius")
-    plt.hist(blobs[:, 2], 40)
-    plt.show()
-
 
 def pad_with(vector, pad_width, iaxis, kwargs):
     '''
@@ -238,20 +197,34 @@ def pad_with(vector, pad_width, iaxis, kwargs):
     return vector
 
 
-def filter_blobs(blobs, r_min, r_max):
-    '''
-    filter blobs based on size of r
-    '''
-    flitered_blobs = blobs[blobs[:, 2] >= r_min,]
-    flitered_blobs = flitered_blobs[flitered_blobs[:, 2] < r_max,]
-    print("Filtered blobs:", len(flitered_blobs))
-    return flitered_blobs
 
-def flat_label_filter(flats, label_filter = 1):
-    if (label_filter != 'na'):
-        filtered_idx = flats[:, 3] == label_filter
-        flats = flats[filtered_idx, :]
-    return (flats)
+## Blob related ## 
+
+def find_blob(image_neg, scaling_factor = 2, 
+    max_sigma=40, min_sigma=4, num_sigma=5, threshold=0.1, overlap=.0):
+    '''
+    input: gray scaled image with bright blob on dark background (image_neg)
+    output: [n, 3] array of blob information, [y-locaiton, x-location, r-blob-radius] !!!
+    https://scikit-image.org/docs/dev/auto_examples/features_detection/plot_blob.html 
+    https://scikit-image.org/docs/dev/api/skimage.feature.html#skimage.feature.blob_log
+    # larger num_sigma: more accurate boundry, slower, try 15
+    # larger max_sigma: larger max blob size, slower
+    # threshold: larger, less low contrast stuff
+    '''
+    print('image size', image_neg.shape)
+    image_neg = down_scale(image_neg, scaling_factor)
+    print('image-blob detection size', image_neg.shape)
+    tic = time.time()
+    blobs = blob_log(
+        image_neg, 
+        max_sigma=max_sigma, min_sigma=min_sigma, num_sigma=num_sigma, 
+        threshold=threshold, overlap=overlap, exclude_border = False
+        )
+    blobs[:, 2] = blobs[:, 2] * sqrt(2)  # adjust r
+    blobs = blobs * scaling_factor  # scale back coordinates
+    toc = time.time()
+    print("blob detection time: ", toc - tic)
+    return blobs
 
 
 def crop_blobs(blobs, block_img, area=-1, place_holder=-1, crop_width=100,
@@ -295,6 +268,90 @@ def crop_blobs(blobs, block_img, area=-1, place_holder=-1, crop_width=100,
         flat_crop = np.array([flat_crop])
         flat_crops = np.append(flat_crops, flat_crop, axis=0)
     return flat_crops
+
+
+def blobs_stat(blobs):
+    '''
+    print summary of labels in blobs
+    :param blobs:
+    :return:
+    '''
+    print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
+        sum(blobs[:, 3] == 1),
+        sum(blobs[:, 3] == 0),
+        sum(blobs[:, 3] == -2),
+        sum(blobs[:, 3] == -1),
+    ))
+
+
+def vis_blob_on_block(blobs, block_img_equ, block_img_ori, 
+    blob_extention_ratio=1.4, blob_extention_radius=2, scaling = 8, fname=None):
+    '''
+    blobs: blob info array [n, 0:3]
+    block_img_equ: corresponding block_img equalized
+    block_img_ori: block_img before equalization
+    plot: plot block_img with blobs in yellow circles
+    '''
+    print('scaling of visualization is ', scaling)
+    blobs = blobs[:, 0:3]
+    blobs = blobs/scaling
+    block_img_equ = down_scale(block_img_equ, scaling)
+    block_img_ori = down_scale(block_img_ori, scaling)
+    
+
+    fig, axes = plt.subplots(2, 1, figsize=(80, 40), sharex=True, sharey=True)
+    ax = axes.ravel()
+
+    ax[0].set_title('Equalized Image')
+    ax[0].imshow(block_img_equ, 'gray', interpolation='nearest', clim=(0.0, 1.0))
+    for blob in blobs:
+        y, x, r = blob
+        c = plt.Circle((x, y), 
+                       r * blob_extention_ratio + blob_extention_radius, 
+                       color=(0.9, 0.9, 0, 0.5), linewidth=1,
+                       fill=False)  # r*1.3 to get whole blob
+        ax[0].add_patch(c)
+    # ax[0].set_axis_off()
+    ax[1].set_title("Original Image")
+    ax[1].imshow(block_img_ori, 'gray', interpolation='nearest')
+    for blob in blobs:
+        y, x, r = blob
+        d = plt.Circle((x, y), 
+                       r * blob_extention_ratio + blob_extention_radius, 
+                       color=(0.9, 0.9, 0, 0.5), linewidth=1,
+                       fill=False)  # r*1.3 to get whole blob
+        ax[1].add_patch(d)
+    # ax[0].set_axis_off()
+    plt.tight_layout()
+    if fname:
+        plt.savefig(fname)
+    else:
+        plt.show()
+        
+
+def hist_blobsize(blobs):
+    '''
+    show blob size distribution with histogram
+    '''
+    plt.title("Histogram of blob radius")
+    plt.hist(blobs[:, 2], 40)
+    plt.show()
+
+
+def filter_blobs(blobs, r_min, r_max):
+    '''
+    filter blobs based on size of r
+    '''
+    flitered_blobs = blobs[blobs[:, 2] >= r_min,]
+    flitered_blobs = flitered_blobs[flitered_blobs[:, 2] < r_max,]
+    print("Filtered blobs:", len(flitered_blobs))
+    return flitered_blobs
+
+def flat_label_filter(flats, label_filter = 1):
+    if (label_filter != 'na'):
+        filtered_idx = flats[:, 3] == label_filter
+        flats = flats[filtered_idx, :]
+    return (flats)
 
 
 def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
@@ -484,163 +541,8 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
     return (True)
 
 
-# # Depreciated, use block_equalize + find_blob istread
-# def split_image(image, 
-#     block_height=2048, block_width=2048, 
-#     crop_width=100,
-#     blob_extention_ratio=1.4,
-#     blob_extention_radius=2,
-#     scaling_factor=2,
-#     max_sigma=40, min_sigma=11, num_sigma=5, threshold=0.1, overlap=.0 
-#     ):
-#     '''
-#     split
-#     scale down
-#     equalization
-#     feed into find_blob
-#     '''
-#     height = block_height
-#     width = block_width
-
-#     image_flat_crops = np.empty((0, int(6 + 2 * crop_width * 2 * crop_width)))
-
-#     r = 0
-#     while (r + 1) * height <= image.shape[0]:
-#         top = r * height
-#         bottom = (r + 1) * height
-#         c = 0
-#         while (c + 1) * width <= image.shape[1]:
-#             # get each block
-#             left = c * width
-#             right = (c + 1) * width
-#             block = image[top:bottom, left:right]
-#             print('block row:', r, '; column:', c, '; bottom-right pixcel:', bottom, right)
-#             # scale down
-#             block_small = down_scale(block, scaling_factor)  # scale factor for each dim 1-> 1/1, 2 -> 1/2, 4 -> 1/4
-#             # equalization (good for blob detection, not nessessarily good for classifier) (todo)
-#             block_small_equ = equalize(block_small)
-#             # blob detection
-#             blobs = find_blob(
-#                 (1 - block_small_equ), 
-#                 max_sigma=max_sigma, min_sigma=min_sigma, num_sigma=num_sigma, 
-#                 threshold=threshold, overlap=overlap, 
-#                 scaling_factor=scaling_factor
-#             )  # reverse color, get bright blobs
-#             # visualization of equalized block with blob yellow circles, and block before equalization
-#             vis_blob_on_block(blobs, block_small_equ, block_small)
-#             # create crop from blob (50x50 crops, with white padding)
-#             block_flat_crops = crop_blobs(blobs, block_small, block_row=r, block_column=c, crop_width=crop_width) # image before
-#             # equalization
-#             image_flat_crops = np.append(image_flat_crops, block_flat_crops, axis=0)
-
-#             print("{} block_flat_crops".format(len(block_flat_crops)))
-#             print("{} image_flat_crops".format(len(image_flat_crops)))
-#             # np.apply_along_axis( plot_flat_crop, axis=1, arr=block_flat_crops)
-#             c += 1
-#         r += 1
-
-#     return image_flat_crops
 
 
-
-def block_equalize(image, block_height=2048, block_width=2048):
-    '''
-    split
-    equalization
-    stitch and return
-    '''
-    image_equ = np.empty(image.shape)
-
-    if block_width <= 0:
-        return equalize(image)
-
-
-    r = 0
-    while (r + 1) * block_height <= image.shape[0]:
-        top = r * block_height
-        bottom = (r + 1) * block_height
-        c = 0
-        while (c + 1) * block_width <= image.shape[1]:
-            # get each block
-            left = c * block_width
-            right = (c + 1) * block_width
-            if bottom - top < 10 or right - left < 10:
-                image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
-            else:
-                image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
-            c += 1
-        
-        # For right most columns
-        left = c * block_width
-        right = image.shape[1]
-        if bottom - top < 10 or right - left < 10:
-            image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
-        else:
-            image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
-        
-        r += 1
-    
-    # For bottom row
-    top = r * block_height
-    bottom = image.shape[0]
-    c = 0
-    while (c + 1) * block_width <= image.shape[1]:
-        # get each block
-        left = c * block_width
-        right = (c + 1) * block_width
-        if bottom - top < 10 or right - left < 10:
-            image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
-        else:
-            image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
-        c += 1
-
-    left = c * block_width
-    right = image.shape[1]
-    if bottom - top < 10 or right - left < 10:
-        image_equ[top:bottom, left:right] = image[top:bottom, left:right] # skip equalization
-    else:
-        image_equ[top:bottom, left:right] = equalize(image[top:bottom, left:right]) # for each block
-
-    return image_equ
-
-
-def find_blobs_and_crop(image, image_equ, 
-    crop_width=100,
-    scaling_factor=2,
-    max_sigma=40, min_sigma=11, num_sigma=5, threshold=0.1, overlap=.0,
-    blob_extention_ratio=1.4, blob_extention_radius=2,
-    fname=None
-    ):
-    '''
-    detect with image_equ
-    return blobs with image
-    if fname assigned xx.jpg, will save to jpg rather than plot inline
-    '''
-    print("scaling factor for findinb_blobs is ", scaling_factor)
-    
-    image_flat_crops = np.empty((0, int(6 + 2 * crop_width * 2 * crop_width)))
-
-    print("Finding blobs")
-    blobs = find_blob(
-        (1 - image_equ), scaling_factor=scaling_factor,
-        max_sigma=max_sigma, min_sigma=min_sigma, 
-        num_sigma=num_sigma, threshold=threshold, overlap=overlap
-    )  # reverse color, get bright blobs
-    
-    print(blobs.shape, "detected")
-
-#     print("Visualizing blobs")
-#     vis_blob_on_block(blobs, image_equ, image, 
-#         blob_extention_ratio=blob_extention_ratio, 
-#         blob_extention_radius=blob_extention_radius, 
-#                      fname=fname)
-
-    # create crop from blob
-    print("Creating crops from blobs")
-    image_flat_crops = crop_blobs(blobs, image, crop_width=crop_width) # image before
-    print("{} image_flat_crops".format(len(image_flat_crops)))
-
-    return image_flat_crops
 
 
 
