@@ -1,3 +1,5 @@
+## User params ## 
+
 DATA_DIR: data/
 
 FORMAT: 2019
@@ -5,3 +7,43 @@ WEIGHT1: resources/weights/FL.t.old.hd5
 WEIGHT2: None
 
 
+## Advanced params ##
+# (Please don't change unless you're developer)
+
+# blob detection
+test_mode: True
+block_height: 2000
+block_width: 2400  # if < 0, skip block equalization
+scaling_factor: 4  # 1, 2,4
+max_sigma: 20 # 20-50
+min_sigma: 8  # 2-8
+num_sigma: 10  # smaller->faster, less accurate, 5-20
+threshold: 0.02
+visualization: True
+equalization: True
+blob_extention_ratio: 1.4 # soft extend blob radius manually (1.4)
+blob_extention_radius: 2 # pixcels to extend (2)
+crop_width: 80  # padding width, which is cropped img width/2 (50)
+overlap: .0
+
+
+# Notes
+
+## 2018 params recommendation
+# if scaling_factor == 1:
+#     max_sigma=50 
+#     min_sigma=5
+#     num_sigma=15
+#     threshold=0.1
+# elif scaling_factor == 2:
+#     max_sigma=40
+#     min_sigma=2
+#     num_sigma=10
+#     threshold=0.1
+# elif scaling_factor == 4:
+#     max_sigma=20
+#     min_sigma=8
+#     num_sigma=10  # Aug2019: 10 better sensitivity than 5, 1/2 speed
+#     threshold=0.02
+# else:
+#     raise Exception("scaling factor not implemented")

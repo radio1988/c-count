@@ -2,3 +2,7 @@ data/
 res/
 log/
 .snakemake/
+.DS*
+._.DS*
+._config.yaml
+test/

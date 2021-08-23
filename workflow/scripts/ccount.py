@@ -23,7 +23,7 @@ from random import randint
 from time import sleep
 
 
-def read_czi(fname, Format="2019", concatenation=False):
+def read_czi(fname, Format="2019"):
     '''
     input: fname of czi file
     output: 2d numpy array, uint8 for 2019
@@ -31,7 +31,10 @@ def read_czi(fname, Format="2019", concatenation=False):
     e.g. (4, 1, 70759, 65864, 1)
 
     '''
+    fname=str(fname)
+    Format=str(Format)
     from czifile import CziFile
+    print('read_czi:', fname)
 
     if fname.endswith('czi'):
         with CziFile(fname) as czi:
@@ -41,51 +44,59 @@ def read_czi(fname, Format="2019", concatenation=False):
         raise Exception("todo")
     else:
         raise Exception("input czi/czi.gz file type error\n")
-        
-    Format = Format.strip()
+
+    return image_arrays
+
+
+def parse_image_arrays (image_arrays, i = 0,  Format = '2019'):
+    '''
+    image_arrays: output from read_czi
+    i: index of [0,1,2,3], only this image will be parsed
+    Format: e.g. 2019
+    '''
+    i = int(i)
+    Format = str(Format).strip()
     if Format == "2018":
-        # reading (need 38 GB RAM) todo: use int16 if possible
+        # reading (need 38 GB RAM) todo: use uint8 if possible
         image = image_arrays[0, 1, 0, 0, :, :, 0]  # real image
-        print("{}: {}\n".format(fname, image.shape))
         return image 
     elif Format == "2019":        
-        # Find Box with info: todo faster by https://kite.com/python/docs/PIL.Image.Image.getbbox  
-        # todo: int to float slow and large RAM usage, must change, use int16 if possible, done?
-        lst = []
-        for i in range(0,image_arrays.shape[0]): # loop iter does not change process time 
-            print("reading area", i, " from", fname)
-            image = image_arrays[i, 0, :,  :, 0] # 0s
-            nz_image = np.nonzero(image)  # process_time(),36s, most time taken here, 1.4GB RAM with tracemalloc
-            nz0 = np.unique(nz_image[0]) # 1.5s
-            nz1 = np.unique(nz_image[1]) # 2.4s
-            del nz_image
-            n = gc.collect()
-            if len(nz0) < 2 or len(nz1) < 2: 
-                continue
-            image = image[min(nz0):max(nz0), min(nz1):max(nz1)]  # 0s
-            lst.append(image) # 0s
+        # todo: Find Box with info: todo faster by https://kite.com/python/docs/PIL.Image.Image.getbbox  
+
+        image = image_arrays[i, 0, :,  :, 0] # 0s
+        nz_image = np.nonzero(image)  # process_time(),36s, most time taken here, 1.4GB RAM with tracemalloc
+        nz0 = np.unique(nz_image[0]) # 1.5s
+        nz1 = np.unique(nz_image[1]) # 2.4s
+        del nz_image
+        n = gc.collect()
+        if len(nz0) < 2 or len(nz1) < 2: 
+            import warnings
+            warnings.warn('area', i, 'is blank')
+            return False
+        image = image[min(nz0):max(nz0), min(nz1):max(nz1)]  # 0s
+        return image
         
-        if concatenation:
-            # padding
-            heights = [x.shape[0] for x in lst]
-            widths = [x.shape[1] for x in lst]
-            max(heights)
-            max(widths)
-            for (i,image) in enumerate(lst):
-                print(image.shape, i)
-                pad_h = max(heights) - image.shape[0]
-                pad_w = max(widths) - image.shape[1]
-                lst[i] = np.pad(image, [[0,pad_h],[0,pad_w]], "constant")
+        # if concatenation:
+        #     # padding
+        #     heights = [x.shape[0] for x in lst]
+        #     widths = [x.shape[1] for x in lst]
+        #     max(heights)
+        #     max(widths)
+        #     for (i,image) in enumerate(lst):
+        #         print(image.shape, i)
+        #         pad_h = max(heights) - image.shape[0]
+        #         pad_w = max(widths) - image.shape[1]
+        #         lst[i] = np.pad(image, [[0,pad_h],[0,pad_w]], "constant")
                 
-            # concat: use a long wide image instead to adjust for unknown number of scanns
-            image = np.hstack(lst)
-            print("shape of whole picture {}: {}\n".format(fname, image.shape))
-            return image
-        else:
-            # return a list of single are images
-            return lst #[image0, image1, image2 ..]
+        #     # concat: use a long wide image instead to adjust for unknown number of scanns
+        #     image = np.hstack(lst)
+        #     print("shape of whole picture {}: {}\n".format(fname, image.shape))
+        #     return image
+        # else:
+        #     # return a list of single are images
+        #     return lst #[image0, image1, image2 ..]
     else:
-        raise Exception("image format error\n")
+        raise Exception("image format error:", Format, "\n")
         return None
 
 
@@ -126,7 +137,7 @@ def blobs_stat(blobs):
     ))
 
 
-def find_blob(image_bright_blob_on_dark, scaling_factor = 2, 
+def find_blob(image_neg, scaling_factor = 2, 
     max_sigma=40, min_sigma=4, num_sigma=5, threshold=0.1, overlap=.0):
     '''
     input: gray scaled image with bright blob on dark background
@@ -142,12 +153,12 @@ def find_blob(image_bright_blob_on_dark, scaling_factor = 2,
     Detecting larger blobs is especially slower because of larger kernel sizes during convolution.
     Only bright blobs on dark backgrounds are detected. See skimage.feature.blob_log for usage.
     '''
-    print('image size', image_bright_blob_on_dark.shape)
-    image_bright_blob_on_dark = down_scale(image_bright_blob_on_dark, scaling_factor)
-    print('image-blob detection size', image_bright_blob_on_dark.shape)
+    print('image size', image_neg.shape)
+    image_neg = down_scale(image_neg, scaling_factor)
+    print('image-blob detection size', image_neg.shape)
     tic = time.time()
     blobs = blob_log(
-        image_bright_blob_on_dark, 
+        image_neg, 
         max_sigma=max_sigma, min_sigma=min_sigma, num_sigma=num_sigma, 
         threshold=threshold, overlap=overlap
         )
@@ -539,6 +550,10 @@ def block_equalize(image, block_height=2048, block_width=2048):
     stitch and return
     '''
     image_equ = np.empty(image.shape)
+
+    if block_width <= 0:
+        return equalize(image)
+
 
     r = 0
     while (r + 1) * block_height <= image.shape[0]:
