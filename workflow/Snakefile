@@ -25,17 +25,13 @@ rule czi2img:
     input:
         "data/{s}.czi"
     output:
-        "res/img/jpg/{s}.0.jpg",
-        "res/img/equ/{s}.0.equ.jpg", # only tests if image of the first area
         touch("res/img/log/{s}.finished") # if not error
-    priority: 
-        0
     threads:
         1
     log:
-        "res/img/log/{s}.log"
+        "log/img/log/{s}.log"
     benchmark:
-        "res/img/log/{s}.benchmark"
+        "log/img/log/{s}.benchmark"
     resources:
             mem_mb=lambda wildcards, attempt: attempt * 50000
     shell:
@@ -47,18 +43,15 @@ rule blob_detection:
     input:
         "data/{s}.czi"
     output:
-        "res/blobs/{s}.0.npy.gz", # todo: include all outputs
         touch("res/blobs/{s}.finished")
-    priority:
-        50
     threads:
         1
     resources:
             mem_mb=lambda wildcards, attempt: attempt * 50000
     log:
-        "res/blobs/{s}.log"
+        "log/blobs/{s}.log"
     benchmark:
-        "res/blobs/{s}.benchmark"
+        "log/blobs/{s}.benchmark"
     shell:
         """
         python workflow/scripts/blob_detection.py -i {input} -f {FORMAT} -odir res/blobs/ &> {log}
@@ -68,18 +61,17 @@ rule view0:
     input:
         "res/blobs/{s}.finished"
     output:
-        #nb="res/blobs/view/{s}.{i}.ipynb",
         html="res/blobs/view/{s}.{i}.html"
     params:
         html="../res/blobs/view/{s}.{i}.html"
     log:
-        "res/blobs/view/{s}.{i}.html.log"
+        "log/blobs/view/{s}.{i}.html.log"
     benchmark:
-        "res/blobs/view/{s}.{i}.html.benchmark"
+        "log/blobs/view/{s}.{i}.html.benchmark"
     threads:
         1
     resources:
-            mem_mb=lambda wildcards, attempt: attempt * 8000
+        mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
         fname="res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" dir={WKDIR} \
@@ -99,7 +91,7 @@ rule classification1:
     threads:
         1
     resources:
-            mem_mb=lambda wildcards, attempt: attempt * 8000
+        mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
         python workflow/scripts/classification.pred.py  -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
@@ -110,18 +102,17 @@ rule view1:
     input:
         "res/classification1/{s}.{i}.pred.npy.gz"  # some will not exist, but just ignore warnings
     output:
-        #nb="res/classification1/view/{s}.{i}.ipynb",
         html="res/classification1/view/{s}.{i}.html"
     params:
         html="../res/classification1/view/{s}.{i}.html"
     log:
-        "res/classification1/view/{s}.{i}.html.log"
+        "log/classification1/view/{s}.{i}.html.log"
     benchmark:
-        "res/classification1/view/{s}.{i}.html.benchmark"
+        "log/classification1/view/{s}.{i}.html.benchmark"
     threads:
         1
     resources:
-            mem_mb=lambda wildcards, attempt: attempt * 8000
+        mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
         mkdir -p res res/classification1 res/classification1/view
@@ -139,7 +130,7 @@ rule count1:
     threads:
         1
     resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1000
+        mem_mb=lambda wildcards, attempt: attempt * 1000
     priority:
         100
     log:
@@ -163,7 +154,7 @@ rule area_calculation1:
     threads:
         1
     resources:
-            mem_mb=lambda wildcards, attempt: attempt * 8000
+        mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
         python workflow/scripts/area_calculation.py {input} {output.txt} &> {log}
@@ -184,7 +175,7 @@ rule area_aggregation:
     threads:
         1
     resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1000
+        mem_mb=lambda wildcards, attempt: attempt * 1000
     shell:
         """
         python workflow/scripts/get_areas.py res/classification1/area/ res/areas.csv &> {log}
