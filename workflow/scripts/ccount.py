@@ -62,7 +62,7 @@ def parse_image_arrays (image_arrays, i = 0,  Format = '2019'):
         image = image_arrays[0, 1, 0, 0, :, :, 0]  # real image
         return image 
     elif Format == "2019":        
-        # todo: Find Box with info: todo faster by https://kite.com/python/docs/PIL.Image.Image.getbbox  
+        # todo: Find Box faster by https://kite.com/python/docs/PIL.Image.Image.getbbox  
 
         image = image_arrays[i, 0, :,  :, 0] # 0s
         nz_image = np.nonzero(image)  # process_time(),36s, most time taken here, 1.4GB RAM with tracemalloc
@@ -196,6 +196,18 @@ def pad_with(vector, pad_width, iaxis, kwargs):
     vector[-pad_width[1]:] = pad_value
     return vector
 
+def uint16_image_auto_contrast(image):
+    '''
+    pos image
+    output forced into uint16
+    max_contrast_achieved
+    for 2019 format, input is also uint16
+    '''
+    image = image - np.min(image)  # pos image
+    image = image/np.max(image) * 2**16
+    image = image.astype(np.uint16)
+    return image
+
 
 
 ## Blob related ## 
@@ -226,6 +238,30 @@ def find_blob(image_neg, scaling_factor = 2,
     print("blob detection time: ", toc - tic)
     return blobs
 
+def save_into_npygz(array, fname):
+    import subprocess
+    fname = fname.replace('.gz', '')
+    np.save(fname, array)
+    print('saved into {}'.format(fname))
+    bashCommand = "gzip -f " + fname
+    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+
+
+def load_from_npygz(fname):
+    '''
+    assuming reading fname.locs.npy.gz
+    '''
+    import gzip
+    if os.path.isfile(fname):
+        if fname.endswith('npy'):
+            array = np.load(fname)
+        elif fname.endswith('npy.gz'):
+            f = gzip.GzipFile(fname, "r")
+            array = np.load(f)
+        else:
+            raise Exception ("suffix not npy nor npy.gz")
+    return array
 
 def crop_blobs(blobs, block_img, area=-1, place_holder=-1, crop_width=100,
                blob_extention_ratio=1.4, blob_extention_radius=2):
@@ -285,7 +321,7 @@ def blobs_stat(blobs):
 
 
 def vis_blob_on_block(blobs, block_img_equ, block_img_ori, 
-    blob_extention_ratio=1.4, blob_extention_radius=2, scaling = 8, fname=None):
+    blob_extention_ratio=1.0, blob_extention_radius=0, scaling = 4, fname=None):
     '''
     blobs: blob info array [n, 0:3]
     block_img_equ: corresponding block_img equalized
@@ -392,6 +428,7 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, f
     flat = flat_crop[6:]
     w = int(sqrt(len(flat)) / 2)
     image = np.reshape(flat, (w + w, w + w))
+    image = (image - np.min(image)) / np.max(image)
     #print("max_pixel value:", round(np.max(image), 3))
 
     # Equalized
@@ -460,8 +497,9 @@ def area_calculation(img, r, plotting=False, fname=None):
     import matplotlib.pyplot as plt
     
     # automatic thresholding method such as Otsu's (avaible in scikit-image)
-    img = equalize(img)  # no use
     img = normalize_img(img)  # bad
+    img = equalize(img)  # no use
+
     # val = filters.threshold_otsu(img)
     try:
         val = filters.threshold_yen(img)

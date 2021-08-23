@@ -1,7 +1,8 @@
 from ccount import read_czi, parse_image_arrays, block_equalize, down_scale
+from ccount import uint16_image_auto_contrast, save_into_npygz
 from ccount import find_blob, crop_blobs, remove_edge_crops, vis_blob_on_block
 from pathlib import Path
-import argparse, os, re, matplotlib, subprocess, yaml
+import argparse, os, re, matplotlib, yaml
 import matplotlib.pyplot as plt
 matplotlib.use('Agg')  # for plotting without GUI
 import numpy as np
@@ -37,20 +38,7 @@ def parse_cmd_and_prep ():
     return [args, corename, config]
 
 
-
-def uint16_image_auto_contrast(image):
-    '''
-    pos image
-    output forced into uint16
-    max_contrast_achieved
-    for 2019 format, input is also uint16
-    '''
-    image = image - np.min(image)  # pos image
-    image = image/np.max(image) * 2**16
-    image = image.astype(np.uint16)
-    return image
-
-## START ##
+##################Start####################
 [args, corename, config] = parse_cmd_and_prep()
 
 
@@ -93,20 +81,12 @@ for i in range(len(image_arrays)):
         overlap=config['overlap'],
         )
     print('there are {} blobs detected'.format(blob_locs.shape[0]))
-    np.save(out_blob_fname, blob_locs)
-    print('saved into {}'.format(out_blob_fname))
-    bashCommand = "gzip -f " + out_blob_fname
-    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
+    save_into_npygz(blob_locs, out_blob_fname)
+
 
     # Visualizing filtered blobs
     # todo: split into another script to avoid RAM crash
     if config['visualization']:
-        r_ = blob_locs[:,2]
-        plt.hist(r_, 40)
-        plt.title("Histogram of blob size")
-        plt.savefig(hist_img_fname)
-
         vis_blob_on_block(blob_locs, image_equ,image, 
             blob_extention_ratio=config['blob_extention_ratio'], 
             blob_extention_radius=config['blob_extention_radius'], 
