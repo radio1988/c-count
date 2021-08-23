@@ -1,11 +1,13 @@
-from ccount import read_czi, parse_image_arrays, block_equalize, down_scale
+from ccount import read_czi, parse_image_arrays, block_equalize
 from ccount import uint16_image_auto_contrast, save_into_npygz
 from ccount import find_blob, crop_blobs, remove_edge_crops, vis_blob_on_block
 from pathlib import Path
-import argparse, os, re, matplotlib, yaml
-import matplotlib.pyplot as plt
-matplotlib.use('Agg')  # for plotting without GUI
+import argparse, os, re, yaml
 import numpy as np
+
+# usage: 
+# python workflow/scripts/blob_detection.py -i data/IL17A_POINT1_EPO_1.czi \
+# -c config.yaml -odir res/blob_locs/
 
 def parse_cmd_and_prep ():
     # ARGS
@@ -41,25 +43,18 @@ def parse_cmd_and_prep ():
 ##################Start####################
 [args, corename, config] = parse_cmd_and_prep()
 
-
-## Work ## 
 image_arrays = read_czi(args.i, Format=config['FORMAT'])  # fast already
 for i in range(len(image_arrays)):
     # names
     i=str(i)
     out_blob_fname = os.path.join(args.odir, corename+"."+i+".npy")
     print("Searching blobs for area", i, "; output:", out_blob_fname)
-    if config['visualization']:
-        out_img_fname = os.path.join(args.odir, "vis", corename+"."+i+".jpg")
-        hist_img_fname = os.path.join(args.odir, "hist", corename+"."+i+".hist.pdf")
-        print("output histogram:", hist_img_fname)
-        print("output_img_fname:", out_img_fname)
 
     image_arrays = read_czi(args.i, Format=config['FORMAT'])  # fast already
     image = parse_image_arrays(image_arrays, i=i, Format=config['FORMAT'])
     image_arrays = [] # todo: release RAM
 
-    image = uint16_image_auto_contrast(image)
+    image = uint16_image_auto_contrast(image) # still uint16
 
     if config['test_mode']:
         print("in test mode")
@@ -87,28 +82,19 @@ for i in range(len(image_arrays)):
     # Visualizing filtered blobs
     # todo: split into another script to avoid RAM crash
     if config['visualization']:
+        out_img_fname = os.path.join(args.odir, "vis", corename+"."+i+".jpg")
+        print("output_img_fname:", out_img_fname)
         vis_blob_on_block(blob_locs, image_equ,image, 
             blob_extention_ratio=config['blob_extention_ratio'], 
             blob_extention_radius=config['blob_extention_radius'], 
             scaling = 2,
             fname=out_img_fname)
 
-    # todo: split
-    # image_flat_crops = crop_blobs(blob_locs, image, 
-    #                         crop_width=config['crop_width'])
-
     # test: skipped edge filter (we have neg plates now), 08/23/21
     # good_flats = remove_edge_crops(image_flat_crops)
     # print("there are {} blobs passed edge filter".format(len(good_flats)))
     # good_flats = image_flat_crops
 
-
-    # Saving, todo: split into another script to avoid RAM crash
-    # np.save(out_blob_fname, good_flats)
-    # print('saved into {}'.format(out_blob_fname))
-    # bashCommand = "gzip -f " + out_blob_fname
-    # process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-    # output, error = process.communicate()
 
 
 
