@@ -1,5 +1,6 @@
 08/23/21
-RAM reduced to 10G
+- !!!RAM reduced to 10G
+    - enabled workstation for processing/development
 - process images with np.single, save with uint16
     - faster blob_detection, less RAM
 - optimized blob-detection params
