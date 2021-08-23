@@ -92,36 +92,44 @@ for i in range(len(image_arrays)):
         threshold=config['threshold'], 
         overlap=config['overlap'],
         )
-    np.save('blob_locs.npy', blob_locs) # test
     print('there are {} blobs detected'.format(blob_locs.shape[0]))
-
-    image_flat_crops = crop_blobs(blob_locs, image, 
-                            crop_width=config['crop_width'])
-
-    # test: skipped edge filter (we have neg plates now), 08/23/21
-    # good_flats = remove_edge_crops(image_flat_crops)
-    # print("there are {} blobs passed edge filter".format(len(good_flats)))
-    good_flats = image_flat_crops
-
-
-    # Saving, todo: split into another script to avoid RAM crash
-    np.save(out_blob_fname, good_flats)
+    np.save(out_blob_fname, blob_locs)
     print('saved into {}'.format(out_blob_fname))
     bashCommand = "gzip -f " + out_blob_fname
     process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
 
-    # Visualizing filtered blobs, todo: split into another script to avoid RAM crash
+    # Visualizing filtered blobs
+    # todo: split into another script to avoid RAM crash
     if config['visualization']:
-        r_ = good_flats[:,2]
+        r_ = blob_locs[:,2]
         plt.hist(r_, 40)
         plt.title("Histogram of blob size")
         plt.savefig(hist_img_fname)
 
-        vis_blob_on_block(good_flats, image_equ,image, 
+        vis_blob_on_block(blob_locs, image_equ,image, 
             blob_extention_ratio=config['blob_extention_ratio'], 
             blob_extention_radius=config['blob_extention_radius'], 
             scaling = 2,
             fname=out_img_fname)
+
+    # todo: split
+    # image_flat_crops = crop_blobs(blob_locs, image, 
+    #                         crop_width=config['crop_width'])
+
+    # test: skipped edge filter (we have neg plates now), 08/23/21
+    # good_flats = remove_edge_crops(image_flat_crops)
+    # print("there are {} blobs passed edge filter".format(len(good_flats)))
+    # good_flats = image_flat_crops
+
+
+    # Saving, todo: split into another script to avoid RAM crash
+    # np.save(out_blob_fname, good_flats)
+    # print('saved into {}'.format(out_blob_fname))
+    # bashCommand = "gzip -f " + out_blob_fname
+    # process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+    # output, error = process.communicate()
+
+
 
 
