@@ -112,84 +112,84 @@ if args["load_model"] <= 0:
     valBlobs = balancing_by_duplicating(valBlobs)  #todo: skip this if F1 working well
 
 # Parse blobs
-trainImages, trainLabels, trainRs = parse_blobs(trainBlobs)
-valImages, valLabels, valRs = parse_blobs(valBlobs)
+trainimages, trainlabels, trainrs = parse_blobs(trainBlobs)
+valimages, vallabels, valrs = parse_blobs(valBlobs)
 
-# Extend Rs
-trainRs = trainRs * r_ext_ratio + r_ext_pixels
-valRs = valRs * r_ext_ratio + r_ext_pixels
+# Extend rs
+trainrs = trainrs * r_ext_ratio + r_ext_pixels
+valrs = valrs * r_ext_ratio + r_ext_pixels
 
 # Mixed Augmentation (todo: aug into more samples)
 ## todo: contrast, exposure changes
 if args["load_model"] < 0:
-    print("Before Aug:", trainImages.shape, trainRs.shape, trainLabels.shape)
-    trainImages = augment_images(trainImages, aug_sample_size)  # todo: augment to more samples
+    print("Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
+    trainimages = augment_images(trainimages, aug_sample_size)  # todo: augment to more samples
 
-    ## match sample size of labels and Rs with augmented images
-    while trainRs.shape[0] < aug_sample_size:
-        trainRs = np.concatenate((trainRs, trainRs))
-        trainLabels = np.concatenate((trainLabels, trainLabels))
+    ## match sample size of labels and rs with augmented images
+    while trainrs.shape[0] < aug_sample_size:
+        trainrs = np.concatenate((trainrs, trainrs))
+        trainlabels = np.concatenate((trainlabels, trainlabels))
 
-    trainRs = trainRs[0:aug_sample_size]
-    trainLabels = trainLabels[0:aug_sample_size]
+    trainrs = trainrs[0:aug_sample_size]
+    trainlabels = trainlabels[0:aug_sample_size]
     #todo: randomize again
 
-    print("After Aug:", trainImages.shape, trainRs.shape, trainLabels.shape)
-    print('max data', np.max(trainImages), 'min', np.min(trainImages))
+    print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
+    print('max data', np.max(trainimages), 'min', np.min(trainimages))
 
 
 # Downscale images
 print("Downscaling images by ", scaling_factor)
-trainImages = np.array([down_scale(image, scaling_factor=scaling_factor) for image in trainImages])
-valImages = np.array([down_scale(image, scaling_factor=scaling_factor) for image in valImages])
+trainimages = np.array([down_scale(image, scaling_factor=scaling_factor) for image in trainimages])
+valimages = np.array([down_scale(image, scaling_factor=scaling_factor) for image in valimages])
 ## Downscale w and R
 w = int(w/scaling_factor)
-trainRs = trainRs/scaling_factor
-valRs = valRs/scaling_factor
+trainrs = trainrs/scaling_factor
+valrs = valrs/scaling_factor
 
 # Equalize images (todo: test equalization -> scaling)
 # todo: more channels (scaled + equalized + original)
 print("Equalizing images...")
-trainImages = np.array([equalize(image) for image in trainImages])
-valImages = np.array([equalize(image) for image in valImages])
+trainimages = np.array([equalize(image) for image in trainimages])
+valimages = np.array([equalize(image) for image in valimages])
 
 # Mask images
 print("Masking images...")
-trainImages = np.array([mask_image(image, r=trainRs[ind]) for ind, image in enumerate(trainImages)])
-valImages = np.array([mask_image(image, r=valRs[ind]) for ind, image in enumerate(valImages)])
+trainimages = np.array([mask_image(image, r=trainrs[ind]) for ind, image in enumerate(trainimages)])
+valimages = np.array([mask_image(image, r=valrs[ind]) for ind, image in enumerate(valimages)])
 
 # Normalizing images
 print("Normalizing images...")
-trainImages = np.array([float_image_auto_contrast(image) for image in trainImages])
-valImages = np.array([float_image_auto_contrast(image) for image in valImages])
+trainimages = np.array([float_image_auto_contrast(image) for image in trainimages])
+valimages = np.array([float_image_auto_contrast(image) for image in valimages])
 
 
-# # Show Images for model training
+# # Show images for model training
 # for i in range(20):
 #     fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=True, sharey=True)
 #     ax = axes.ravel()
 
 #     ax[0].set_title("Original contrast")
-#     ax[0].imshow(trainImages[i], 'gray', clim=(0.0, 1.0))
-#     c = plt.Circle((w - 1, w - 1), trainRs[i], color='yellow', linewidth=1, fill=False)
+#     ax[0].imshow(trainimages[i], 'gray', clim=(0.0, 1.0))
+#     c = plt.Circle((w - 1, w - 1), trainrs[i], color='yellow', linewidth=1, fill=False)
 #     ax[0].add_patch(c)
 
 #     ax[1].set_title('HDR')
-#     ax[1].imshow(trainImages[i], 'gray')
-#     c = plt.Circle((w - 1, w - 1), trainRs[i], color='yellow', linewidth=1, fill=False)
+#     ax[1].imshow(trainimages[i], 'gray')
+#     c = plt.Circle((w - 1, w - 1), trainrs[i], color='yellow', linewidth=1, fill=False)
 #     ax[1].add_patch(c)
 #     print('save fig', i)
 #     plt.savefig(str(i)+'.png')
 
 # Reshape for model
-trainImages = trainImages.reshape((trainImages.shape[0], 2*w, 2*w, 1))
-valImages = valImages.reshape((valImages.shape[0], 2*w, 2*w, 1))
-print("max pixel value: ", np.max(trainImages))
-print("min pixel value: ", np.min(trainImages))
+trainimages = trainimages.reshape((trainimages.shape[0], 2*w, 2*w, 1))
+valimages = valimages.reshape((valimages.shape[0], 2*w, 2*w, 1))
+print("max pixel value: ", np.max(trainimages))
+print("min pixel value: ", np.min(trainimages))
 
 # Categorize labels for softmax
-trainLabels2 = np_utils.to_categorical(trainLabels, numClasses)
-valLabels2 = np_utils.to_categorical(valLabels, numClasses)
+trainlabels2 = np_utils.to_categorical(trainlabels, numClasses)
+vallabels2 = np_utils.to_categorical(vallabels, numClasses)
 
 # Initialize the optimizer and model
 # todo: feature normalization (optional)
@@ -223,27 +223,27 @@ if args["load_model"] <= 0:
         #todo: blur focus
     )
 
-    datagen.fit(trainImages)
+    datagen.fit(trainimages)
 
-    # model.fit(trainImages, trainLabels, validation_data=(valImagesMsk, valLabels),
+    # model.fit(trainimages, trainlabels, validation_data=(valimagesMsk, vallabels),
     #           batch_size=batch_size, epochs=epochs,
     #           verbose=verbose)
 
-    model.fit_generator(datagen.flow(trainImages, trainLabels2, batch_size=batch_size),
-                        validation_data=(valImages, valLabels2),
-                        steps_per_epoch=len(trainImages) / batch_size, epochs=epochs,
+    model.fit_generator(datagen.flow(trainimages, trainlabels2, batch_size=batch_size),
+                        validation_data=(valimages, vallabels2),
+                        steps_per_epoch=len(trainimages) / batch_size, epochs=epochs,
                         callbacks=callbacks_list,
                         verbose=verbose)
 
 
     # Evaluation of the model
     print("[INFO] evaluating...")
-    (loss, f1) = model.evaluate(trainImages, trainLabels2,
+    (loss, f1) = model.evaluate(trainimages, trainlabels2,
                                       batch_size=batch_size, verbose=verbose)
     print("[INFO] training F1: {:.2f}%".format(f1 * 100))
 
     print("[INFO] evaluating...")
-    (loss,  f1) = model.evaluate(valImages, valLabels2,
+    (loss,  f1) = model.evaluate(valimages, vallabels2,
                                       batch_size=batch_size, verbose=verbose)
     print("[INFO] validation F1: {:.2f}%".format(f1 * 100))
 
@@ -269,44 +269,44 @@ elif args["load_model"] > 0:
 
     # w = int(sqrt(blobs.shape[1] - 6) / 2)  # width of img
     # # parse
-    # Images, Labels, Rs = parse_blobs(blobs)  # for human
+    # images, labels, rs = parse_blobs(blobs)  # for human
     # # equalize
-    # Images_ = np.array([equalize(image) for image in Images])
+    # images_ = np.array([equalize(image) for image in images])
     # # scale down
-    # Images_ = np.array([down_scale(image, scaling_factor=scaling_factor) for image in Images_])
+    # images_ = np.array([down_scale(image, scaling_factor=scaling_factor) for image in images_])
     # w_ = int(w / scaling_factor)
-    # Rs_ = Rs / scaling_factor * r_extension_ratio  # for machine
+    # rs_ = rs / scaling_factor * r_extension_ratio  # for machine
     # # mask
-    # Images_ = np.array([mask_image(image, r=Rs_[ind]) for ind, image in enumerate(Images_)])
+    # images_ = np.array([mask_image(image, r=rs_[ind]) for ind, image in enumerate(images_)])
     # # reshape for model
-    # Images_ = Images_.reshape((Images_.shape[0], 2 * w_, 2 * w_, 1))
+    # images_ = images_.reshape((images_.shape[0], 2 * w_, 2 * w_, 1))
 
-    Images = np.vstack((trainImages, valImages))  # todo, don't get complicated code
-    Images_ = Images
-    Labels = np.concatenate((trainLabels, valLabels))
-    Labels_ = Labels
-    Rs = np.concatenate((trainRs, valRs))
-    Rs_ = Rs
+    images = np.vstack((trainimages, valimages))  # todo, don't get complicated code
+    images_ = images
+    labels = np.concatenate((trainlabels, vallabels))
+    labels_ = labels
+    rs = np.concatenate((trainrs, valrs))
+    rs_ = rs
 
-    print("Images_.shape:", Images_.shape)
+    print("images_.shape:", images_.shape)
     # Predictions
     print('Making predictions...')
-    probs = model.predict(Images_)
+    probs = model.predict(images_)
     predictions = probs.argmax(axis=1)
     positive_idx = [i for i, x in enumerate(predictions) if x == 1]
 
-    print("Labels:", Labels.shape, Counter(Labels))
+    print("labels:", labels.shape, Counter(labels))
     print("predictions:", predictions.shape, Counter(predictions))
-    print("Manual F1 score: ", F1_calculation(predictions, Labels))
+    print("Manual F1 score: ", F1_calculation(predictions, labels))
 
 
-    wrong_idx = [i for i, x in enumerate(predictions) if (int(predictions[i]) - int(Labels[i])) != 0]
+    wrong_idx = [i for i, x in enumerate(predictions) if (int(predictions[i]) - int(labels[i])) != 0]
     print("Predictions: mean: {}, count_yes: {} / {};".format(
         np.mean(predictions), np.sum(predictions), len(predictions)))
     print("Wrong predictions: {}".format(len(wrong_idx)))
 
     # save predictions
-    # blobs[:, 3] = predictions  # have effect on Labels[i]
+    # blobs[:, 3] = predictions  # have effect on labels[i]
     print("saving predictions")
     np.savetxt(name +'.pred.txt', predictions.astype(int))
     blobs_predict = np.copy(blobs)
@@ -324,20 +324,20 @@ elif args["load_model"] > 0:
     # for j in range(len(wrong_idx)):
     #     i = wrong_idx[j]  # only show samples predicted to be positive
         
-    #     image = Images_[i]
-    #     image_ = Images_[i]
+    #     image = images_[i]
+    #     image_ = images_[i]
     #     prediction = predictions[i]
-    #     label = int(Labels[i])
-    #     r = Rs[i]
-    #     r_ = Rs_[i]  # todo: fix r at the blob detection stage and don't extend r after wards
+    #     label = int(labels[i])
+    #     r = rs[i]
+    #     r_ = rs_[i]  # todo: fix r at the blob detection stage and don't extend r after wards
 
     #     image = np.reshape(image, image.shape[0:2])
     #     image_ = np.reshape(image_, image_.shape[0:2])
 
     #     print("[INFO] Predicted: {}, Label: {}".format(prediction, label))
 
-    #     # image = (Images[i] * 255).astype("uint8")
-    #     # image_ = (Images_[i] * 255).astype("uint8")
+    #     # image = (images[i] * 255).astype("uint8")
+    #     # image_ = (images_[i] * 255).astype("uint8")
 
     #     # visualize original and masked/euqalized blobs
     #     fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=False, sharey=False)

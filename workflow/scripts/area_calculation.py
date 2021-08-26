@@ -23,14 +23,14 @@ def area_calculation_of_blobs(crops,
                               title="Blob Area In Pixcels", label_filter=1,
                               plotting=True, txt_saving=True, crop_saving=True):
     '''only calculate for positive blobs'''
-    Images, Labels, Rs = parse_blobs(crops)
-    print("Labels", [ str(int(x)) for x in Labels])
+    images, labels, rs = parse_blobs(crops)
+    print("labels", [ str(int(x)) for x in labels])
     print("label_filter", str(int(label_filter)))
     # filter
-    neg_idx = [str(int(x)) != str(int(label_filter)) for x in Labels]
+    neg_idx = [str(int(x)) != str(int(label_filter)) for x in labels]
     print("idx", neg_idx)
     # cal
-    areas = [area_calculation(image, r=Rs[ind], plotting=False) for ind, image in enumerate(Images)]
+    areas = [area_calculation(image, r=rs[ind], plotting=False) for ind, image in enumerate(images)]
     crops[:, 4] = areas
     crops[neg_idx, 4] = -1
     areas = crops[:, 4]

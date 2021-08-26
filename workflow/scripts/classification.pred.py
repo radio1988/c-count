@@ -92,40 +92,40 @@ if numClasses == 2:
 
 
 # Parse blobs
-Images, Labels, Rs = parse_blobs(blobs)
+images, labels, rs = parse_blobs(blobs)
 
-# Extend Rs
-Rs = Rs * r_ext_ratio + r_ext_pixels
+# Extend rs
+rs = rs * r_ext_ratio + r_ext_pixels
 
 
 # Downscale images
 print("Downscaling images by ", scaling_factor)
-Images = np.array([down_scale(image, scaling_factor=scaling_factor) for image in Images])
+images = np.array([down_scale(image, scaling_factor=scaling_factor) for image in images])
 
 ## Downscale w and R
 w = int(w/scaling_factor)
-Rs = Rs/scaling_factor
+rs = rs/scaling_factor
 
 # Equalize images (todo: test equalization -> scaling)
 # todo: more channels (scaled + equalized + original)
 print("Equalizing images...")
-Images = np.array([equalize(image) for image in Images])
+images = np.array([equalize(image) for image in images])
 
 # Mask images
 print("Masking images...")
-Images = np.array([mask_image(image, r=Rs[ind]) for ind, image in enumerate(Images)])
+images = np.array([mask_image(image, r=rs[ind]) for ind, image in enumerate(images)])
 
 # Normalizing images
 print("Normalizing images...")
-Images = np.array([float_image_auto_contrast(image) for image in Images])
+images = np.array([float_image_auto_contrast(image) for image in images])
 
 # Reshape for model
-Images = Images.reshape((Images.shape[0], 2*w, 2*w, 1))
-print("max pixel value: ", np.max(Images))
-print("min pixel value: ", np.min(Images))
+images = images.reshape((images.shape[0], 2*w, 2*w, 1))
+print("max pixel value: ", np.max(images))
+print("min pixel value: ", np.min(images))
 
 # Categorize labels for softmax
-Labels2 = np_utils.to_categorical(Labels, numClasses)
+labels2 = np_utils.to_categorical(labels, numClasses)
 
 # Initialize the optimizer and model
 # todo: feature normalization (optional)
@@ -144,29 +144,29 @@ callbacks_list = [earlystop]
 
 
 # Classification process
-Images_ = Images
-Labels_ = Labels
-Rs_ = Rs
+images_ = images
+labels_ = labels
+rs_ = rs
 
-print("Images_.shape:", Images_.shape)
+print("images_.shape:", images_.shape)
 # Predictions
 print('Making predictions...')
-probs = model.predict(Images_)
+probs = model.predict(images_)
 predictions = probs.argmax(axis=1)
 positive_idx = [i for i, x in enumerate(predictions) if x == 1]
 
-print("Labels:", Labels.shape, Counter(Labels))
+print("labels:", labels.shape, Counter(labels))
 print("predictions:", predictions.shape, Counter(predictions))
-print("Manual F1 score: ", F1_calculation(predictions, Labels))
+print("Manual F1 score: ", F1_calculation(predictions, labels))
 
 
-wrong_idx = [i for i, x in enumerate(predictions) if (int(predictions[i]) - int(Labels[i])) != 0]
+wrong_idx = [i for i, x in enumerate(predictions) if (int(predictions[i]) - int(labels[i])) != 0]
 print("Predictions: mean: {}, count_yes: {} / {};".format(
     np.mean(predictions), np.sum(predictions), len(predictions)))
 print("Wrong predictions: {}".format(len(wrong_idx)))
 
 # save predictions
-# blobs[:, 3] = predictions  # have effect on Labels[i]
+# blobs[:, 3] = predictions  # have effect on labels[i]
 print("saving predictions")
 np.savetxt(name +'.pred.txt', predictions.astype(int))
 blobs_predict = np.copy(blobs)

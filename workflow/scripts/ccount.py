@@ -242,8 +242,8 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
         np.random.seed()
 
         if (plot_area):
-            Images, Labels, Rs = parse_blobs(crops[randidx, :])
-            [area_calculation(image, r=Rs[ind], plotting=True) for ind, image in enumerate(Images)]
+            images, labels, rs = parse_blobs(crops[randidx, :])
+            [area_calculation(image, r=rs[ind], plotting=True) for ind, image in enumerate(images)]
 
         plot_flat_crops(crops[randidx, :], 
             blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname)
@@ -253,8 +253,8 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
             blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname)
 
         if (plot_area):
-            Images, Labels, Rs = parse_blobs(crops)
-            [area_calculation(image, r=Rs[ind], plotting=True) for ind, image in enumerate(Images)]
+            images, labels, rs = parse_blobs(crops)
+            [area_calculation(image, r=rs[ind], plotting=True) for ind, image in enumerate(images)]
     else:
         print('num_blobs after filtering is 0')
         
@@ -343,7 +343,7 @@ def remove_edge_crops(flat_blobs):
     good_flats = []
     for i in range(0, flat_blobs.shape[0]):
         flat = flat_blobs[i,]
-        crop = reshape_img_from_flat(flat)
+        crop = flat2image(flat)
         crop = crop * 255
         crop = crop.astype(np.uint8)
     
@@ -485,13 +485,13 @@ def balancing_by_duplicating(blobs):
 
 
 
-def augment_images(Images, aug_sample_size):
+def augment_images(images, aug_sample_size):
     '''
     Input images (n_samples, 2*w, 2*w)
     Process: Augmentation; Normalization back to [0, 1]
     Output augmented images of the same shape
-    :param Images:
-    :return: augImages
+    :param images:
+    :return: augimages
     '''
     # Sometimes(0.5, ...) applies the given augmenter in 50% of all cases,
     # e.g. Sometimes(0.5, GaussianBlur(0.3)) would blur roughly every second image.
@@ -501,8 +501,8 @@ def augment_images(Images, aug_sample_size):
 
     sometimes = lambda aug: iaa.Sometimes(0.9, aug)
 
-    w2 = Images.shape[1]
-    Images = Images.reshape(len(Images), w2, w2, 1) # formatting
+    w2 = images.shape[1]
+    images = images.reshape(len(images), w2, w2, 1) # formatting
 
     seq = iaa.Sequential(
         [
@@ -523,16 +523,16 @@ def augment_images(Images, aug_sample_size):
         random_order=True
     )
 
-    Images_ = seq.augment_images(Images)
-    while Images_.shape[0] < aug_sample_size:
-        _ = seq.augment_images(Images)
-        Images_ = np.vstack((Images_, _))
-    Images = Images_[0:aug_sample_size, :]
-    print('shape:', Images.shape, 'after augment_images')
+    images_ = seq.augment_images(images)
+    while images_.shape[0] < aug_sample_size:
+        _ = seq.augment_images(images)
+        images_ = np.vstack((images_, _))
+    images = images_[0:aug_sample_size, :]
+    print('shape:', images.shape, 'after augment_images')
 
-    Images = Images.reshape(len(Images), w2, w2)  # formatting back
-    Images = np.array([float_image_auto_contrast(image) for image in Images])
-    return Images
+    images = images.reshape(len(images), w2, w2)  # formatting back
+    images = np.array([float_image_auto_contrast(image) for image in images])
+    return images
 
 
 def F1(y_pred, y_true):
@@ -591,30 +591,30 @@ def F1_calculation(predictions, labels):
     return F1
 
 
-def preprocessing_imgs(Images, Rs, Labels, scaling_factor):
+def preprocessing_imgs(images, rs, labels, scaling_factor):
     # Downscale images (todo: downscale as the first step)
     print("Downscaling images by ", scaling_factor)
-    Images = np.array([down_scale(image, scaling_factor=scaling_factor) for image in Images])
+    images = np.array([down_scale(image, scaling_factor=scaling_factor) for image in images])
     ## Downscale w and R
     print('w after scaling:', w)
-    Rs = Rs/scaling_factor
+    rs = rs/scaling_factor
 
     # Equalize images (todo: test equalization -> scaling)
     # todo: more channels (scaled + equalized + original)
     print("Equalizing images...")
     # todo:  Possible precision loss when converting from float64 to uint16
-    Images = np.array([equalize(image) for image in Images])
+    images = np.array([equalize(image) for image in images])
 
     # Mask images
     print("Masking images...")
-    Images = np.array([mask_image(image, r=Rs[ind]) for ind, image in enumerate(Images)])
+    images = np.array([mask_image(image, r=rs[ind]) for ind, image in enumerate(images)])
 
     # Normalizing images
     print("Normalizing images...")
     # todo:  Possible precision loss when converting from float64 to uint16
-    Images = np.array([float_image_auto_contrast(image) for image in Images])
+    images = np.array([float_image_auto_contrast(image) for image in images])
 
-    return Images, Rs, Labels, w
+    return images, rs, labels, w
 
 
 from sklearn.decomposition import PCA

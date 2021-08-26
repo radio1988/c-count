@@ -57,17 +57,3 @@ def save_crops(crops, fname):
     np.save(fname, crops)
     subprocess.run("gzip -f " + fname, shell=True, check=True)
 
-
-def parse_blobs(blobs):
-    '''
-    parse blobs into Images, Labels, Rs
-    :param blobs:
-    :return:  Images, Labels, Rs
-    '''
-    Flats = blobs[:, 6:]
-    w = int(sqrt(blobs.shape[1] - 6) / 2)  # width of img
-    Images = Flats.reshape(len(Flats), 2*w, 2*w)
-    Labels = blobs[:, 3]
-    Rs = blobs[:, 2]
-
-    return Images, Labels, Rs
