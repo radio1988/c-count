@@ -1,7 +1,29 @@
-from ccount import parse_image_arrays, block_equalize
-from ccount.img.read_czi import read_czi
+from ccount import block_equalize
+from ccount.img.read_czi import read_czi, parse_image_arrays
+from ccount.img.uint16_image_auto_contrast import uint16_image_auto_contrast
 
-from ccount import uint16_image_auto_contrast, save_into_npygz
+
+from ccount import crop_blobs, load_from_npygz, save_into_npygz
+from pathlib import Path
+import argparse, os, re, matplotlib, subprocess, yaml
+
+
+# Example Usage:
+# python workflow/scripts/blob_cropping.py -czi data/IL17A_POINT1_EPO_1.czi -i 0 -locs test/IL17A_POINT1_EPO_1.0.npy.gz -config config.yaml -o test/crops/IL17A_POINT1_EPO_1.0.crops.npy.gz
+
+
+def parse_cmd_and_prep ():
+    # ARGS
+    parser = argparse.ArgumentParser(
+        description='Read czi, blob_locs, output square crop images of each blob')
+    parser.add_argument('-czi', type=str,
+        help='czi file name: path/xxx.czi')
+    parser.add_argument('-i', type=int,
+        help='area index, e.g. 1,2,3,4')
+
+
+
+from ccount import save_into_npygz
 from ccount import find_blob, crop_blobs, remove_edge_crops, vis_blob_on_block
 from pathlib import Path
 import argparse, os, re, yaml

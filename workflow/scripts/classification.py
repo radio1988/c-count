@@ -1,4 +1,7 @@
 # import the necessary packages
+from ccount.img.equalize import equalize, block_equalize
+
+
 from pyimagesearch.cnn.networks.lenet import LeNet
 from ccount import *
 from sklearn.model_selection import train_test_split
