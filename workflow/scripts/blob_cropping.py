@@ -1,5 +1,7 @@
 # todo: get square crops from blob_locs and czi
-from ccount import read_czi, parse_image_arrays, uint16_image_auto_contrast
+from ccount import parse_image_arrays, uint16_image_auto_contrast
+from ccount.img.read_czi import read_czi
+
 from ccount import crop_blobs, load_from_npygz, save_into_npygz
 from pathlib import Path
 import argparse, os, re, matplotlib, subprocess, yaml

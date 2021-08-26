@@ -1,4 +1,6 @@
-from ccount import read_czi, parse_image_arrays, block_equalize
+from ccount import parse_image_arrays, block_equalize
+from ccount.img.read_czi import read_czi
+
 from ccount import uint16_image_auto_contrast, save_into_npygz
 from ccount import find_blob, crop_blobs, remove_edge_crops, vis_blob_on_block
 from pathlib import Path
