@@ -1,51 +1,47 @@
-import argparse
+from ccount import read_czi, parse_image_arrays, uint16_image_auto_contrast
 from pathlib import Path
-import os
-import re
 import matplotlib
-from ccount import read_czi, block_equalize, down_scale
+import argparse, os, re, yaml
 
-# Parse args
-parser = argparse.ArgumentParser(
-	description='Convert czi to jpg images'
-	)
-parser.add_argument(
-	'-i', type=str,
-	help='input file name'
-	)
-parser.add_argument(
-	'-f', type=str, 
-	help='czi file format: 2018, 2019'
-	)
-parser.add_argument(
-	'-odir', type=str, default="img",
-	help='output dir: e.g. img'
-	)
-args = parser.parse_args()
-print('input fname:', args.i)
-print('input format:', args.f)
-print('odir:', args.odir)
 
-outname = os.path.basename(args.i)
-oimgname = re.sub('.czi$', '.jpg', outname)
-oimgname = os.path.join(args.odir, "jpg", oimgname)
-oequname = re.sub('.czi$', '.equ.jpg', outname)
-oequname = os.path.join(args.odir, "equ", oequname)
-print("output_img_fname:", oimgname)
-print("equalized_output_img_fname:", oequname)
+def parse_cmd_and_prep ():
+	parser = argparse.ArgumentParser(
+		description='Convert czi to jpg images')
+	parser.add_argument('-i', type=str,
+		help='input file name')
+	parser.add_argument('-c', type=str, default="config.yaml", 
+	    help='path to config.yaml file')
+	parser.add_argument('-odir', type=str, default="img",
+		help='output dir: e.g. img')
+	args = parser.parse_args()
+	print('input fname:', args.i)
+	print('config fname::', args.c)
+	print('output dir:', args.odir)
 
-# Prep ourdir
-Path(os.path.join(args.odir, "jpg")).mkdir(parents=True, exist_ok=True)
-Path(os.path.join(args.odir, "equ")).mkdir(parents=True, exist_ok=True)
+	corename = os.path.basename(args.i)
+	corename = re.sub('.czi$', '.jpg', corename)
+	ofname = os.path.join(args.odir, corename)
+	Path(args.odir).mkdir(parents=True, exist_ok=True)
 
-# Work and output
-images = read_czi(args.i, Format=args.f, concatenation=False)
-for i,image in enumerate(images):
-	image_equ = block_equalize(image, block_height=2000, block_width=2400)
+	with open(args.c, 'r') as stream:
+	    config = yaml.safe_load(stream)
+
+	return [args, config, ofname]
+
+
+
+##################Start####################
+[args, config, ofname] = parse_cmd_and_prep()
+
+image_arrays = read_czi(args.i, Format=config['FORMAT'])
+for i in range(len(image_arrays)):
+	image_arrays = read_czi(args.i, Format=config['FORMAT'])
+	image = parse_image_arrays(image_arrays, i=i, Format=config['FORMAT'])
+	image_arrays = []
+	image = uint16_image_auto_contrast(image) # still uint16
 	
-	name1 = re.sub("jpg$", str(i)+".jpg", oimgname)
-	matplotlib.image.imsave(name1, image, cmap = "gray")
-	
-	name2 = re.sub("equ.jpg$", str(i)+".equ.jpg", oequname)
-	matplotlib.image.imsave(name2, image_equ, cmap = "gray")
+	ofname_i = re.sub("jpg$", str(i)+".jpg", ofname)
+	matplotlib.image.imsave(ofname_i, image, cmap = "gray")
+	print('saved into', ofname_i)
+
 

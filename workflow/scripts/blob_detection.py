@@ -27,7 +27,7 @@ def parse_cmd_and_prep ():
     print('output dir:', args.odir, "\n")
     corename = re.sub('.czi$', '', os.path.basename(args.i))
 
-    with open('config.yaml', 'r') as stream:
+    with open(args.c, 'r') as stream:
         config = yaml.safe_load(stream)
     if config['scaling_factor'] not in [1,2,4]:
         raise Exception('scaling_factor', scaling_factor, 'not implemented',
@@ -36,7 +36,6 @@ def parse_cmd_and_prep ():
     # Prep output dir
     if config['visualization']:
         Path(os.path.join(args.odir, "vis")).mkdir(parents=True, exist_ok=True)
-        Path(os.path.join(args.odir, "hist")).mkdir(parents=True, exist_ok=True)  # todo: move out
     return [args, corename, config]
 
 

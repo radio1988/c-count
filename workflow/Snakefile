@@ -12,50 +12,60 @@ SAMPLES=get_samples(DATA_DIR)
 
 rule targets:
     input:
-        img=expand("res/img/log/{s}.finished", s=SAMPLES),  # czi2img
-        blobs=expand("res/blobs/{s}.finished", s=SAMPLES),  # blob_detection
+        img=expand("log/img/{s}.finished", s=SAMPLES),  # czi2img
+        blobs=expand("log/blobs/{s}.finished", s=SAMPLES),  # blob_detection
 #        view0=input_names(SAMPLES),
 #        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
-        area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
-            suffix=".area.txt"),
-        count1="res/COUNT.csv",  # count from weight1
-        area1_agg="res/areas.csv",
+        # area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
+        #     suffix=".area.txt"),
+        # count1="res/COUNT.csv",  # count from weight1
+        # area1_agg="res/areas.csv",
 
 rule czi2img:
     input:
         "data/{s}.czi"
     output:
-        touch("res/img/log/{s}.finished") # if not error
+        touch("log/img/{s}.finished") # if not error
     threads:
         1
     log:
-        "log/img/log/{s}.log"
+        "log/img/{s}.log"
     benchmark:
-        "log/img/log/{s}.benchmark"
+        "log/img/{s}.benchmark"
     resources:
-            mem_mb=lambda wildcards, attempt: attempt * 50000
+        mem_mb=lambda wildcards, attempt: attempt * 16000  # ~10.5G for '2019'
     shell:
         """
-        python workflow/scripts/czi2img.py -i {input} -f {FORMAT} -odir res/img &> {log}
+        python workflow/scripts/czi2img.py -i {input} -c config.yaml -odir res/img &> {log}
         """
     
 rule blob_detection:
     input:
         "data/{s}.czi"
     output:
-        touch("res/blobs/{s}.finished")
+        touch("log/blobs/{s}.finished")
     threads:
         1
     resources:
-            mem_mb=lambda wildcards, attempt: attempt * 50000
+        mem_mb=lambda wildcards, attempt: attempt * 16000  # ~12G for '2019'
     log:
         "log/blobs/{s}.log"
     benchmark:
         "log/blobs/{s}.benchmark"
     shell:
         """
-        python workflow/scripts/blob_detection.py -i {input} -f {FORMAT} -odir res/blobs/ &> {log}
+        # todo: dynamic config.fname
+        python workflow/scripts/blob_detection.py \
+        -i {input} -c config.yaml -odir res/blob_locs &> {log}  
         """
+
+# rule blob_cropping:
+#     input:
+#         "log/blobs/{s}.finished"
+#     output:
+#         "res/blob_croppings/{s}.croppings.npy.gz"
+#     shell:
+#         "cp {input} {output}"
 
 rule view0:
     input:
@@ -81,7 +91,7 @@ rule view0:
 
 rule classification1:
     input:
-        blobs="res/blobs/{s}.finished",
+        blobs="log/blobs/{s}.finished",
         weight=WEIGHT1
     output:
         npy=temp("res/classification1/{s}.{i}.pred.npy.gz"),
@@ -94,7 +104,8 @@ rule classification1:
         mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
-        python workflow/scripts/classification.pred.py  -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
+        python workflow/scripts/classification.pred.py  \
+        -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
         -o res/classification1 -l 1 -w {input.weight} &> {output.log}
         """
 
@@ -196,7 +207,8 @@ rule area_aggregation:
 #         mem="8000"
 #     shell:
 #         """
-#         python workflow/classification.py  -db {input} -o res/filter2 -l 1 -w {WEIGHT2} &> {output.log}
+#         python workflow/classification.py  \
+#          -db {input} -o res/filter2 -l 1 -w {WEIGHT2} &> {output.log}
 #         """
 
 
