@@ -1,0 +1,13 @@
+yes: 1, no: 0, unlabeled: -1, Uncertain: -2
+
+
+crops: n-blobs x [meta + flat]
+		 [y, x, r, label, area, place_holder, flattened cropped_blob_img (crop_width^2)]
+
+flat_crop: flat of crop
+
+image: image of crop (2d array)
+
+blob_locs: n-blobs x [x,y,r]
+
+

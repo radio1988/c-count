@@ -5,6 +5,9 @@ from ccount.img.uint16_image_auto_contrast import uint16_image_auto_contrast
 from ccount.blob.find_blob import find_blob
 from ccount.blob.crop_blobs import crop_blobs
 from ccount.blob.io import save_crops
+from ccount.blob.plot import vis_blob_detection_on_img
+
+
 
 
 
@@ -12,7 +15,7 @@ from pathlib import Path
 import argparse, os, re, matplotlib, subprocess, yaml
 
 
-from ccount import  remove_edge_crops, vis_blob_on_block
+from ccount import  remove_edge_crops
 from pathlib import Path
 import argparse, os, re, yaml
 import numpy as np
@@ -95,7 +98,7 @@ for i in range(len(image_arrays)):
     if config['visualization']:
         out_img_fname = os.path.join(args.odir, "vis", corename+"."+i+".jpg")
         print("output_img_fname:", out_img_fname)
-        vis_blob_on_block(blob_locs, image_equ,image, 
+        vis_blob_detection_on_img(image, blob_locs,
             blob_extention_ratio=config['blob_extention_ratio'], 
             blob_extention_radius=config['blob_extention_radius'], 
             scaling = 2,

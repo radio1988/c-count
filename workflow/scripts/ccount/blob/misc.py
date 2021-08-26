@@ -1,6 +1,9 @@
 ## blob_locs and crops
 
 def sub_sample(A, n, seed=1):
+    '''
+    replace=False
+    '''
     if n <=0:
         raise Exception ('n must be float between 0-1 or int >=1')
     if n < 1:
@@ -11,7 +14,7 @@ def sub_sample(A, n, seed=1):
         A = A[np.random.choice(A.shape[0], n, replace=False), :]
         np.random.seed(seed=None)
     else:
-        pass
+        raise Exception("more samples than data asked for sub_sampling process")
     return (A)
 
 
@@ -54,6 +57,7 @@ def crops_stat(crops):
 def crop_width(image_flat_crops):
     from math import sqrt
     return  int(sqrt(crops.shape[1] - 6) / 2)
+
 
 
 def parse_crops(crops):
@@ -136,48 +140,4 @@ def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
     return hard_masked
 
 
-def area_calculation(img, r, plotting=False, fname=None):
-    #todo: increase speed
-    from skimage import io, filters
-    from scipy import ndimage
-    import matplotlib.pyplot as plt
-    
-    # automatic thresholding method such as Otsu's (avaible in scikit-image)
-    img = float_image_auto_contrast(img)  # bad
-    img = equalize(img)  # no use
 
-    # val = filters.threshold_otsu(img)
-    try:
-        val = filters.threshold_yen(img)
-    except ValueError: 
-        #print("Ops, got blank blob crop")
-        return (0)
-
-    # val = filters.threshold_li(img)
-
-    drops = ndimage.binary_fill_holes(img < val)  # cells as 1 (white), bg as 0
-    
-    # create mask 
-    w = int(img.shape[0]/2)
-    mask = np.zeros((2 * w, 2 * w))  # zeros are masked to be black
-    rr, cc = circle(w - 1, w - 1, min(r, w - 1))
-    mask[rr, cc] = 1  # 1 is white
-    
-    # apply mask on binary image
-    drops = abs(drops * mask)
-    
-    if (plotting):
-        plt.subplot(1, 2, 1)
-        plt.imshow(img, 'gray', clim=(0, 1))
-        plt.subplot(1, 2, 2)
-        plt.imshow(drops, cmap='gray')
-        if fname:
-            plt.savefig(fname+'.png')
-        else:
-            plt.show()
-    #         plt.hist(drops.flatten())
-    #         plt.show()
-        #print('intensity cut-off is', round(val, 3), '; pixcel count is %d' %(int(drops.sum())))
-        return drops
-    else:
-        return int(drops.sum())

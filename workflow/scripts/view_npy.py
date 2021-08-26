@@ -59,5 +59,5 @@ plt.hist(r_, 40)
 plt.show()
 
 
-show_rand_crops(crops=image_flat_crops, label_filter=label_filter, num_shown=num_shown, fname=out_name, plot_area=True, seed = seed)
+show_rand_crops(crops=image_flat_crops, label_filter=label_filter, num_shown=num_shown, fname=out_name, seed = seed)
 print("Plotting finished")
