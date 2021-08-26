@@ -17,10 +17,10 @@ rule targets:
         blobs=expand("log/blobs/{s}.finished", s=SAMPLES),  # blob_detection
 #        view0=input_names(SAMPLES),
 #        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
-        area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
-            suffix=".area.txt"),
-        count1="res/COUNT.csv",  # count from weight1
-        area1_agg="res/areas.csv",
+        # area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
+        #     suffix=".area.txt"),
+        # count1="res/COUNT.csv",  # count from weight1
+        # area1_agg="res/areas.csv",
 
 rule czi2img:
     input:

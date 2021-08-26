@@ -2,7 +2,7 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from ccount import area_calculation, load_blobs_db, parse_blobs
+from ccount import area_calculation, load_crops, parse_blobs
 import subprocess
 
 
@@ -15,7 +15,7 @@ if len(sys.argv) is not 3:
 print("only calculate area accurately for positive blobs, negative blobs area calculation not accurate if the blob shape not regular")
 print("cmd:", sys.argv)
 
-crops = load_blobs_db(sys.argv[1])
+crops = load_crops(sys.argv[1])
 print(crops.shape[0], "blobs loaded ")
 
 def area_calculation_of_blobs(crops, 

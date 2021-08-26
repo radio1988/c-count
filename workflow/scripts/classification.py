@@ -1,5 +1,7 @@
 # import the necessary packages
 from ccount.img.equalize import equalize, block_equalize
+from ccount.img.auto_contrast import float_image_auto_contrast
+
 
 
 from pyimagesearch.cnn.networks.lenet import LeNet
@@ -77,7 +79,7 @@ verbose = 2  # {0, 1, 2}
 
 
 # Load Labeled blobs_db
-blobs = load_blobs_db(args["blobs_db"])
+blobs = load_crops(args["blobs_db"])
 w = int(sqrt(blobs.shape[1]-6) / 2)  # width/2 of img
 
 
@@ -158,8 +160,8 @@ valImages = np.array([mask_image(image, r=valRs[ind]) for ind, image in enumerat
 
 # Normalizing images
 print("Normalizing images...")
-trainImages = np.array([normalize_img(image) for image in trainImages])
-valImages = np.array([normalize_img(image) for image in valImages])
+trainImages = np.array([float_image_auto_contrast(image) for image in trainImages])
+valImages = np.array([float_image_auto_contrast(image) for image in valImages])
 
 
 # # Show Images for model training
@@ -259,7 +261,7 @@ elif args["load_model"] > 0:
     # _tkinter.TclError: couldn't connect to display ":0.0"
     # load
     # print('loading...', args["blobs_db"])
-    # blobs = load_blobs_db(args["blobs_db"])
+    # blobs = load_crops(args["blobs_db"])
     # # unlabeled and uncertain to negative
     # print("set unlabeled and uncertain to negative for correct F1 calculation and popping up")
     # blobs[blobs[:, 3] == -1] = 0

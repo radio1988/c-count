@@ -3,10 +3,9 @@ from ccount import uint16_image_auto_contrast
 from ccount.img.read_czi import read_czi, parse_image_arrays
 from ccount.img.uint16_image_auto_contrast import uint16_image_auto_contrast
 
+from ccount.blob.crop_blobs import crop_blobs
+from ccount.blob.io import save_crops, load_locs
 
-
-
-from ccount import crop_blobs, load_from_npygz, save_into_npygz
 from pathlib import Path
 import argparse, os, re, matplotlib, subprocess, yaml
 
@@ -61,7 +60,7 @@ image = uint16_image_auto_contrast(image)
 print('image.shape:', image.shape)
 
 # blob_locs
-blob_locs = load_from_npygz(args.locs)
+blob_locs = load_locs(args.locs)
 print('blob_locs.shape:', blob_locs.shape)
 
 # cropping # test
@@ -70,4 +69,4 @@ image_flat_crops = crop_blobs(blob_locs[1:100], image,
 print('image_flat_crops.shape:', image_flat_crops.shape)
 
 
-save_into_npygz(image_flat_crops, args.o)
+save_crops(image_flat_crops, args.o)

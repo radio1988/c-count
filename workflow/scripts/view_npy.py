@@ -1,7 +1,7 @@
 #%matplotlib inline
 import warnings
 warnings.filterwarnings('ignore')
-from ccount import load_blobs_db, show_rand_crops
+from ccount import load_crops, show_rand_crops
 from math import sqrt
 import matplotlib
 import matplotlib.pyplot as plt
@@ -50,7 +50,7 @@ blob_extention_ratio = 1.4 # extend blob radius manually (1.4)
 blob_extention_radius = 30 # pixcels to extend (2)
 
 # load
-image_flat_crops = load_blobs_db(in_name)
+image_flat_crops = load_crops(in_name)
 w = int(sqrt(image_flat_crops.shape[1]-6)) # padding width & cropped img width/2
 
 

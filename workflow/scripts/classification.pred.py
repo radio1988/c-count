@@ -1,5 +1,6 @@
 # import the necessary packages
 from ccount.img.equalize import equalize, block_equalize
+from ccount.img.auto_contrast import float_image_auto_contrast
 
 
 from pyimagesearch.cnn.networks.lenet import LeNet
@@ -77,7 +78,7 @@ verbose = 2  # {0, 1, 2}
 
 
 # Load Labeled blobs_db
-blobs = load_blobs_db(args["blobs_db"])
+blobs = load_crops(args["blobs_db"])
 w = int(sqrt(blobs.shape[1]-6) / 2)  # width/2 of img
 
 
@@ -116,7 +117,7 @@ Images = np.array([mask_image(image, r=Rs[ind]) for ind, image in enumerate(Imag
 
 # Normalizing images
 print("Normalizing images...")
-Images = np.array([normalize_img(image) for image in Images])
+Images = np.array([float_image_auto_contrast(image) for image in Images])
 
 # Reshape for model
 Images = Images.reshape((Images.shape[0], 2*w, 2*w, 1))

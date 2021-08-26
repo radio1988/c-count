@@ -2,7 +2,7 @@ from ccount.img.read_czi import read_czi, parse_image_arrays
 from ccount.img.uint16_image_auto_contrast import uint16_image_auto_contrast
 
 from pathlib import Path
-import matplotlib
+from matplotlib.pyplot import imsave
 import argparse, os, re, yaml
 
 
@@ -37,13 +37,14 @@ def parse_cmd_and_prep ():
 
 image_arrays = read_czi(args.i, Format=config['FORMAT'])
 for i in range(len(image_arrays)):
+	print('For area', i)
 	image_arrays = read_czi(args.i, Format=config['FORMAT'])
 	image = parse_image_arrays(image_arrays, i=i, Format=config['FORMAT'])
 	image_arrays = []
 	image = uint16_image_auto_contrast(image) # still uint16
 	
 	ofname_i = re.sub("jpg$", str(i)+".jpg", ofname)
-	matplotlib.image.imsave(ofname_i, image, cmap = "gray")
+	imsave(ofname_i, image, cmap = "gray")
 	print('saved into', ofname_i)
 
 

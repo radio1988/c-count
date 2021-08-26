@@ -11,3 +11,17 @@ def uint16_image_auto_contrast(image):
     image = image/np.max(image) * 2**16
     image = image.astype(np.uint16)
     return image
+
+
+def float_image_auto_contrast(image):
+    '''
+    Normalize images into [0,1]
+    :param image:
+    :return:
+    '''
+    import numpy as np
+    
+    image = image - np.min(image)
+    image = image / np.max(image)
+    image = image.astype(np.float)
+    return image

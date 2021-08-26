@@ -21,141 +21,14 @@ from math import sqrt
 from skimage import data, img_as_float
 from skimage.draw import circle
 from skimage import exposure
-from skimage.feature import blob_dog, blob_log, blob_doh
 from skimage.color import rgb2gray
 from skimage.transform import rescale, resize, downscale_local_mean
 from IPython.display import clear_output
 from random import randint
 from time import sleep
 
-## Read ## 
-
-
-
-
-
-
-## image transformation ##
-
-
-
-
-
-
-
-
-
 
 ## Blob related ## 
-
-def find_blob(image_neg, scaling_factor = 2, 
-    max_sigma=40, min_sigma=4, num_sigma=5, threshold=0.1, overlap=.0):
-    '''
-    input: gray scaled image with bright blob on dark background (image_neg)
-    output: [n, 3] array of blob information, [y-locaiton, x-location, r-blob-radius] !!!
-    https://scikit-image.org/docs/dev/auto_examples/features_detection/plot_blob.html 
-    https://scikit-image.org/docs/dev/api/skimage.feature.html#skimage.feature.blob_log
-    # larger num_sigma: more accurate boundry, slower, try 15
-    # larger max_sigma: larger max blob size, slower
-    # threshold: larger, less low contrast stuff
-    '''
-    print('image size', image_neg.shape)
-    image_neg = down_scale(image_neg, scaling_factor)
-    print('image-blob detection size', image_neg.shape)
-    tic = time.time()
-    blobs = blob_log(
-        image_neg, 
-        max_sigma=max_sigma, min_sigma=min_sigma, num_sigma=num_sigma, 
-        threshold=threshold, overlap=overlap, exclude_border = False
-        )
-    blobs[:, 2] = blobs[:, 2] * sqrt(2)  # adjust r
-    blobs = blobs * scaling_factor  # scale back coordinates
-    toc = time.time()
-    print("blob detection time: ", toc - tic)
-    return blobs
-
-def save_into_npygz(array, fname):
-    import subprocess
-    fname = fname.replace('.gz', '')
-    np.save(fname, array)
-    print('saved into {}'.format(fname))
-    bashCommand = "gzip -f " + fname
-    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
-
-
-def load_from_npygz(fname):
-    '''
-    assuming reading fname.locs.npy.gz
-    '''
-    import gzip
-    if os.path.isfile(fname):
-        if fname.endswith('npy'):
-            array = np.load(fname)
-        elif fname.endswith('npy.gz'):
-            f = gzip.GzipFile(fname, "r")
-            array = np.load(f)
-        else:
-            raise Exception ("suffix not npy nor npy.gz")
-    return array
-
-def crop_blobs(blobs, block_img, area=-1, place_holder=-1, crop_width=100,
-               blob_extention_ratio=1.4, blob_extention_radius=2):
-    '''
-    input1: blobs, blob info [n, 0:3] [y, x, r]
-    input2: block_img, corresponding block_img
-    plt: cropped images
-    return: cropped padded images in a flattened 2d-array, with meta data in the first 6 numbers
-            - rows: blobs
-            - columns: [y, x, r_, label, area, place_holder, flattened cropped_blob_img (crop_width^2)]
-                - y, x: corrd of centroid on original block_img
-                - r_: extended radius
-                - label: -1 = unlabeled; 1 = yes, 0 = no
-                - area: in pixels, -1 as na
-                - place_holder: for future use
-
-    Algorithm:
-    1. White padding
-    2. Crop for each blob
-    '''
-    # White padding so that blobs on the edge can get cropped image
-    padder = max(np.max(block_img), 1)
-    padded = np.pad(block_img, crop_width, pad_with, padder=padder)  # 1 = white padding, 0 = black padding
-
-    # crop for each blob
-    flat_crops = np.empty((0, int(6 + 2 * crop_width * 2 * crop_width)))
-    for blob in blobs:
-        y, x, r = blob  # conter-intuitive order
-        # print("the {}th blob  x:{} y:{} r:{}\n".format(i, x, y, r))
-        y_ = int(y + crop_width)
-        x_ = int(x + crop_width)  # adj for padding
-        r_ = int(
-            blob_extention_ratio * r + blob_extention_radius)  # extend circles, need to keep parameters sync between functions
-
-        cropped_img = padded[y_ - crop_width: y_ + crop_width,
-                      x_ - crop_width: x_ + crop_width]  # x coordinates use columns to locate, vise versa
-
-        flat_crop = np.insert(cropped_img.flatten(), [0, 0, 0, 0, 0, 0],
-                              [y, x, r_, -1, area, place_holder])  # -1 unlabeled
-        flat_crop = np.array([flat_crop])
-        flat_crops = np.append(flat_crops, flat_crop, axis=0)
-    return flat_crops
-
-
-def blobs_stat(blobs):
-    '''
-    print summary of labels in blobs
-    :param blobs:
-    :return:
-    '''
-    print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
-        sum(blobs[:, 3] == 1),
-        sum(blobs[:, 3] == 0),
-        sum(blobs[:, 3] == -2),
-        sum(blobs[:, 3] == -1),
-    ))
-
-
 def vis_blob_on_block(blobs, block_img_equ, block_img_ori, 
     blob_extention_ratio=1.0, blob_extention_radius=0, scaling = 4, fname=None):
     '''
@@ -201,29 +74,7 @@ def vis_blob_on_block(blobs, block_img_equ, block_img_ori,
         plt.show()
         
 
-def hist_blobsize(blobs):
-    '''
-    show blob size distribution with histogram
-    '''
-    plt.title("Histogram of blob radius")
-    plt.hist(blobs[:, 2], 40)
-    plt.show()
 
-
-def filter_blobs(blobs, r_min, r_max):
-    '''
-    filter blobs based on size of r
-    '''
-    flitered_blobs = blobs[blobs[:, 2] >= r_min,]
-    flitered_blobs = flitered_blobs[flitered_blobs[:, 2] < r_max,]
-    print("Filtered blobs:", len(flitered_blobs))
-    return flitered_blobs
-
-def flat_label_filter(flats, label_filter = 1):
-    if (label_filter != 'na'):
-        filtered_idx = flats[:, 3] == label_filter
-        flats = flats[filtered_idx, :]
-    return (flats)
 
 
 def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
@@ -243,11 +94,6 @@ def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
     return hard_masked
 
 
-def reshape_img_from_flat(flat_crop):
-    flat = flat_crop[6:]
-    w = int(sqrt(len(flat)) / 2)
-    image = np.reshape(flat, (w + w, w + w))
-    return image
 
 
 def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, fname=None, plot_area=True):
@@ -333,7 +179,7 @@ def area_calculation(img, r, plotting=False, fname=None):
     import matplotlib.pyplot as plt
     
     # automatic thresholding method such as Otsu's (avaible in scikit-image)
-    img = normalize_img(img)  # bad
+    img = float_image_auto_contrast(img)  # bad
     img = equalize(img)  # no use
 
     # val = filters.threshold_otsu(img)
@@ -484,50 +330,8 @@ yes=1, no=0, undistinguishable=3, skip=s, go-back=b, excape(pause)=e: '''.format
     return flat_crops
 
 
-def sub_sample(A, n, seed=1):
-    if n < A.shape[0]:
-        np.random.seed(seed=seed)
-        A = A[np.random.choice(A.shape[0], n, replace=False), :]
-        np.random.seed(seed=None)
-    else:
-        pass
-    return (A)
+
     
-
-def load_blobs_db(in_db_name, n_subsample=False, seed=1):
-    '''
-    use parameters: db_name
-    input: db fname from user (xxx.npy)
-    output: array (crops format)
-    '''
-    import gzip
-    if os.path.isfile(in_db_name):
-        if in_db_name.endswith('npy'):
-            image_flat_crops = np.load(in_db_name)
-        elif in_db_name.endswith('npy.gz'):
-            f = gzip.GzipFile(in_db_name, "r")
-            image_flat_crops = np.load(f)
-        else:
-            raise Exception ("db suffix not npy nor npy.gz")
-
-        print("{} read into RAM".format(in_db_name))
-        print("{} cropped blobs, {} pixcels in each blob".format(len(image_flat_crops),
-                                                                 image_flat_crops.shape[1] - 6))
-        blobs_stat(image_flat_crops)
-        
-        if n_subsample:
-            print("subsampling to", n_subsample, "blobs")
-            image_flat_crops = sub_sample(image_flat_crops, n_subsample, seed=seed)  
-    else:
-        print("{} file not found".format(in_db_name))
-
-    return image_flat_crops
-
-def save_blobs_db(crops, fname):
-    import subprocess
-    fname = fname.replace(".npy.gz", ".npy")
-    np.save(fname, crops)
-    subprocess.run("gzip -f " + fname, shell=True, check=True)
 
 
 def remove_edge_crops(flat_blobs):
@@ -576,14 +380,6 @@ def remove_edge_crops(flat_blobs):
 
 
 
-def sample_crops(crops, proportion, seed):
-    np.random.seed(seed)
-    crops = np.random.permutation(crops)
-    sample = crops[range(int(len(crops)*proportion)), :]
-    np.random.seed(seed=None)
-    print(len(sample), "samples taken")
-    return sample
-    
 
 # TEST SCALING and Equalization
 # i = 0; j = 0; l = 2048
@@ -620,15 +416,7 @@ def split_train_valid(array, training_ratio):
     valid = array[N1:]
     return train, valid
 
-def normalize_img(image):
-    '''
-    Normalize images into [0,1]
-    :param image:
-    :return:
-    '''
-    image = image - np.min(image)
-    image = image / np.max(image)
-    return image
+
 
 
 def balancing_by_removing_no(blobs):
@@ -694,19 +482,7 @@ def balancing_by_duplicating(blobs):
     return blobs
 
 
-def parse_blobs(blobs):
-    '''
-    parse blobs into Images, Labels, Rs
-    :param blobs:
-    :return:  Images, Labels, Rs
-    '''
-    Flats = blobs[:, 6:]
-    w = int(sqrt(blobs.shape[1] - 6) / 2)  # width of img
-    Images = Flats.reshape(len(Flats), 2*w, 2*w)
-    Labels = blobs[:, 3]
-    Rs = blobs[:, 2]
 
-    return Images, Labels, Rs
 
 
 def augment_images(Images, aug_sample_size):
@@ -755,7 +531,7 @@ def augment_images(Images, aug_sample_size):
     print('shape:', Images.shape, 'after augment_images')
 
     Images = Images.reshape(len(Images), w2, w2)  # formatting back
-    Images = np.array([normalize_img(image) for image in Images])
+    Images = np.array([float_image_auto_contrast(image) for image in Images])
     return Images
 
 
@@ -836,7 +612,7 @@ def preprocessing_imgs(Images, Rs, Labels, scaling_factor):
     # Normalizing images
     print("Normalizing images...")
     # todo:  Possible precision loss when converting from float64 to uint16
-    Images = np.array([normalize_img(image) for image in Images])
+    Images = np.array([float_image_auto_contrast(image) for image in Images])
 
     return Images, Rs, Labels, w
 
