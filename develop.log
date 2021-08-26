@@ -1,0 +1,23 @@
+08/23/21
+- !!!RAM reduced to 10G
+    - enabled workstation for processing/development
+- process images with np.single, save with uint16
+    - faster blob_detection, less RAM
+- optimized blob-detection params
+    - faster wt
+- equalization only for blob detection
+    - may improve CNN performance
+- auto_contrast improved
+- skipped edge filter, will use Non_Epo to filter out
+    - increased blob_detection speed
+    - kept more True clusters
+
+
+
+todo:
+[ ] package folder structure of ccount
+[ ] czi tracking system
+[ ] re-labeling tracking
+[ ] use Neg to train
+[ ] skip equalization in CNN
+[ ] sample size plot

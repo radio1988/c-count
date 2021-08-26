@@ -11,7 +11,7 @@ WEIGHT2: None
 # (Please don't change unless you're developer)
 
 # blob detection
-test_mode: True
+test_mode: False
 block_height: 2000
 block_width: 2400  # if < 0, skip block equalization
 scaling_factor: 4  # 1, 2, 4 (08/23/2021 for blob_detection)

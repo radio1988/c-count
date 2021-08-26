@@ -51,7 +51,7 @@ for i in range(len(image_arrays)):
 
     image_arrays = read_czi(args.i, Format=config['FORMAT'])  # fast already
     image = parse_image_arrays(image_arrays, i=i, Format=config['FORMAT'])
-    image_arrays = [] # todo: release RAM
+    image_arrays = [] # todo: release RAM, 08/21/21 use ~10G
 
     image = uint16_image_auto_contrast(image) # still uint16
 

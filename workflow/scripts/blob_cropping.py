@@ -50,7 +50,7 @@ def parse_cmd_and_prep ():
 # image czi
 image_arrays = read_czi(args.czi, Format=config['FORMAT'])  # fast already
 image = parse_image_arrays(image_arrays, i=args.i, Format=config['FORMAT'])
-image_arrays = [] # todo: release RAM
+image_arrays = [] # todo: release RAM  08/21/21 use ~10G
 image = uint16_image_auto_contrast(image)
 print('image.shape:', image.shape)
 
