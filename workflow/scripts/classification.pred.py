@@ -23,7 +23,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt  # tk not on hpcc
 matplotlib.use('Agg')  # not display on hpcc
-import cv2  # not on hpcc
+# import cv2  # not on hpcc
 
 
 # Show CPU/GPU info
