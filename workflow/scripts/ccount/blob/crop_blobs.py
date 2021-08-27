@@ -47,7 +47,10 @@ def crop_blobs(blobs, image, area=-1, place_holder=-1, crop_width=100,
         cropped_img = padded[
             y_ - crop_width: y_ + crop_width, 
             x_ - crop_width: x_ + crop_width]  # x coordinates use columns to locate, vise versa
-
+        # todo: check why 
+        # blobs [[ 4772  9924    25 65535 65535]
+        #      [ 3968  2372    25 65535 65535]
+        #      [ 6984   788    35 65535 65535]]
         flat_crop = np.insert(
             cropped_img.flatten(), [0, 0, 0, 0, 0, 0], 
             [y, x, r_, -1, area, place_holder])  # -1 unlabeled

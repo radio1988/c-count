@@ -1,6 +1,6 @@
 #import ccount
 from ccount.blob.area_calculation import area_calculation
-from ccount.blob.io import load_crops, parse_blobs
+from ccount.blob.io import load_crops, parse_crops
 import sys, subprocess
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,7 +23,7 @@ def area_calculation_of_blobs(crops,
                               title="Blob Area In Pixcels", label_filter=1,
                               plotting=True, txt_saving=True, crop_saving=True):
     '''only calculate for positive blobs'''
-    images, labels, rs = parse_blobs(crops)
+    images, labels, rs = parse_crops(crops)
     print("labels", [ str(int(x)) for x in labels])
     print("label_filter", str(int(label_filter)))
     # filter

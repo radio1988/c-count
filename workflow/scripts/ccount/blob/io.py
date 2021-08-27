@@ -27,7 +27,7 @@ def load_crops(in_db_name, n_subsample=False, seed=1):
     import gzip
     import os
     import numpy as np
-    from .misc import blobs_stat, crop_width, sub_sample
+    from .misc import crops_stat, crop_width, sub_sample
 
     if not os.path.isfile(in_db_name):
         raise Exception("{} file not found".format(in_db_name))
@@ -47,7 +47,7 @@ def load_crops(in_db_name, n_subsample=False, seed=1):
 
     print("n-crop: {}, crop width: {}".\
         format(len(image_flat_crops), crop_width(image_flat_crops)))
-    blobs_stat(image_flat_crops)
+    crops_stat(image_flat_crops)
     
     return image_flat_crops
 

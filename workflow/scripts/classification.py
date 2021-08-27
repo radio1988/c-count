@@ -1,6 +1,8 @@
 # import the necessary packages
 from ccount.img.equalize import equalize, block_equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
+from ccount.img.transform import down_scale
+
 
 from ccount.blob.mask_image import mask_image
 
@@ -86,7 +88,7 @@ if args["load_model"] <= 0:
     print("In training mode")
     print("Removing unlabeled blobs")
     blobs = blobs[blobs[:, 3] != -1, :]
-    blobs_stat(blobs)
+    crops_stat(blobs)
 
 
 # set other laberls as no
@@ -94,7 +96,7 @@ if numClasses == 2:
     print("Remove undistinguishable and artifacts")  # todo: user decide
     blobs[blobs[:, 3] == -2, 3] = 0
     blobs[blobs[:, 3] == 9, 3] = 0
-    blobs_stat(blobs)
+    crops_stat(blobs)
 
 
 # Split train/valid
@@ -110,8 +112,8 @@ if args["load_model"] <= 0:
     valBlobs = balancing_by_duplicating(valBlobs)  #todo: skip this if F1 working well
 
 # Parse blobs
-trainimages, trainlabels, trainrs = parse_blobs(trainBlobs)
-valimages, vallabels, valrs = parse_blobs(valBlobs)
+trainimages, trainlabels, trainrs = parse_crops(trainBlobs)
+valimages, vallabels, valrs = parse_crops(valBlobs)
 
 # Extend rs
 trainrs = trainrs * r_ext_ratio + r_ext_pixels
@@ -267,7 +269,7 @@ elif args["load_model"] > 0:
 
     # w = int(sqrt(blobs.shape[1] - 6) / 2)  # width of img
     # # parse
-    # images, labels, rs = parse_blobs(blobs)  # for human
+    # images, labels, rs = parse_crops(blobs)  # for human
     # # equalize
     # images_ = np.array([equalize(image) for image in images])
     # # scale down

@@ -4,7 +4,9 @@ def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
     return: hard-masked image
     '''
     import numpy as np
-    
+    from skimage.draw import circle
+
+
     r_ = r * blob_extention_ratio + blob_extention_radius
     w = int(image.shape[0]/2)
 

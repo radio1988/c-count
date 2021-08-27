@@ -56,7 +56,7 @@ def crops_stat(crops):
 
 def crop_width(image_flat_crops):
     from math import sqrt
-    return  int(sqrt(crops.shape[1] - 6) / 2)
+    return  int(sqrt(image_flat_crops.shape[1] - 6) / 2)
 
 
 
@@ -119,6 +119,5 @@ def flat2image(flat_crop):
     w = int(sqrt(len(flat)) / 2)
     image = np.reshape(flat, (w + w, w + w))
     return image
-
 
 

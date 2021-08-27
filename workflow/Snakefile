@@ -17,7 +17,7 @@ rule targets:
         blob_locs=expand("log/blob_locs/{s}.done", s=SAMPLES),  # blob_detection
         blob_crops=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES, 
                                suffix='.crops.npy.gz'),
-        # count='res/COUNT.csv', # requires/enables classification
+        count_file='res/COUNT.csv', # requires/enables classification
 
 #        view0=input_names(SAMPLES),
 #        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
@@ -33,12 +33,12 @@ rule czi2img:
         touch("log/img/{s}.done") # if not error
     threads:
         1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 16000  # ~10.5G for '2019'
     log:
         "log/img/{s}.log"
     benchmark:
         "log/img/{s}.benchmark"
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 16000  # ~10.5G for '2019'
     shell:
         """
         python workflow/scripts/czi2img.py -i {input} -c config.yaml -odir res/img &> {log}
@@ -88,21 +88,21 @@ rule blob_cropping:
 
 rule classification:
     input:
-        blobs="log/blobs/{s}.done",
+        blob_crops='res/blob_crops/{s}.{i}.crops.npy.gz',
         weight=WEIGHT1
     output:
         npy=temp("res/classification1/{s}.{i}.pred.npy.gz"),
-        log="res/classification1/{s}.{i}.log"
-    benchmark:
-        "res/classification1/{s}.{i}.benchmark"
+        log="res/classification1/{s}.{i}.log" # todo: log deleted if job fail
     threads:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 8000
+    benchmark:
+        "res/classification1/{s}.{i}.benchmark"
     shell:
         """
         python workflow/scripts/classification.pred.py  \
-        -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
+        -db {input.blob_crops} \
         -o res/classification1 -l 1 -w {input.weight} &> {output.log}
         """
 

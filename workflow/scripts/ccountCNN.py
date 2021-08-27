@@ -9,6 +9,8 @@ import time
 import tracemalloc
 import gc
 
+from ccount.img.transform import down_scale
+
 
 
 from math import sqrt
@@ -76,7 +78,7 @@ def balancing_by_removing_no(blobs):
     :return: balanced blobs (with less samples)
     '''
     print('Before balancing:')
-    blobs_stat(blobs)
+    crops_stat(blobs)
 
     idx_yes = np.arange(0, blobs.shape[0])[blobs[:, 3] == 1]
     idx_no = np.arange(0, blobs.shape[0])[blobs[:, 3] == 0]
@@ -93,7 +95,7 @@ def balancing_by_removing_no(blobs):
         blobs = blobs[idx_choice,]
 
     print("After balancing by removing neg samples")
-    blobs_stat(blobs)
+    crops_stat(blobs)
 
     return blobs
 
@@ -107,7 +109,7 @@ def balancing_by_duplicating(blobs):
     :return: balanced blobs (with less samples)
     '''
     print('Before balancing:')
-    blobs_stat(blobs)
+    crops_stat(blobs)
 
     idx_yes = np.arange(0, blobs.shape[0])[blobs[:, 3] == 1]
     idx_no = np.arange(0, blobs.shape[0])[blobs[:, 3] == 0]
@@ -128,7 +130,7 @@ def balancing_by_duplicating(blobs):
     blobs = blobs[idx_choice, ]
 
     print("After balancing by adding positive samples")
-    blobs_stat(blobs)
+    crops_stat(blobs)
 
     return blobs
 

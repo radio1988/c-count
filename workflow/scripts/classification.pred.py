@@ -1,8 +1,11 @@
 # import the necessary packages
 from ccount.img.equalize import equalize, block_equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
+from ccount.img.transform import down_scale
 
+from ccount.blob.io import load_crops
 from ccount.blob.mask_image import mask_image
+from ccount.blob.misc import crops_stat, parse_crops
 
 from ccountCNN import *
 
@@ -90,39 +93,31 @@ if numClasses == 2:
     print("Remove undistinguishable and artifacts")  # todo: user decide
     blobs[blobs[:, 3] == -2, 3] = 0
     blobs[blobs[:, 3] == 9, 3] = 0
-    blobs_stat(blobs)
+    crops_stat(blobs)
 
 
 
-# Parse blobs
-images, labels, rs = parse_blobs(blobs)
+images, labels, rs = parse_crops(blobs)
+print('blobs', blobs[0:3, 0:5])
 
-# Extend rs
 rs = rs * r_ext_ratio + r_ext_pixels
 
-
-# Downscale images
 print("Downscaling images by ", scaling_factor)
 images = np.array([down_scale(image, scaling_factor=scaling_factor) for image in images])
-
-## Downscale w and R
 w = int(w/scaling_factor)
 rs = rs/scaling_factor
 
-# Equalize images (todo: test equalization -> scaling)
+# todo: test equalization -> scaling)
 # todo: more channels (scaled + equalized + original)
 print("Equalizing images...")
 images = np.array([equalize(image) for image in images])
 
-# Mask images
 print("Masking images...")
 images = np.array([mask_image(image, r=rs[ind]) for ind, image in enumerate(images)])
 
-# Normalizing images
-print("Normalizing images...")
+print("Auto contrasting images...")
 images = np.array([float_image_auto_contrast(image) for image in images])
 
-# Reshape for model
 images = images.reshape((images.shape[0], 2*w, 2*w, 1))
 print("max pixel value: ", np.max(images))
 print("min pixel value: ", np.min(images))

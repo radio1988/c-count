@@ -128,7 +128,7 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
 
     plot_flat_crops(crops,
         blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname)
-    images, labels, rs = parse_blobs(crops)
+    images, labels, rs = parse_crops(crops)
     [area_calculation(image, r=rs[ind], plotting=True) for ind, image in enumerate(images)]
 
     return (True)

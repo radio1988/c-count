@@ -88,7 +88,7 @@ for i in range(len(image_arrays)):
     # Visualizing filtered blobs
     # todo: split into another script to avoid RAM crash
     if config['blob_detection_visualization']:
-        out_img_fname = os.path.join(args.odir, "vis", corename+"."+i+".jpg")
+        out_img_fname = os.path.join(args.odir, "vis_blob_detection", corename+"."+i+".jpg")
         print("output_img_fname:", out_img_fname)
         visualize_blob_detection(image, blob_locs,
             blob_extention_ratio=config['blob_extention_ratio'], 
