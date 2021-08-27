@@ -53,7 +53,7 @@ image_arrays = read_czi(args.i, Format=config['FORMAT'])  # fast already
 for i in range(len(image_arrays)):
     # names
     i=str(i)
-    out_blob_fname = os.path.join(args.odir, corename+"."+i+".npy")
+    out_blob_fname = os.path.join(args.odir, corename+"."+i+".locs.npy")
     print("Searching blobs for area", i, "; output:", out_blob_fname)
 
     image_arrays = read_czi(args.i, Format=config['FORMAT'])  # fast already

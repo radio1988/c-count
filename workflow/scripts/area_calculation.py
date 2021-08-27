@@ -1,10 +1,9 @@
 #import ccount
 from ccount.blob.area_calculation import area_calculation
 from ccount.blob.io import load_crops, parse_blobs
-import sys
+import sys, subprocess
 import numpy as np
 import matplotlib.pyplot as plt
-import subprocess
 
 
 # no filtering, all reasults saved, bug negative ones should have -1 as output? as the calculation can be wrong for negative ones?? Now it is still calculated for testing

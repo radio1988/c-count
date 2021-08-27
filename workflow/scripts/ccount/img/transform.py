@@ -11,11 +11,3 @@ def down_scale(img, scaling_factor=2):
     return resize(img, (img.shape[0] // scaling_factor, img.shape[1] // scaling_factor))
 
 
-def pad_with(vector, pad_width, iaxis, kwargs):
-    '''
-    to make np.pad in crop_blobs work
-    '''
-    pad_value = kwargs.get('padder', 10)
-    vector[:pad_width[0]] = pad_value
-    vector[-pad_width[1]:] = pad_value
-    return vector

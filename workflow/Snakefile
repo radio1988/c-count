@@ -13,8 +13,12 @@ SAMPLES=get_samples(DATA_DIR)
 
 rule targets:
     input:
-        img=expand("log/img/{s}.finished", s=SAMPLES),  # czi2img
-        blobs=expand("log/blobs/{s}.finished", s=SAMPLES),  # blob_detection
+        images=expand("log/img/{s}.done", s=SAMPLES),  # czi2img
+        blob_locs=expand("log/blob_locs/{s}.done", s=SAMPLES),  # blob_detection
+        blob_crops=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES, 
+                               suffix='.crops.npy.gz'),
+        # count='res/COUNT.csv', # requires/enables classification
+
 #        view0=input_names(SAMPLES),
 #        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
         # area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
@@ -26,7 +30,7 @@ rule czi2img:
     input:
         "data/{s}.czi"
     output:
-        touch("log/img/{s}.finished") # if not error
+        touch("log/img/{s}.done") # if not error
     threads:
         1
     log:
@@ -44,15 +48,16 @@ rule blob_detection:
     input:
         "data/{s}.czi"
     output:
-        touch("log/blobs/{s}.finished")
+        touch("log/blob_locs/{s}.done")
+        #input_names(SAMPLES=[{s}], prefix="res/blob_locs/", suffix='.locs.npy.gz')
     threads:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 16000  # ~12G for '2019'
     log:
-        "log/blobs/{s}.log"
+        "log/blob_locs/{s}.log"
     benchmark:
-        "log/blobs/{s}.benchmark"
+        "log/blob_locs/{s}.benchmark"
     shell:
         """
         # todo: dynamic config.fname
@@ -60,17 +65,109 @@ rule blob_detection:
         -i {input} -c config.yaml -odir res/blob_locs &> {log}  
         """
 
-# rule blob_cropping:
-#     input:
-#         "log/blobs/{s}.finished"
-#     output:
-#         "res/blob_croppings/{s}.croppings.npy.gz"
-#     shell:
-#         "cp {input} {output}"
+rule blob_cropping:
+    input:
+        czi='data/{s}.czi',
+        blob_locs_flag="log/blob_locs/{s}.done",
+        blob_locs='res/blob_locs/{s}.{i}.locs.npy.gz'
+    output:
+        'res/blob_crops/{s}.{i}.crops.npy.gz'
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 16000 # todo: how much
+    log:
+        'log/blob_crops/{s}.{i}.crops.npy.gz.log'
+    benchmark:
+        'log/blob_crops/{s}.{i}.crops.npy.gz.benchmark'
+    shell:
+        """
+        python workflow/scripts/blob_cropping.py -czi {input.czi} -locs {input.blob_locs} \
+        -i {wildcards.i}  -config config.yaml -o {output} &> {log}
+        """
+
+rule classification:
+    input:
+        blobs="log/blobs/{s}.done",
+        weight=WEIGHT1
+    output:
+        npy=temp("res/classification1/{s}.{i}.pred.npy.gz"),
+        log="res/classification1/{s}.{i}.log"
+    benchmark:
+        "res/classification1/{s}.{i}.benchmark"
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 8000
+    shell:
+        """
+        python workflow/scripts/classification.pred.py  \
+        -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
+        -o res/classification1 -l 1 -w {input.weight} &> {output.log}
+        """
+
+rule count_aggregation:
+    input:
+        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".log")
+    output:
+        raw="res/classification1/COUNT1.txt",
+        clean="res/COUNT.csv"
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1000
+    priority:
+        100
+    log:
+        "res/COUNT.csv.log"
+    shell:
+        """
+        grep 'Predictions' {input} > {output.raw} 2> {log}
+        python workflow/scripts/aggr_count_info.py.py res/classification1/COUNT1.txt res/COUNT.csv &>> {log}
+        """
+
+rule area_calculation:
+    input:
+        "res/classification1/{s}.{i}.pred.npy.gz"
+    output:
+        txt="res/classification1/area/{s}.{i}.area.txt",
+        npy="res/classification1/area/{s}.{i}.area.txt.npy.gz"
+    log:
+        "res/classification1/area/{s}.{i}.area.log"
+    benchmark:
+        "res/classification1/area/{s}.{i}.area.benchmark"
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 8000
+    shell:
+        """
+        python workflow/scripts/area_calculation.py {input} {output.txt} &> {log}
+        """
+
+rule area_aggregation:
+    '''
+    Will aggreated all files under res/classification1/area, regardless of config.yaml
+    '''
+    input:
+        input_names(SAMPLES=SAMPLES, 
+                    prefix="res/classification1/area/", suffix=".area.txt")
+    output:
+        "res/areas.csv"
+    log:
+        "res/areas.csv.log"
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1000
+    shell:
+        """
+        python workflow/scripts/aggr_area_info.py res/classification1/area/ res/areas.csv &> {log}
+        """
 
 rule view0:
     input:
-        "res/blobs/{s}.finished"
+        "res/blobs/{s}.done"
     output:
         html="res/blobs/view/{s}.{i}.html"
     params:
@@ -88,26 +185,6 @@ rule view0:
         fname="res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" dir={WKDIR} \
         jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
         --output {params.html} &> {log}
-        """
-
-rule classification1:
-    input:
-        blobs="log/blobs/{s}.finished",
-        weight=WEIGHT1
-    output:
-        npy=temp("res/classification1/{s}.{i}.pred.npy.gz"),
-        log="res/classification1/{s}.{i}.log"
-    benchmark:
-        "res/classification1/{s}.{i}.benchmark"
-    threads:
-        1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 8000
-    shell:
-        """
-        python workflow/scripts/classification.pred.py  \
-        -db "res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" \
-        -o res/classification1 -l 1 -w {input.weight} &> {output.log}
         """
 
 rule view1:
@@ -132,122 +209,3 @@ rule view1:
         jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
         --output {params.html} &> {log}
         """
-
-rule count1:
-    input:
-        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".log")
-    output:
-        raw="res/classification1/COUNT1.txt",
-        clean="res/COUNT.csv"
-    threads:
-        1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1000
-    priority:
-        100
-    log:
-        "res/COUNT.csv.log"
-    shell:
-        """
-        grep 'Predictions' {input} > {output.raw} 2> {log}
-        python workflow/scripts/get_counts.py res/classification1/COUNT1.txt res/COUNT.csv &>> {log}
-        """
-
-rule area_calculation1:
-    input:
-        "res/classification1/{s}.{i}.pred.npy.gz"
-    output:
-        txt="res/classification1/area/{s}.{i}.area.txt",
-        npy="res/classification1/area/{s}.{i}.area.txt.npy.gz"
-    log:
-        "res/classification1/area/{s}.{i}.area.log"
-    benchmark:
-        "res/classification1/area/{s}.{i}.area.benchmark"
-    threads:
-        1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 8000
-    shell:
-        """
-        python workflow/scripts/area_calculation.py {input} {output.txt} &> {log}
-        """
-
-
-rule area_aggregation:
-    '''
-    Will aggreated all files under res/classification1/area, regardless of config.yaml
-    '''
-    input:
-        input_names(SAMPLES=SAMPLES, 
-                    prefix="res/classification1/area/", suffix=".area.txt")
-    output:
-        "res/areas.csv"
-    log:
-        "res/areas.csv.log"
-    threads:
-        1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1000
-    shell:
-        """
-        python workflow/scripts/get_areas.py res/classification1/area/ res/areas.csv &> {log}
-        """
-
-# rule filter2:
-#     input:
-#         "res/classification1/{s}.yes.npy.gz"
-#     output:
-#         yes="res/filter2/{s}.yes.yes.npy.gz",
-#         all="res/filter2/{s}.yes.pred.npy.gz",
-#         log="res/filter2/{s}.log"
-#     benchmark:
-#         "res/filter2/{s}.benchmark"
-#     threads:
-#         1
-#     params:
-#         mem="8000"
-#     shell:
-#         """
-#         python workflow/classification.py  \
-#          -db {input} -o res/filter2 -l 1 -w {WEIGHT2} &> {output.log}
-#         """
-
-
-
-# rule count2:
-#     input:
-#         expand("res/filter2/{s}.log", s=SAMPLES)
-#     output:
-#         "res/filter2/COUNT2.txt"
-#     threads:
-#         1
-#     params:
-#         mem="1000"
-#     shell:
-#         """
-#         grep 'Predictions' {input} > {output}
-#         """
-
-
-
-# rule view2:
-#     input:
-#         "res/filter2/{s}.yes.pred.npy.gz"
-#     output:
-#         nb="res/filter2/{s}.ipynb",
-#         html="res/filter2/{s}.html"
-#     log:
-#         "res/filter2/{s}.html.log"
-#     benchmark:
-#         "res/filter2/{s}.html.benchmark"
-#     threads:
-#         1
-#     params:
-#         mem="8000"
-#     shell:
-#         """
-#         fname={input} dir={WKDIR} runipy workflow/viewing_blobs.ipynb {output.nb} &> {log}
-#         jupyter nbconvert --to html {output.nb} &>> {log}
-#         """
-
-

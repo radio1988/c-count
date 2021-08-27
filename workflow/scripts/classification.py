@@ -4,10 +4,10 @@ from ccount.img.auto_contrast import float_image_auto_contrast
 
 from ccount.blob.mask_image import mask_image
 
+from ccountCNN import *
 
-
+from pathlib import Path
 from pyimagesearch.cnn.networks.lenet import LeNet
-from ccount import *
 from sklearn.model_selection import train_test_split
 from skimage.transform import rescale, resize, downscale_local_mean
 from keras.datasets import mnist
@@ -17,13 +17,9 @@ from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
 from collections import Counter
 
-import sys
-import os
-import argparse
-import numpy as np
-import keras
-from pathlib import Path
+import sys, os, argparse, keras
 
+import numpy as np
 import matplotlib.pyplot as plt  # tk not on hpcc
 matplotlib.use('Agg')  # not display on hpcc
 # import cv2  # not on hpcc
