@@ -249,6 +249,7 @@ def F1_calculation(predictions, labels):
 
 
 def preprocessing_imgs(images, rs, labels, scaling_factor):
+    from ccount.blob.mask_image import mask_image
     # Downscale images (todo: downscale as the first step)
     print("Downscaling images by ", scaling_factor)
     images = np.array([down_scale(image, scaling_factor=scaling_factor) for image in images])

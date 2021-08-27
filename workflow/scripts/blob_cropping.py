@@ -1,7 +1,6 @@
 # todo: get square crops from blob_locs and czi
-from ccount import uint16_image_auto_contrast
 from ccount.img.read_czi import read_czi, parse_image_arrays
-from ccount.img.uint16_image_auto_contrast import uint16_image_auto_contrast
+from ccount.img.auto_contrast import uint16_image_auto_contrast
 
 from ccount.blob.crop_blobs import crop_blobs
 from ccount.blob.io import save_crops, load_locs

@@ -9,11 +9,10 @@ def find_blob(image_neg, scaling_factor = 2,
     # larger max_sigma: larger max blob size, slower
     # threshold: larger, less low contrast stuff
     '''
+    from ..img.transform import down_scale
     from skimage.feature import  blob_log # blob_doh, blob_dog
     import time
-    from ..img import down_scale
     from math import sqrt
-
 
     print('image size', image_neg.shape)
     image_neg = down_scale(image_neg, scaling_factor)

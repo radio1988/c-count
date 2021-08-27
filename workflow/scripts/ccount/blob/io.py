@@ -17,6 +17,7 @@ def load_locs(fname):
             raise Exception ("suffix not npy nor npy.gz")
     return array
 
+
 def load_crops(in_db_name, n_subsample=False, seed=1):
     '''
     use parameters: db_name
@@ -45,7 +46,7 @@ def load_crops(in_db_name, n_subsample=False, seed=1):
         image_flat_crops = sub_sample(image_flat_crops, n_subsample, seed=seed)  
 
     print("n-crop: {}, crop width: {}".\
-        format(len(image_flat_crops), crop_width(image_flat_crops))
+        format(len(image_flat_crops), crop_width(image_flat_crops)))
     blobs_stat(image_flat_crops)
     
     return image_flat_crops
@@ -53,6 +54,8 @@ def load_crops(in_db_name, n_subsample=False, seed=1):
 
 def save_crops(crops, fname):
     import subprocess
+    import numpy as np
+
     fname = fname.replace(".npy.gz", ".npy")
     np.save(fname, crops)
     subprocess.run("gzip -f " + fname, shell=True, check=True)

@@ -1,22 +1,14 @@
-from ccount.img.equalize import equalize, block_equalize
+from ccount.img.equalize import block_equalize
 from ccount.img.read_czi import read_czi, parse_image_arrays
-from ccount.img.uint16_image_auto_contrast import uint16_image_auto_contrast
+from ccount.img.auto_contrast import uint16_image_auto_contrast
 
 from ccount.blob.find_blob import find_blob
 from ccount.blob.crop_blobs import crop_blobs
 from ccount.blob.io import save_crops
-from ccount.blob.plot import vis_blob_detection_on_img
-
-
-
-
+from ccount.blob.plot import visualize_blob_detection
 
 from pathlib import Path
-import argparse, os, re, matplotlib, subprocess, yaml
 
-
-from ccount import  remove_edge_crops
-from pathlib import Path
 import argparse, os, re, yaml
 import numpy as np
 
@@ -49,7 +41,7 @@ def parse_cmd_and_prep ():
                         'only support 1,2,4')
 
     # Prep output dir
-    if config['visualization']:
+    if config['blob_detection_visualization']:
         Path(os.path.join(args.odir, "vis")).mkdir(parents=True, exist_ok=True)
     return [args, corename, config]
 
@@ -95,10 +87,10 @@ for i in range(len(image_arrays)):
 
     # Visualizing filtered blobs
     # todo: split into another script to avoid RAM crash
-    if config['visualization']:
+    if config['blob_detection_visualization']:
         out_img_fname = os.path.join(args.odir, "vis", corename+"."+i+".jpg")
         print("output_img_fname:", out_img_fname)
-        vis_blob_detection_on_img(image, blob_locs,
+        visualize_blob_detection(image, blob_locs,
             blob_extention_ratio=config['blob_extention_ratio'], 
             blob_extention_radius=config['blob_extention_radius'], 
             scaling = 2,

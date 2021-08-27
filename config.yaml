@@ -12,6 +12,7 @@ WEIGHT2: None
 
 # blob detection
 test_mode: False
+equalization: True  # hard code: yes in blob detection, no in CNN
 block_height: 2000
 block_width: 2400  # if < 0, skip block equalization
 scaling_factor: 4  # 1, 2, 4 (08/23/2021 for blob_detection)
@@ -19,8 +20,7 @@ max_sigma: 6 # 20-50
 min_sigma: 3  # 2-8
 num_sigma: 20  # smaller->faster, less accurate, 5-20
 threshold: 0.02
-visualization: True
-equalization: True
+blob_detection_visualization: True
 blob_extention_ratio: 1.0 # soft extend blob radius manually (1.4)
 blob_extention_radius: 0 # pixcels to extend (2)
 crop_width: 80  # padding width, which is cropped img width/2 (50)

@@ -1,8 +1,9 @@
 #import ccount
+from ccount.blob.area_calculation import area_calculation
+from ccount.blob.io import load_crops, parse_blobs
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from ccount import area_calculation, load_crops, parse_blobs
 import subprocess
 
 

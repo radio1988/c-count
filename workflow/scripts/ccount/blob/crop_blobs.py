@@ -1,4 +1,3 @@
-
 def crop_blobs(blobs, block_img, area=-1, place_holder=-1, crop_width=100,
                blob_extention_ratio=1.4, blob_extention_radius=2):
     '''

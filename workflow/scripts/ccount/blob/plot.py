@@ -1,4 +1,4 @@
-def vis_blob_detection_on_img(image, blob_locs, 
+def visualize_blob_detection(image, blob_locs, 
     blob_extention_ratio=1.0, blob_extention_radius=0, scaling = 2, fname=None):
     '''
     image: image where blobs were detected from
@@ -6,29 +6,26 @@ def vis_blob_detection_on_img(image, blob_locs,
 
     output: image with yellow circles around blobs
     '''
-    from .transform import down_scale
+    from ..img.transform import down_scale
     import matplotlib.pyplot as plt
 
     blob_locs = blob_locs[:, 0:3]
     blob_locs = blob_locs/scaling
-    print('vis_blob_detection_on_img scaling:', scaling)
+    print('visualize_blob_detection scaling:', scaling)
 
     image = down_scale(image, scaling)
 
-    fig, axes = plt.subplots(1, 1, figsize=(40, 40), sharex=True, sharey=True)
-    ax = axes.ravel()
-
-    ax[0].set_title('blob detection')
-    ax[0].imshow(image, 'gray', interpolation='nearest')
+    fig, ax = plt.subplots(figsize=(40, 40))
+    ax.set_title('Visualizing blob detection')
+    ax.imshow(image, 'gray', interpolation='nearest')
     for loc in blob_locs:
         y, x, r = loc
         c = plt.Circle((x, y), 
                        r * blob_extention_ratio + blob_extention_radius, 
                        color=(0.9, 0.9, 0, 0.5), linewidth=1,
                        fill=False) 
-        ax[0].add_patch(c)
+        ax.add_patch(c)
 
-    plt.tight_layout()
     if fname:
         plt.savefig(fname)
     else:
@@ -37,12 +34,10 @@ def vis_blob_detection_on_img(image, blob_locs,
 
 def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, fname=None):
     '''
-    input: one padded crop of a blob
+    input: flat_crop of a blob
     output: two plots
         - left: original image with yellow circle
         - right: binary for area calculation
-
-    return: cropped image and hard-masked image
     '''
     import numpy as np
     from math import sqrt
@@ -84,8 +79,6 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, f
     # c = plt.Circle((w - 1, w - 1), r, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
     # ax[2].add_patch(c)
 
-
-
     plt.tight_layout()
     if fname:
         plt.savefig(fname+".png")
@@ -123,7 +116,7 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
         filtered_idx = [str(int(x)) == str(label_filter) for x in crops[:, 3]]
         crops = crops[filtered_idx, :]
 
-    if len(crops) = 0:
+    if len(crops) == 0:
         print('num_blobs after filtering is 0')
         return False
 
@@ -139,13 +132,6 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
     [area_calculation(image, r=rs[ind], plotting=True) for ind, image in enumerate(images)]
 
     return (True)
-
-
-
-
-
-
-
 
 def pop_label_flat_crops(flat_crops, random=True, seed=1, skip_labeled=True):
     '''

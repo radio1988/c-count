@@ -2,6 +2,8 @@
 from ccount.img.equalize import equalize, block_equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
 
+from ccount.blob.mask_image import mask_image
+
 
 
 from pyimagesearch.cnn.networks.lenet import LeNet

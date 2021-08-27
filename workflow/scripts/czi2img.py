@@ -1,5 +1,5 @@
 from ccount.img.read_czi import read_czi, parse_image_arrays
-from ccount.img.uint16_image_auto_contrast import uint16_image_auto_contrast
+from ccount.img.auto_contrast import uint16_image_auto_contrast
 
 from pathlib import Path
 from matplotlib.pyplot import imsave
