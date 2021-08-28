@@ -6,6 +6,7 @@ FORMAT: 2019
 WEIGHT1: resources/weights/FL.t.old.hd5
 WEIGHT2: None
 
+I: [1,2,3,4]
 
 ## Advanced params ##
 # (Please don't change unless you're developer)

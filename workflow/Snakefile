@@ -10,14 +10,17 @@ WEIGHT2=config["WEIGHT2"]
 WKDIR=os.getcwd()
 
 SAMPLES=get_samples(DATA_DIR)
+# I=[1,2,3,4]
 
 rule targets:
     input:
-        images=expand("log/img/{s}.done", s=SAMPLES),  # czi2img
-        blob_locs=expand("log/blob_locs/{s}.done", s=SAMPLES),  # blob_detection
-        blob_crops=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES, 
-                               suffix='.crops.npy.gz'),
-        count_file='res/COUNT.csv', # requires/enables classification
+        czi2img=expand("log/img/{s}.done", s=SAMPLES), 
+        blob_detection=expand("log/blob_locs/{s}.done", s=SAMPLES),
+        blob_cropping=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES, 
+                                 suffix='.crops.npy.gz'),
+        classification=input_names(prefix='res/classification1/', SAMPLES=SAMPLES,
+                                   suffix=".crops.clas.txt"),
+        count_file='res/COUNT.csv',
 
 #        view0=input_names(SAMPLES),
 #        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
@@ -30,7 +33,7 @@ rule czi2img:
     input:
         "data/{s}.czi"
     output:
-        touch("log/img/{s}.done") # if not error
+        touch("log/img/{s}.done")
     threads:
         1
     resources:
@@ -48,17 +51,16 @@ rule blob_detection:
     input:
         "data/{s}.czi"
     output:
-        # touch("log/blob_locs/{s}.done"), 
-        dynamic("res/blob_locs/{s}.{i}.locs.npy.gz")
+        touch("log/blob_locs/{s}.done"), 
         #input_names(SAMPLES=[{s}], prefix="res/blob_locs/", suffix='.locs.npy.gz')
     threads:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 16000  # ~12G for '2019'
     log:
-        "log/blob_locs/{s}.{i}.log"
+        "log/blob_locs/{s}.log"
     benchmark:
-        "log/blob_locs/{s}.{i}.benchmark"
+        "log/blob_locs/{s}.benchmark"
     shell:
         """
         # todo: dynamic config.fname
@@ -69,12 +71,9 @@ rule blob_detection:
 rule blob_cropping:
     input:
         czi='data/{s}.czi',
-        # blob_locs_flag="log/blob_locs/{s}.done", 
-        blob_locs=dynamic("res/blob_locs/{s}.{i}.locs.npy.gz")
+        blob_locs_flag="log/blob_locs/{s}.done"
     output:
         'res/blob_crops/{s}.{i}.crops.npy.gz'
-    params:
-        blob_locs=input_names(SAMPLES={wildcards.s}, prefix="res/blob_locs/", suffix='.locs.npy.gz')
     threads:
         1
     resources:
@@ -85,7 +84,8 @@ rule blob_cropping:
         'log/blob_crops/{s}.{i}.crops.npy.gz.benchmark'
     shell:
         """
-        python workflow/scripts/blob_cropping.py -czi {input.czi} -locs {params.blob_locs} \
+        python workflow/scripts/blob_cropping.py -czi {input.czi} \
+        -locs res/blob_locs/{wildcards.s}.{wildcards.i}.locs.npy.gz \
         -i {wildcards.i}  -config config.yaml -o {output} &> {log}
         """
 
