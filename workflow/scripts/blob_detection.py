@@ -17,7 +17,6 @@ import numpy as np
 # -c config.yaml -odir res/blob_locs/
 
 def parse_cmd_and_prep ():
-    # ARGS
     parser = argparse.ArgumentParser(
         description='Read czi, output blobs')
     parser.add_argument('-i', type=str,

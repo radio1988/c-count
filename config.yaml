@@ -28,6 +28,18 @@ crop_width: 80  # padding width, which is cropped img width/2 (50)
 overlap: .8
 
 
+# CNN 
+clas_scaling_factor: 2  # input scale down for model training
+aug_sample_size: 2000
+training_ratio: 0.9  # proportion of data to be in training set
+r_ext_ratio: 1.0  # larger (1.4) for better view under augmentation
+r_ext_pixels: 0
+numClasses: 2  # if 2, all other than 1 will be zero
+batch_size: 64  # default 64
+patience: 3  # default 50
+learning_rate: 0.0001  # default 0.0001 (Adam)
+verbose: 2  # {0, 1, 2}
+
 # Notes
 
 ## 2018 params recommendation

@@ -95,7 +95,7 @@ rule classification:
         weight=WEIGHT1
     output:
         npy=temp("res/classification1/{s}.{i}.crops.clas.npy.gz"),
-        txt=temp("res/classification1/{s}.{i}.crops.clas.txt")
+        txt="res/classification1/{s}.{i}.crops.clas.txt"
     threads:
         1
     resources:
@@ -107,8 +107,8 @@ rule classification:
     shell:
         """
         python workflow/scripts/classification.py  \
-        -db {input.blob_crops} \
-        -o res/classification1 -l 1 -w {input.weight} &> {log}
+        -crops {input.blob_crops} -weight {input.weight} \
+        -config config.yaml -odir res/classification1 &> {log}
         """
 
 rule aggr_count:

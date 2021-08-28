@@ -17,7 +17,8 @@
 todo:
 [ ] package folder structure of ccount
 [x] czi tracking system
-[ ] classification.py bug (labels wrong)
+[ ] classification.py bug (labels wrong), int16 does not have -1? became 65535
+[ ] verify if clas.npy.gz contain correct label or 65535
 [ ] classifications.py/training.py cleaning
 [ ] re-labeling tracking
 [ ] use Neg to train

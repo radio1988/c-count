@@ -1,4 +1,4 @@
-yes: 1, no: 0, unlabeled: -1, Uncertain: -2
+yes: 1, no: 0, unlabeled: -1, uncertain: -2, artifacts: 9
 
 
 crops: n-blobs x [meta + flat]
