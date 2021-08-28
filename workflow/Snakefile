@@ -91,27 +91,28 @@ rule classification:
         blob_crops='res/blob_crops/{s}.{i}.crops.npy.gz',
         weight=WEIGHT1
     output:
-        npy=temp("res/classification1/{s}.{i}.pred.npy.gz"),
-        log="res/classification1/{s}.{i}.log" # todo: log deleted if job fail
+        npy=temp("res/classification1/{s}.{i}.crops.clas.npy.gz"),
+        txt=temp("res/classification1/{s}.{i}.crops.clas.txt")
     threads:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 8000
+    log:
+        "log/classification1/{s}.{i}.log" # todo: log deleted if job fail
     benchmark:
-        "res/classification1/{s}.{i}.benchmark"
+        "log/classification1/{s}.{i}.benchmark"
     shell:
         """
-        python workflow/scripts/classification.pred.py  \
+        python workflow/scripts/classification.py  \
         -db {input.blob_crops} \
-        -o res/classification1 -l 1 -w {input.weight} &> {output.log}
+        -o res/classification1 -l 1 -w {input.weight} &> {log}
         """
 
 rule count_aggregation:
     input:
-        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".log")
+        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".crops.clas.txt")
     output:
-        raw="res/classification1/COUNT1.txt",
-        clean="res/COUNT.csv"
+        "res/COUNT.csv"
     threads:
         1
     resources:
@@ -119,16 +120,15 @@ rule count_aggregation:
     priority:
         100
     log:
-        "res/COUNT.csv.log"
+        "log/COUNT.csv.log"
     shell:
         """
-        grep 'Predictions' {input} > {output.raw} 2> {log}
-        python workflow/scripts/aggr_count_info.py.py res/classification1/COUNT1.txt res/COUNT.csv &>> {log}
+        python workflow/scripts/aggr_count.py {input} {output} &> {log}
         """
 
 rule area_calculation:
     input:
-        "res/classification1/{s}.{i}.pred.npy.gz"
+        "res/classification1/{s}.{i}.clas.npy.gz"
     output:
         txt="res/classification1/area/{s}.{i}.area.txt",
         npy="res/classification1/area/{s}.{i}.area.txt.npy.gz"
@@ -189,7 +189,7 @@ rule view0:
 
 rule view1:
     input:
-        "res/classification1/{s}.{i}.pred.npy.gz"  # some will not exist, but just ignore warnings
+        "res/classification1/{s}.{i}.clas.npy.gz"  # some will not exist, but just ignore warnings
     output:
         html="res/classification1/view/{s}.{i}.html"
     params:

@@ -17,8 +17,8 @@ def aggr_count_info(inputs, label = int(1)):
     return pd.DataFrame(zip(names, counts), columns=['NAME', 'COUNT'])
 
 
-print(">>> usage: aggr_count.py COUNT-1.txt COUNT-2.txt ... COUNT-n.txt output.csv")
-print(">>> example: python workflow/scripts/aggr_count.py.py \
+print(">>> usage: aggr_count_info.py COUNT-1.txt COUNT-2.txt ... COUNT-n.txt output.csv")
+print(">>> example: python workflow/scripts/aggr_count_info.py.py \
     x.clas.txt y.clas.txt res/COUNT.csv")
 
 if len(sys.argv) < 3:
