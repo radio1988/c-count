@@ -48,16 +48,17 @@ rule blob_detection:
     input:
         "data/{s}.czi"
     output:
-        touch("log/blob_locs/{s}.done")
+        # touch("log/blob_locs/{s}.done"), 
+        dynamic("res/blob_locs/{s}.{i}.locs.npy.gz")
         #input_names(SAMPLES=[{s}], prefix="res/blob_locs/", suffix='.locs.npy.gz')
     threads:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 16000  # ~12G for '2019'
     log:
-        "log/blob_locs/{s}.log"
+        "log/blob_locs/{s}.{i}.log"
     benchmark:
-        "log/blob_locs/{s}.benchmark"
+        "log/blob_locs/{s}.{i}.benchmark"
     shell:
         """
         # todo: dynamic config.fname
@@ -68,10 +69,12 @@ rule blob_detection:
 rule blob_cropping:
     input:
         czi='data/{s}.czi',
-        blob_locs_flag="log/blob_locs/{s}.done",
-        blob_locs='res/blob_locs/{s}.{i}.locs.npy.gz'
+        # blob_locs_flag="log/blob_locs/{s}.done", 
+        blob_locs=dynamic("res/blob_locs/{s}.{i}.locs.npy.gz")
     output:
         'res/blob_crops/{s}.{i}.crops.npy.gz'
+    params:
+        blob_locs=input_names(SAMPLES={wildcards.s}, prefix="res/blob_locs/", suffix='.locs.npy.gz')
     threads:
         1
     resources:
@@ -82,7 +85,7 @@ rule blob_cropping:
         'log/blob_crops/{s}.{i}.crops.npy.gz.benchmark'
     shell:
         """
-        python workflow/scripts/blob_cropping.py -czi {input.czi} -locs {input.blob_locs} \
+        python workflow/scripts/blob_cropping.py -czi {input.czi} -locs {params.blob_locs} \
         -i {wildcards.i}  -config config.yaml -o {output} &> {log}
         """
 
@@ -108,7 +111,7 @@ rule classification:
         -o res/classification1 -l 1 -w {input.weight} &> {log}
         """
 
-rule count_aggregation:
+rule aggr_count:
     input:
         input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".crops.clas.txt")
     output:

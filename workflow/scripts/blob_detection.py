@@ -32,6 +32,7 @@ def parse_cmd_and_prep ():
     print('input fname:', args.i)
     print('config file:', args.c)
     print('output dir:', args.odir, "\n")
+    Path(args.odir).mkdir(parents=True, exist_ok=True)
     corename = re.sub('.czi$', '', os.path.basename(args.i))
 
     with open(args.c, 'r') as stream:
@@ -40,9 +41,6 @@ def parse_cmd_and_prep ():
         raise Exception('scaling_factor', scaling_factor, 'not implemented',
                         'only support 1,2,4')
 
-    # Prep output dir
-    if config['blob_detection_visualization']:
-        Path(os.path.join(args.odir, "vis")).mkdir(parents=True, exist_ok=True)
     return [args, corename, config]
 
 
@@ -88,6 +86,7 @@ for i in range(len(image_arrays)):
     # Visualizing filtered blobs
     # todo: split into another script to avoid RAM crash
     if config['blob_detection_visualization']:
+        Path(os.path.join(args.odir, "vis_blob_detection")).mkdir(parents=True, exist_ok=True)
         out_img_fname = os.path.join(args.odir, "vis_blob_detection", corename+"."+i+".jpg")
         print("output_img_fname:", out_img_fname)
         visualize_blob_detection(image, blob_locs,

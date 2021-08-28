@@ -37,28 +37,17 @@ matplotlib.use('Agg')  # not display on hpcc
 # print(device_lib.list_local_devices())
 
 # Communication
-print('example training: python lenet_colonies.py -db mid.strict.npy.gz -s 1 -w ./output/mid.strict.hdf5')
-print('example loading: python lenet_colonies.py -db mid.strict.npy.gz -l 1 -w ./output/mid.strict.hdf5')
+print('example training: python classification.py -crops xxx.crops.npy.gz -w ./output/mid.strict.hdf5')
 print('cmd:', sys.argv)
-# todo: change format to pandas to count positives for each scanned image (for now, image-> npy -> count)
-
 
 # Construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-db", "--blobs-db", type=str,
-                help="path to blobs-db file, e.g. xxx.labeled.npy.gz")
-ap.add_argument("-odir", "--outdir", type=str,
-                help="outdir, e.g filter1, filter2")
-ap.add_argument("-s", "--save-model", type=int, default=0,
-                help="(optional) whether or not model should be saved to disk")
-ap.add_argument("-l", "--load-model", type=int, default=0,
-                help="(optional) whether or not pre-trained model should be loaded")
-ap.add_argument("-w", "--weights", type=str,
-                help="(optional) path to weights file")
-ap.add_argument("-u", "--undistinguishable", type=str, default="delete",
-                help="(optional) treat undistinguishable by delete/convert_to_yes/convert_to_no")
-ap.add_argument("-e", "--epochs", type=int, default=30,
-                help="(optional) max-epochs, default 30")
+ap.add_argument("-crops", type=str,
+                help="blob-crops file, e.g. res/blob_crops/xxx.crops.npy.gz")
+ap.add_argument("-odir", type=str,
+                help="outdir, e.g. res/classification")
+ap.add_argument("-weight", type=str,
+                help="weights file, e.g. resources/weights/trained.hdf5")
 
 args = vars(ap.parse_args())
 name = os.path.basename(args['blobs_db'])

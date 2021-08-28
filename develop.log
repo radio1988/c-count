@@ -16,7 +16,9 @@
 
 todo:
 [ ] package folder structure of ccount
-[ ] czi tracking system
+[x] czi tracking system
+[ ] classification.py bug (labels wrong)
+[ ] classifications.py/training.py cleaning
 [ ] re-labeling tracking
 [ ] use Neg to train
 [ ] skip equalization in CNN
