@@ -3,10 +3,12 @@ from ccount.img.equalize import equalize, block_equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
 
-
 from ccount.blob.mask_image import mask_image
 
-from ccountCNN import *
+from ccount.clas.split_data import split_data
+from ccount.clas.balance_data import balance_by_duplication
+from ccount.clas.augment_images import augment_images
+from ccount.clas.metrics import F1, F1_calculation
 
 from pathlib import Path
 from pyimagesearch.cnn.networks.lenet import LeNet
@@ -100,16 +102,16 @@ if numClasses == 2:
 
 
 # Split train/valid
-[trainBlobs, valBlobs] = split_train_valid(blobs, training_ratio)
+[trainBlobs, valBlobs] = split_data(blobs, training_ratio)
 print("{} Split ratio, split Data into {} training and {} testing".\
       format(training_ratio, trainBlobs.shape[0], valBlobs.shape[0]))
 
 # Balancing Yes/No ratio
 if args["load_model"] <= 0:
     print('For training split:')
-    trainBlobs = balancing_by_duplicating(trainBlobs)
+    trainBlobs = balance_by_duplication(trainBlobs)
     print('For validation split:')
-    valBlobs = balancing_by_duplicating(valBlobs)  #todo: skip this if F1 working well
+    valBlobs = balance_by_duplication(valBlobs)  #todo: skip this if F1 working well
 
 # Parse blobs
 trainimages, trainlabels, trainrs = parse_crops(trainBlobs)
@@ -290,43 +292,43 @@ elif args["load_model"] > 0:
 
     print("images_.shape:", images_.shape)
     # Predictions
-    print('Making predictions...')
+    print('Making classifications...')
     probs = model.predict(images_)
-    predictions = probs.argmax(axis=1)
-    positive_idx = [i for i, x in enumerate(predictions) if x == 1]
+    classifications = probs.argmax(axis=1)
+    positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 
     print("labels:", labels.shape, Counter(labels))
-    print("predictions:", predictions.shape, Counter(predictions))
-    print("Manual F1 score: ", F1_calculation(predictions, labels))
+    print("classifications:", classifications.shape, Counter(classifications))
+    print("Manual F1 score: ", F1_calculation(classifications, labels))
 
 
-    wrong_idx = [i for i, x in enumerate(predictions) if (int(predictions[i]) - int(labels[i])) != 0]
+    wrong_idx = [i for i, x in enumerate(classifications) if (int(classifications[i]) - int(labels[i])) != 0]
     print("Predictions: mean: {}, count_yes: {} / {};".format(
-        np.mean(predictions), np.sum(predictions), len(predictions)))
-    print("Wrong predictions: {}".format(len(wrong_idx)))
+        np.mean(classifications), np.sum(classifications), len(classifications)))
+    print("Wrong classifications: {}".format(len(wrong_idx)))
 
-    # save predictions
-    # blobs[:, 3] = predictions  # have effect on labels[i]
-    print("saving predictions")
-    np.savetxt(name +'.class.txt', predictions.astype(int))
+    # save classifications
+    # blobs[:, 3] = classifications  # have effect on labels[i]
+    print("saving classifications")
+    np.savetxt(name +'.class.txt', classifications.astype(int))
     blobs_predict = np.copy(blobs)
-    blobs_predict[:, 3] = predictions
+    blobs_predict[:, 3] = classifications
     np.save(name+'.class.npy', blobs_predict)
     os.system('gzip  -f ' + name+'.class.npy')
     
-    # save yes predictions
+    # save yes classifications
     yes_blobs = flat_label_filter(blobs_predict, 1)
     np.save(name+'.yes.npy', yes_blobs)
     os.system('gzip  -f ' + name +'.yes.npy')
 
-    # # Visualizing random predictions
+    # # Visualizing random classifications
     # print('Showing samples from', args['blobs_db'])
     # for j in range(len(wrong_idx)):
     #     i = wrong_idx[j]  # only show samples predicted to be positive
         
     #     image = images_[i]
     #     image_ = images_[i]
-    #     prediction = predictions[i]
+    #     prediction = classifications[i]
     #     label = int(labels[i])
     #     r = rs[i]
     #     r_ = rs_[i]  # todo: fix r at the blob detection stage and don't extend r after wards

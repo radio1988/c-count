@@ -2,18 +2,18 @@
 from ccount.img.equalize import equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
-from ccount.blob.misc import crop_width
 
+from ccount.blob.misc import crop_width
 from ccount.blob.io import load_crops, save_crops
 from ccount.blob.mask_image import mask_image
 from ccount.blob.misc import crops_stat, parse_crops
+
+from ccount.clas.metrics import F1
 
 import sys, argparse, os, re, yaml, keras
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
-
-from ccountCNN import *
 
 from pyimagesearch.cnn.networks.lenet import LeNet
 from keras.optimizers import Adam
@@ -104,12 +104,12 @@ model.compile(loss="categorical_crossentropy", optimizer=opt, metrics=[F1])
 # Classification process
 print('Making classifications...')
 probs = model.predict(images)
-predictions = probs.argmax(axis=1)
-positive_idx = [i for i, x in enumerate(predictions) if x == 1]
+classifications = probs.argmax(axis=1)
+positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 
-print("Saving predictions..")
-np.savetxt(corename +'.clas.txt', predictions.astype(int), fmt='%d')
-crops[:, 3] = predictions
+print("Saving classifications..")
+np.savetxt(corename +'.clas.txt', classifications.astype(int), fmt='%d')
+crops[:, 3] = classifications
 crops_stat(crops)
 
 np.save(corename+'.clas.npy', crops)
