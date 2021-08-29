@@ -8,7 +8,7 @@ def uint16_image_auto_contrast(image):
     import numpy as np
 
     image = image - np.min(image)  # pos image
-    image = image/np.max(image) * 2**16
+    image = image/np.max(image) * (2**16-1)
     image = image.astype(np.uint16)
     return image
 

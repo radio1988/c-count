@@ -44,7 +44,7 @@ def parse_cmd_and_prep ():
     corename = corename.replace(".npy", "")
     corename = corename.replace(".gz", "")
     corename = os.path.join(args.odir, corename)
-    print("corename", corename)
+    print("output corename", corename)
     
     with open(args.config, 'r') as stream:
         config = yaml.safe_load(stream)
@@ -60,7 +60,7 @@ def parse_cmd_and_prep ():
 # print(device_lib.list_local_devices())
 
 # Communication
-print('>>> Command:', sys.argv)
+# print('>>> Command:', sys.argv)
 args, corename, config = parse_cmd_and_prep()
 
 crops = load_crops(args.crops)
@@ -107,7 +107,7 @@ predictions = probs.argmax(axis=1)
 positive_idx = [i for i, x in enumerate(predictions) if x == 1]
 
 print("Saving predictions..")
-np.savetxt(corename +'.clas.txt', predictions.astype(int))  # todo: make int
+np.savetxt(corename +'.clas.txt', predictions.astype(int), fmt='%d')
 crops[:, 3] = predictions
 crops_stat(crops)
 

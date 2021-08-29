@@ -1,7 +1,7 @@
 def read_czi(fname, Format="2019"):
     '''
     input: fname of czi file
-    output: 2d numpy array, uint8 for 2019
+    output: 2d numpy array, uint16 for 2019
     assuming input czi format (n, 1, :, :, 1)
     e.g. (4, 1, 70759, 65864, 1)
 
@@ -13,7 +13,7 @@ def read_czi(fname, Format="2019"):
     print('read_czi:', fname)
     if fname.endswith('czi'):
         with CziFile(fname) as czi:
-            image_arrays = czi.asarray()  # 129s, Current memory usage is 735.235163MB; Peak was 40143.710599MB
+            image_arrays = czi.asarray() 
             print(image_arrays.shape)
     elif fname.endswith('czi.gz'):
         raise Exception("todo")
@@ -35,12 +35,10 @@ def parse_image_arrays (image_arrays, i = 0,  Format = '2019'):
     i = int(i)
     Format = str(Format).strip()
     if Format == "2018":
-        # reading (need 38 GB RAM) todo: use uint8 if possible
         image = image_arrays[0, 1, 0, 0, :, :, 0]  # real image
         return image 
     elif Format == "2019":        
         # todo: Find Box faster by https://kite.com/python/docs/PIL.Image.Image.getbbox  
-
         image = image_arrays[i, 0, :,  :, 0] # 0s
         nz_image = np.nonzero(image)  # process_time(),36s, most time taken here, 1.4GB RAM with tracemalloc
         nz0 = np.unique(nz_image[0]) # 1.5s
