@@ -3,10 +3,9 @@ from ccount.img.equalize import equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
 
-from ccount.blob.misc import crop_width
 from ccount.blob.io import load_crops, save_crops
 from ccount.blob.mask_image import mask_image
-from ccount.blob.misc import crops_stat, parse_crops
+from ccount.blob.misc import crops_stat, parse_crops, crop_width
 
 from ccount.clas.metrics import F1
 

@@ -49,8 +49,8 @@ def crops_stat(crops):
     print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
         sum(crops[:, 3] == 1),
         sum(crops[:, 3] == 0),
-        sum(crops[:, 3] == -2),
-        sum(crops[:, 3] == -1),))
+        sum(crops[:, 3] == 3),
+        sum(crops[:, 3] == 5),))
     print("Total:", crops.shape[0])
 
 

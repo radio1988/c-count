@@ -56,6 +56,9 @@ def save_crops(crops, fname):
     import subprocess
     import numpy as np
 
+    print("Saving", fname)
+    from .misc import crops_stat
+    crops_stat(crops)
     fname = fname.replace(".npy.gz", ".npy")
     np.save(fname, crops)
     subprocess.run("gzip -f " + fname, shell=True, check=True)
