@@ -78,8 +78,9 @@ rs = rs/config['clas_scaling_factor']
 
 # todo: test skip equalization
 # todo: more channels (scaled + equalized + original)
-print("Equalizing images...")
-images = np.array([equalize(image) for image in images])
+if config['classification_equalization']:
+    print("Equalizing images...")
+    images = np.array([equalize(image) for image in images])
 
 print("Masking images...")
 images = np.array([mask_image(image, r=rs[ind]) for ind, image in enumerate(images)])

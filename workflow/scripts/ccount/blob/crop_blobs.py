@@ -8,7 +8,7 @@ def pad_with(vector, pad_width, iaxis, kwargs):
     return vector
 
 
-def crop_blobs(blobs, image, area=-1, place_holder=-1, crop_width=100,
+def crop_blobs(blobs, image, label = 5, area=0, place_holder=0, crop_width=100,
                blob_extention_ratio=1.4, blob_extention_radius=2):
     '''
     input1: blobs, blob info [n, 0:3], [y, x, r]
@@ -53,6 +53,6 @@ def crop_blobs(blobs, image, area=-1, place_holder=-1, crop_width=100,
         #      [ 6984   788    35 65535 65535]]
         flat_crop = np.insert(
             cropped_img.flatten(), [0, 0, 0, 0, 0, 0], 
-            [y, x, r_, -1, area, place_holder])  # -1 unlabeled
+            [y, x, r_, label, area, place_holder])  # -1 unlabeled
         L.append(flat_crop)
     return np.array(L)

@@ -29,6 +29,7 @@ overlap: .8
 
 
 # CNN 
+classification_equalization: True  # wether use equ for model training/classification
 clas_scaling_factor: 2  # input scale down for model training
 aug_sample_size: 2000
 training_ratio: 0.9  # proportion of data to be in training set
