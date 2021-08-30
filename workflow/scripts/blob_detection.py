@@ -24,8 +24,7 @@ def parse_cmd_and_prep ():
     parser.add_argument('-c', type=str, default="config.yaml", 
         help='path to config.yaml file')
     parser.add_argument('-odir', type=str, default="blobs",
-        help='output dir: default blobs'
-        )
+        help='output dir: default blobs'        )
 
     args = parser.parse_args()
     print('input fname:', args.i)
@@ -91,7 +90,6 @@ for i in range(len(image_arrays)):
         visualize_blob_detection(image, blob_locs,
             blob_extention_ratio=config['blob_extention_ratio'], 
             blob_extention_radius=config['blob_extention_radius'], 
-            scaling = 2,
             fname=out_img_fname)
 
     # test: skipped edge filter (we have neg plates now), 08/23/21

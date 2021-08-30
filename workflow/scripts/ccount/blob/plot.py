@@ -12,31 +12,64 @@ def flat2image(flat_crop):
 
 
 def visualize_blob_detection(image, blob_locs, 
-    blob_extention_ratio=1.0, blob_extention_radius=0, scaling = 2, fname=None):
+    blob_extention_ratio=1.0, blob_extention_radius=0, fname=None):
     '''
     image: image where blobs were detected from
     blob_locs: blob info array n x 3 [x, y, r], crops also works, only first 3 columns used
+    blob_locs: if labels in the fourth column provided, use that to give colors to blobs
 
     output: image with yellow circles around blobs
     '''
     from ..img.transform import down_scale
+    px = 1/plt.rcParams['figure.dpi']
 
-    blob_locs = blob_locs[:, 0:3]
-    blob_locs = blob_locs/scaling
-    print('visualize_blob_detection scaling:', scaling)
+    # blob_locs[:, 0:3] = blob_locs[:, 0:3]/scaling
+    #image = down_scale(image, scaling)
+    print("image shape:", image.shape)
 
-    image = down_scale(image, scaling)
+    fig, ax = plt.subplots(figsize=(image.shape[1]*px+0.5, image.shape[0]*px+0.5))
+    ax.imshow(image, 'gray')
 
-    fig, ax = plt.subplots(figsize=(40, 40))
-    ax.set_title('Visualizing blob detection')
-    ax.imshow(image, 'gray', interpolation='nearest')
-    for loc in blob_locs:
-        y, x, r = loc
-        c = plt.Circle((x, y), 
-                       r * blob_extention_ratio + blob_extention_radius, 
-                       color=(0.9, 0.9, 0, 0.5), linewidth=1,
-                       fill=False) 
-        ax.add_patch(c)
+    print("blob shape:", blob_locs.shape)
+    if blob_locs.shape[1] > 4:
+        ax.set_title('Visualizing blobs:\n\
+            Red: Yes, Blue: No, Green: Others')
+        labels = blob_locs[:,3]
+        red = labels == 1
+        blue = labels == 0
+        green = [x not in [0, 1] for x in labels]
+        for loc in blob_locs[red,0:3]:
+            y, x, r = loc
+            RED = plt.Circle((x, y), 
+                           r * blob_extention_ratio + blob_extention_radius, 
+                           color=(1, 0, 0, 0.7), linewidth=2,
+                           fill=False) 
+            ax.add_patch(RED)
+
+        for loc in blob_locs[blue,0:3]:
+            y, x, r = loc
+            BLUE = plt.Circle((x, y), 
+                           r * blob_extention_ratio + blob_extention_radius, 
+                           color=(0, 0, 1, 0.7), linewidth=2,
+                           fill=False) 
+            ax.add_patch(BLUE)
+
+        for loc in blob_locs[green,0:3]:
+            y, x, r = loc
+            GREEN = plt.Circle((x, y), 
+                           r * blob_extention_ratio + blob_extention_radius, 
+                           color=(0, 1, 0, 0.5), linewidth=2,
+                           fill=False) 
+            ax.add_patch(GREEN)
+    else:
+        for loc in blob_locs[:, 0:3]:
+            ax.set_title('Visualizing blobs')
+            y, x, r = loc
+            YELLOW = plt.Circle((x, y), 
+                           r * blob_extention_ratio + blob_extention_radius, 
+                           color=(0.9, 0.9, 0, 0.5), linewidth=1,
+                           fill=False) 
+            ax.add_patch(YELLOW)
 
     if fname:
         plt.savefig(fname)
