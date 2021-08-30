@@ -26,6 +26,7 @@ def pca_tsne(df_gene_col, cluster_info=None, title='data',
 
     tic = time.time()
     # PCA
+    num_pc = min(num_pc, df.shape[0])
     pca = PCA(n_components=num_pc)
     pc_x = pca.fit_transform(df)
     df_pc_df = pd.DataFrame(data=pc_x, index=df.index, columns=range(num_pc))

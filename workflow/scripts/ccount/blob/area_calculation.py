@@ -1,8 +1,13 @@
 def area_calculation(img, r, plotting=False, fname=None):
     #todo: increase speed
+    from ..img.auto_contrast import float_image_auto_contrast
+    from ..img.equalize import equalize
     from skimage import io, filters
+    from skimage.draw import circle
     from scipy import ndimage
+    import numpy as np
     import matplotlib.pyplot as plt
+
     
     # automatic thresholding method such as Otsu's (avaible in scikit-image)
     img = float_image_auto_contrast(img)  # bad

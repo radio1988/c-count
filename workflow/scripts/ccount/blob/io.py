@@ -53,12 +53,15 @@ def load_crops(in_db_name, n_subsample=False, seed=1):
 
 
 def save_crops(crops, fname):
-    import subprocess
+    import subprocess, os
     import numpy as np
-
+    from .misc import crops_stat, crop_width
+    from pathlib import Path
     print("Saving", fname)
-    from .misc import crops_stat
+    Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
     crops_stat(crops)
+    print('crops dim:', crops.shape)
+    print('crop width:', crop_width(crops))
     fname = fname.replace(".npy.gz", ".npy")
     np.save(fname, crops)
     subprocess.run("gzip -f " + fname, shell=True, check=True)

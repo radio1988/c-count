@@ -1,3 +1,16 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from ..blob.misc import parse_crops
+
+def flat2image(flat_crop):
+    from math import sqrt
+    import numpy as np
+    flat = flat_crop[6:]
+    w = int(sqrt(len(flat)) / 2)
+    image = np.reshape(flat, (w + w, w + w))
+    return image
+
+
 def visualize_blob_detection(image, blob_locs, 
     blob_extention_ratio=1.0, blob_extention_radius=0, scaling = 2, fname=None):
     '''
@@ -7,7 +20,6 @@ def visualize_blob_detection(image, blob_locs,
     output: image with yellow circles around blobs
     '''
     from ..img.transform import down_scale
-    import matplotlib.pyplot as plt
 
     blob_locs = blob_locs[:, 0:3]
     blob_locs = blob_locs/scaling
@@ -32,69 +44,55 @@ def visualize_blob_detection(image, blob_locs,
         plt.show()
 
 
-def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, fname=None):
+def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, 
+    image_scale=1, fname=None):
     '''
-    input: flat_crop of a blob
+    input: flat_crop of a blob, e.g. (160006,)
     output: two plots
         - left: original image with yellow circle
         - right: binary for area calculation
     '''
-    import numpy as np
     from math import sqrt
-    from .area_calculation import area_calculation
-    from .misc import crop_width
-    from ..img.transform import float_image_auto_contrast
+    from ..img.auto_contrast import float_image_auto_contrast
+    import matplotlib.pyplot as plt
+    import numpy as np
 
-    [y, x, r, label, area, place_holder] = flat_crop[0:6]
+    if len(flat_crop) >= 6:
+        [y, x, r, label, area, place_holder] = flat_crop[0:6]
+    else: 
+        [y, x, r] = flat_crop[0:3]
+        label = 5
+        area = 0
+
     r = r * blob_extention_ratio + blob_extention_radius
     image = flat2image(flat_crop)
     image = float_image_auto_contrast(image)
-    w = crop_width(flat_crop)
+    w = sqrt(len(flat_crop) - 6) / 2
+    W = w * image_scale / 30
 
-    area_plot = area_calculation(image, r, plotting=True)
+    fig, ax = plt.subplots(figsize=(W, W))
+    ax.set_title('Image for Labeling\ncurrent label:{}\n\
+        x:{}, y:{}, r:{}'.format(int(label), x ,y, r))
+    ax.imshow(image, 'gray')
+    c = plt.Circle((w, w), r , 
+                   color=(1, 1, 0, 0.7), linewidth=2,
+                   fill=False) 
+    ax.add_patch(c)
 
-    fig, axes = plt.subplots(1, 2, figsize=(8, 16), sharex=False, sharey=False)
-    ax = axes.ravel()
-    ## Auto Contrast For labeler
-    ax[0].set_title('Image for Labeling\ncurrent label:{}'.format(int(label)))
-    ax[0].imshow(image, 'gray')
-    c = plt.Circle((w - 1, w - 1), r, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
-    ax[0].add_patch(c)
-
-    ## area calculation
-    ax[1].set_title('Image for Area Calculation\narea (pixels):{}'.format(int(area)))
-    ax[1].imshow(area_plot, 'gray', clim=(0.0, 1.0))
-    c = plt.Circle((w - 1, w - 1), r, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
-    ax[1].add_patch(c)
-
-    # ## Original for QC
-    # ax[1].set_title('Native Contrast\nblob_detection radius:{}'.format(r))
-    # ax[1].imshow(image, 'gray', clim=(0.0, 1.0))
-    # c = plt.Circle((w - 1, w - 1), r, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
-    # ax[1].add_patch(c)
-
-    # ## Equalized for QC
-    # ax[2].set_title('Equalized\narea (pixels):{}'.format(int(area)))
-    # ax[2].imshow(equalized, 'gray', clim=(0.0, 1.0))
-    # c = plt.Circle((w - 1, w - 1), r, color=(0.9, 0.9, 0, 0.5), linewidth=1, fill=False)
-    # ax[2].add_patch(c)
-
-    plt.tight_layout()
     if fname:
-        plt.savefig(fname+".png")
+        plt.savefig(fname)
     else:
         plt.show()
-    fig.canvas.draw()
 
-    return True
+    return image
 
 
-def plot_flat_crops(flat_crops, blob_extention_ratio=1, blob_extention_radius=0, fname=None):
+def plot_flat_crops(crops, blob_extention_ratio=1, blob_extention_radius=0, fname=None):
     '''
-    input: flat_crops
+    input: crops
     task: call plot_flat_crop many times
     '''
-    for i, flat_crop in enumerate(flat_crops):
+    for i, flat_crop in enumerate(crops):
         if fname:
             plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, 
                 fname=fname+'.rnd'+str(i))
@@ -102,15 +100,17 @@ def plot_flat_crops(flat_crops, blob_extention_ratio=1, blob_extention_radius=0,
             plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
 
 
-def show_rand_crops(crops, label_filter="na", num_shown=5, 
-    blob_extention_ratio=1, blob_extention_radius=0, 
-     seed = None, fname=None):
+
+    
+
+def show_rand_crops(crops, label_filter="na", num_shown=1, 
+    blob_extention_ratio=1, blob_extention_radius=0, seed = None, fname=None):
     '''
     crops: the blob crops
-    label_filter: 0, 1, -1; "na" means no filter
+    label_filter: 0, 1, 5; "na" means no filter
     fname: None, plot.show(); if fname provided, saved to png
     '''
-    from .misc import sub_sample
+    from .misc import sub_sample    
 
     if (label_filter != 'na'):
         filtered_idx = [str(int(x)) == str(label_filter) for x in crops[:, 3]]
@@ -126,23 +126,33 @@ def show_rand_crops(crops, label_filter="na", num_shown=5,
     else:
         print("all {} blobs will be plotted".format(len(crops)))
 
-    plot_flat_crops(crops,
-        blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, fname=fname)
+    plot_flat_crops(
+        crops,
+        blob_extention_ratio=blob_extention_ratio, 
+        blob_extention_radius=blob_extention_radius, 
+        fname=fname)
+
     images, labels, rs = parse_crops(crops)
-    [area_calculation(image, r=rs[ind], plotting=True) for ind, image in enumerate(images)]
 
     return (True)
 
-def pop_label_flat_crops(flat_crops, random=True, seed=1, skip_labeled=True):
-    '''
-    input: flat_crops
-    task: plot padded crop and hard-masked crop side-by-side, and let user label them
-    labels: -1 not-labeled, 0 NO, 1 YES
-    output: labeled array in the original order
-    '''
-    print("Input: there are {} blobs unlabeled in {} blobs\n\n".format(sum(flat_crops[:, 3] == -1), len(flat_crops)))
 
-    N = len(flat_crops)
+def pop_label_flat_crops(crops, random=True, seed=1, skip_labels=[0, 5]):
+    '''
+    input: 
+        crops
+    task: 
+        plot padded crop, let user label them
+    labels: 
+        no: 0, yes: 1, uncertain: 3, artifacts: 4, unlabeled: 5 
+        never use neg values
+    output: 
+        labeled array in the original order
+    '''
+    from IPython.display import clear_output
+
+
+    N = len(crops)
     if random:
         np.random.seed(seed=seed)
         idx = np.random.permutation(N)
@@ -150,10 +160,13 @@ def pop_label_flat_crops(flat_crops, random=True, seed=1, skip_labeled=True):
     else:
         idx = np.arange(N)
 
-    if skip_labeled:
-        idx = idx[flat_crops[idx, 3] == -1]  # only keep unlabeled (-1)
+    labels = crops[idx, 3]
+    keep = [x not in skip_labels for x in labels]
+    idx = idx[keep] 
 
-    num_unlabeled = sum(flat_crops[:, 3] == -1)
+    num_to_label = sum(keep)
+    print("Input: there are {} blobs to label in {} blobs".\
+        format(num_to_label, len(crops)))
 
     i = -1
     while i < len(idx):
@@ -161,17 +174,16 @@ def pop_label_flat_crops(flat_crops, random=True, seed=1, skip_labeled=True):
         if i >= len(idx):
             break
 
-        plot_flat_crop(flat_crops[idx[i], :])
+        plot_flat_crop(crops[idx[i], :])
 
-        label = input('''labeling for the {}/{} unlabeled blob, 
-yes=1, no=0, undistinguishable=3, skip=s, go-back=b, excape(pause)=e: '''.format(i + 1, num_unlabeled))
+        label = input('''labeling for the {}/{} blob, \
+            yes=1, no=0, skip=s, go-back=b, excape(pause)=e'''.\
+            format(i + 1, num_to_label))
 
         if label == '1':
-            flat_crops[idx[i], 3] = 1  # yes
+            crops[idx[i], 3] = 1  # yes
         elif label == '0':
-            flat_crops[idx[i], 3] = 0  # no
-        elif label == '3':
-            flat_crops[idx[i], 3] = -2  # undistinguishable
+            crops[idx[i], 3] = 0  # no
         elif label == 's':
             pass
         elif label == 'b':
@@ -179,7 +191,6 @@ yes=1, no=0, undistinguishable=3, skip=s, go-back=b, excape(pause)=e: '''.format
         elif label == 'e':
             label = input('are you sure to quit?(y/n)')
             if label == 'y':
-                print("there are {} blobs unlabeled\n\n".format(sum(flat_crops[:, 3] == -1)))
                 print("labeling stopped manually")
                 break
             else:
@@ -189,10 +200,9 @@ yes=1, no=0, undistinguishable=3, skip=s, go-back=b, excape(pause)=e: '''.format
             print('invalid input, please try again')
             i -= 1
 
-        print('new label: ', label, flat_crops[idx[i], 0:4])
-        print("there are {} blobs unlabeled\n\n".format(sum(flat_crops[:, 3] == -1)))
+        print('new label: ', label, crops[idx[i], 0:4])
         clear_output()
 
-    return flat_crops
+    return crops
 
 

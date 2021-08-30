@@ -19,7 +19,6 @@ from skimage.draw import circle
 from skimage import exposure
 from skimage.color import rgb2gray
 from skimage.transform import rescale, resize, downscale_local_mean
-from IPython.display import clear_output
 from random import randint
 from time import sleep
 

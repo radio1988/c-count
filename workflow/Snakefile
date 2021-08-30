@@ -20,6 +20,8 @@ rule targets:
                                  suffix='.crops.npy.gz'),
         classification=input_names(prefix='res/classification1/', SAMPLES=SAMPLES,
                                    suffix=".crops.clas.txt"),
+        filter_crops=input_names(prefix='res/classification1/pos/', SAMPLES=SAMPLES,
+                                   suffix=".crops.clas.npy.gz"),
         count_file='res/COUNT.csv',
 
 #        view0=input_names(SAMPLES),
@@ -110,6 +112,26 @@ rule classification:
         -crops {input.blob_crops} -weight {input.weight} \
         -config config.yaml -odir res/classification1 &> {log}
         """
+
+rule filter_crops:
+    input:
+        "res/classification1/{s}.{i}.crops.clas.npy.gz"
+    output:
+        "res/classification1/pos/{s}.{i}.crops.clas.npy.gz"
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 8000
+    log:
+        "log/classification1/pos/{s}.{i}.crops.clas.npy.gz.log"
+    benchmark:
+        "log/classification1/pos/{s}.{i}.crops.clas.npy.gz.benchmark"
+    shell:
+        """
+        python workflow/scripts/crops_filtering.py -crops {input} \
+        -label 1 -output {output} &> {log}
+        """
+
 
 rule aggr_count:
     input:

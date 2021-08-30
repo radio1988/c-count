@@ -3,7 +3,9 @@
 def sub_sample(A, n, seed=1):
     '''
     replace=False
+    return shape (n, w**2 + 6)
     '''
+    import numpy as np
     if n <=0:
         raise Exception ('n must be float between 0-1 or int >=1')
     if n < 1:
@@ -46,11 +48,12 @@ def crops_stat(crops):
     :param crops:
     :return:
     '''
-    print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
-        sum(crops[:, 3] == 1),
-        sum(crops[:, 3] == 0),
-        sum(crops[:, 3] == 3),
-        sum(crops[:, 3] == 5),))
+    if crops.shape[1] >3:
+        print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
+            sum(crops[:, 3] == 1),
+            sum(crops[:, 3] == 0),
+            sum(crops[:, 3] == 3),
+            sum(crops[:, 3] == 5),))
     print("Total:", crops.shape[0])
 
 
@@ -114,10 +117,5 @@ def flat_label_filter(flats, label_filter = 1):
     return flats
 
 
-def flat2image(flat_crop):
-    flat = flat_crop[6:]
-    w = int(sqrt(len(flat)) / 2)
-    image = np.reshape(flat, (w + w, w + w))
-    return image
 
 

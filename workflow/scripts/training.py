@@ -108,12 +108,12 @@ trainlabels = trainlabels[0:config['aug_sample_size']]
 print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
 print('pixel value max', np.max(trainimages), 'min', np.min(trainimages))
 
-print("Downscaling images by ", config['scaling_factor'])
-trainimages = np.array([down_scale(image, scaling_factor=config['scaling_factor']) for image in trainimages])
-valimages = np.array([down_scale(image, scaling_factor=config['scaling_factor']) for image in valimages])
-w = int(w/config['scaling_factor'])
-trainrs = trainrs/config['scaling_factor']
-valrs = valrs/config['scaling_factor']
+print("Downscaling images by ", config['clas_scaling_factor'])
+trainimages = np.array([down_scale(image, scaling_factor=config['clas_scaling_factor']) for image in trainimages])
+valimages = np.array([down_scale(image, scaling_factor=config['clas_scaling_factor']) for image in valimages])
+w = int(w/config['clas_scaling_factor'])
+trainrs = trainrs/config['clas_scaling_factor']
+valrs = valrs/config['clas_scaling_factor']
 
 # todo: more channels (scaled + equalized + original)
 if config['classification_equalization']:
