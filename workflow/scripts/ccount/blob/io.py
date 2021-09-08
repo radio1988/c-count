@@ -66,3 +66,16 @@ def save_crops(crops, fname):
     np.save(fname, crops)
     subprocess.run("gzip -f " + fname, shell=True, check=True)
 
+
+def save_locs(crops, fname):
+    import subprocess, os
+    import numpy as np
+    from .misc import crops_stat, crop_width
+    from pathlib import Path
+    print("Saving", fname)
+    Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
+    print('crops dim:', crops.shape)
+    fname = fname.replace(".npy.gz", ".npy")
+    np.save(fname, crops)
+    subprocess.run("gzip -f " + fname, shell=True, check=True)
+

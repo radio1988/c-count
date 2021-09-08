@@ -17,12 +17,14 @@ rule targets:
         czi2img=expand("log/img/{s}.done", s=SAMPLES), 
         blob_detection=expand("log/blob_locs/{s}.done", s=SAMPLES),
         blob_cropping=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES, 
-                                 suffix='.crops.npy.gz'),
+                                  suffix='.crops.npy.gz'),
         classification=input_names(prefix='res/classification1/', SAMPLES=SAMPLES,
                                    suffix=".crops.clas.txt"),
         filter_crops=input_names(prefix='res/classification1/pos/', SAMPLES=SAMPLES,
-                                   suffix=".crops.clas.npy.gz"),
+                                 suffix=".crops.clas.npy.gz"),
         count_file='res/COUNT.csv',
+        view_clas_on_image=input_names(prefix="res/classification1/", SAMPLES=SAMPLES,
+                                       suffix=".crops.clas.npy.gz.jpg")
 
 #        view0=input_names(SAMPLES),
 #        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
@@ -113,6 +115,25 @@ rule classification:
         -config config.yaml -odir res/classification1 &> {log}
         """
 
+
+rule aggr_count:
+    input:
+        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".crops.clas.txt")
+    output:
+        "res/COUNT.csv"
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1000
+    priority:
+        100
+    log:
+        "log/COUNT.csv.log"
+    shell:
+        """
+        python workflow/scripts/aggr_count.py {input} {output} &> {log}
+        """
+
 rule filter_crops:
     input:
         "res/classification1/{s}.{i}.crops.clas.npy.gz"
@@ -132,23 +153,26 @@ rule filter_crops:
         -label 1 -output {output} &> {log}
         """
 
-
-rule aggr_count:
+rule view_clas_on_image:
     input:
-        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".crops.clas.txt")
+        crop="res/classification1/{s}.{i}.crops.clas.npy.gz",
+        czi="data/{s}.czi"
     output:
-        "res/COUNT.csv"
+        "res/classification1/{s}.{i}.crops.clas.npy.gz.jpg"
     threads:
         1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1000
-    priority:
-        100
+        mem_mb=lambda wildcards, attempt: attempt * 16000
     log:
-        "log/COUNT.csv.log"
+        "log/classification1/{s}.{i}.crops.clas.npy.gz.jpg.log"
+    benchmark:
+        "log/classification1/{s}.{i}.crops.clas.npy.gz.jpg.benchmark"
     shell:
         """
-        python workflow/scripts/aggr_count.py {input} {output} &> {log}
+        python workflow/scripts/visualize_locs_on_czi.py \
+        -crops {input.crop} -index {wildcards.i} \
+        -czi {input.czi} -config config.yaml \
+        -output {output} &> {log}
         """
 
 rule area_calculation:

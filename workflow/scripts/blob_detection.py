@@ -4,7 +4,7 @@ from ccount.img.auto_contrast import uint16_image_auto_contrast
 
 from ccount.blob.find_blob import find_blob
 from ccount.blob.crop_blobs import crop_blobs
-from ccount.blob.io import save_crops
+from ccount.blob.io import save_locs
 from ccount.blob.plot import visualize_blob_detection
 
 from pathlib import Path
@@ -78,7 +78,7 @@ for i in range(len(image_arrays)):
         overlap=config['overlap'],
         )
     print('there are {} blobs detected'.format(blob_locs.shape[0]))
-    save_crops(blob_locs, out_blob_fname)
+    save_locs(blob_locs, out_blob_fname)
 
 
     # Visualizing filtered blobs

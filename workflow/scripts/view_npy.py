@@ -1,13 +1,14 @@
 #%matplotlib inline
 import warnings
 warnings.filterwarnings('ignore')
-from ccount import load_crops, show_rand_crops
+from ccount.blob.io import load_crops
+from ccount.blob.plot import show_rand_crops
 from math import sqrt
 import matplotlib
 import matplotlib.pyplot as plt
 from os import environ, path
 import sys, os
-
+# todo: clean code, matching style
 
 print("usage: python view_npy.py <path_to_area.npy.gz> <label_filter> <num_shown> <seed>")
 # todo: area filter
@@ -19,11 +20,12 @@ print("\n")
 pwd = os.getcwd()
 print("Work Dir:", pwd)
 
-if len(sys.argv) == 5:
+if len(sys.argv) == 6:
 	in_name = sys.argv[1]
 	label_filter = sys.argv[2]
 	num_shown = int(sys.argv[3])
 	seed = int(sys.argv[4])
+	out_name = sys.argv[5]
 	if path.exists(in_name):
 		pass
 	else:
@@ -35,29 +37,14 @@ if len(sys.argv) == 5:
 		sys.exit("File not found error:", in_name)
 else:
 	sys.exit("cmd err")
-#in_name = "/home/rl44w/mount/ccount/analysis/develop/res/classification1/area/NO_EPO_1_FIRST_SCAN-Stitching-10.1.area.txt.npy.gz"
 
 
 
-out_name = in_name.replace(".area.txt.npy.gz", ".label"+str(label_filter)+".seed"+str(seed))
-print("\n", in_name, "->", out_name+'.labelX.seedX.rndX.png')
+print(in_name, "->", out_name)
 
-# Please don't change unless have to
-block_height = 2048 
-block_width = 2048 # pixcels
-
-blob_extention_ratio = 1.4 # extend blob radius manually (1.4)
-blob_extention_radius = 30 # pixcels to extend (2)
 
 # load
 image_flat_crops = load_crops(in_name)
-w = int(sqrt(image_flat_crops.shape[1]-6)) # padding width & cropped img width/2
-
-
-r_ = image_flat_crops[:,2]
-plt.hist(r_, 40)
-plt.show()
-
 
 show_rand_crops(crops=image_flat_crops, label_filter=label_filter, num_shown=num_shown, fname=out_name, seed = seed)
 print("Plotting finished")

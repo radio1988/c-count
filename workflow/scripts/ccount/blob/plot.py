@@ -128,7 +128,7 @@ def plot_flat_crops(crops, blob_extention_ratio=1, blob_extention_radius=0, fnam
     for i, flat_crop in enumerate(crops):
         if fname:
             plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius, 
-                fname=fname+'.rnd'+str(i))
+                fname=fname+'.rnd'+str(i)+'.jpg')
         else:
             plot_flat_crop(flat_crop, blob_extention_ratio=blob_extention_ratio, blob_extention_radius=blob_extention_radius)
 
