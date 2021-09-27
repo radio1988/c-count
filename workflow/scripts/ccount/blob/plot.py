@@ -102,10 +102,11 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0,
     image = float_image_auto_contrast(image)
     w = sqrt(len(flat_crop) - 6) / 2
     W = w * image_scale / 30
+    area = flat_crop[6]
 
     fig, ax = plt.subplots(figsize=(W, W))
     ax.set_title('Image for Labeling\ncurrent label:{}\n\
-        x:{}, y:{}, r:{}'.format(int(label), x ,y, r))
+        x:{}, y:{}, r:{}, area:{}'.format(int(label), x ,y, r, area))
     ax.imshow(image, 'gray')
     c = plt.Circle((w, w), r , 
                    color=(1, 1, 0, 0.7), linewidth=2,
