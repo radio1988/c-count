@@ -78,34 +78,38 @@ def parse_crops(crops):
     return images, labels, rs
 
 
-# def remove_edge_crops(flat_blobs):
-#     """
-#     some crops of blobs contain edges, because they are from the edge of scanned areas or on the edge of the well
-#     use this function to remove blobs with obvious long straight black/white lines
-#     """
-#     import cv2
-#     good_flats = []
-#     for i in range(0, flat_blobs.shape[0]):
-#         flat = flat_blobs[i,]
-#         crop = flat2image(flat)
-#         crop = crop * 255
-#         crop = crop.astype(np.uint8)
-    
-#         crop = cv2.blur(crop,(4,4))
-    
-#         edges = cv2.Canny(crop,50,150,apertureSize = 3)
+def remove_edge_crops(flat_blobs):
+    """
+    some crops of blobs contain edges, because they are from the edge of scanned areas or on the edge of the well
+    use this function to remove blobs with obvious long straight black/white lines
+    """
+    import cv2
+    from .plot import flat2image
+    import numpy as np
+    good_flats = []
+    bad_flats = []
+    for i in range(0, flat_blobs.shape[0]):
+        flat = flat_blobs[i,]
+        crop = flat2image(flat)
+        crop = crop * 255
+        crop = crop.astype(np.uint8)
+  
+        crop = cv2.blur(crop,(4,4))
+  
+        edges = cv2.Canny(crop,50,150,apertureSize = 3)
 
-#         minLineLength = 40
-#         maxLineGap = 10
-#         lines = cv2.HoughLinesP(edges,1,np.pi/180,50,minLineLength,maxLineGap)
-    
-#         if lines is not None: # has lines
-#             pass
-#         else: # no lines
-#             good_flats.append(flat)
-    
-#     good_flats = np.stack(good_flats)
-#     return (good_flats)
+        minLineLength = 40
+        maxLineGap = 10
+        lines = cv2.HoughLinesP(edges,1,np.pi/180,50,minLineLength,maxLineGap)
+  
+        if lines is not None: # has lines
+            bad_flats.append(flat)
+        else: # no lines
+            good_flats.append(flat)
+  
+    good_flats = np.stack(good_flats)
+    bad_flasts = np.stack(bad_flats)
+    return (good_flats, bad_flats)
 
 
 ## flats    
