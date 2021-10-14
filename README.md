@@ -14,7 +14,7 @@ colony count
 - mkdir $workdir && cd $workdir
 - ln -s $path_data data
 - ln -s $path_ccount/workflow
-- conda activate ccount
+- conda activate ccount-env
 - cp workflow/config.yaml ./ && vim config.yaml (edit config.yaml)
 - `snakemake -j 1` or `sh submit.sh` (on HPC) 
 
