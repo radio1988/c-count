@@ -15,6 +15,7 @@ def load_locs(fname):
             array = np.load(f)
         else:
             raise Exception ("suffix not npy nor npy.gz")
+        print(fname, array.shape)
     return array
 
 

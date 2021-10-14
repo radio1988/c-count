@@ -59,6 +59,8 @@ def crops_stat(crops):
 
 def crop_width(image_flat_crops):
     from math import sqrt
+    if image_flat_crops.shape[1] == 3:
+        raise Exception ('this file is locs file, not crops file')
     return  int(sqrt(image_flat_crops.shape[1] - 6) / 2)
 
 
@@ -84,31 +86,33 @@ def remove_edge_crops(flat_blobs):
     use this function to remove blobs with obvious long straight black/white lines
     """
     import cv2
-    from .plot import flat2image
     import numpy as np
+    from .plot import flat2image
+    from .mask_image import mask_image
     good_flats = []
     bad_flats = []
     for i in range(0, flat_blobs.shape[0]):
         flat = flat_blobs[i,]
         crop = flat2image(flat)
+        crop = mask_image(crop, r=flat[2])
         crop = crop * 255
         crop = crop.astype(np.uint8)
-  
-        crop = cv2.blur(crop,(4,4))
-  
-        edges = cv2.Canny(crop,50,150,apertureSize = 3)
 
-        minLineLength = 40
-        maxLineGap = 10
-        lines = cv2.HoughLinesP(edges,1,np.pi/180,50,minLineLength,maxLineGap)
+        crop = cv2.blur(crop,(4,4))  # 4 is good
+        # https://www.pyimagesearch.com/2021/05/12/opencv-edge-detection-cv2-canny/
+        edges = cv2.Canny(crop, 240, 250, apertureSize = 7)  # narrow (240, 250) is good, 7 is good
+        lines = cv2.HoughLinesP(edges, 
+            rho = 1, theta = np.pi/180, 
+            threshold = 30, minLineLength = 20, maxLineGap = 2) # threashold 30 is sensitive, minLineLength20 is good
   
         if lines is not None: # has lines
             bad_flats.append(flat)
         else: # no lines
             good_flats.append(flat)
-  
-    good_flats = np.stack(good_flats)
-    bad_flasts = np.stack(bad_flats)
+    if len(good_flats) > 0:
+        good_flats = np.stack(good_flats)
+    if len(bad_flats) > 0:
+        bad_flats = np.stack(bad_flats)
     return (good_flats, bad_flats)
 
 

@@ -1,11 +1,13 @@
 def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
     '''
     input: one image [100, 100], and radius of the blob
-    return: hard-masked image
+    return: hard-masked image of [0,1] scale
     '''
     import numpy as np
     from skimage.draw import circle
-
+    from ..img.auto_contrast import float_image_auto_contrast
+    
+    image = float_image_auto_contrast(image)
 
     r_ = r * blob_extention_ratio + blob_extention_radius
     w = int(image.shape[0]/2)
