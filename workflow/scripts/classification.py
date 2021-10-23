@@ -81,11 +81,13 @@ if config['classification_equalization']:
     print("Equalizing images...")
     images = np.array([equalize(image) for image in images])
 
-print("Masking images...")
-images = np.array([mask_image(image, r=rs[ind]) for ind, image in enumerate(images)])
 
 print("Auto contrasting images...")
 images = np.array([float_image_auto_contrast(image) for image in images])
+
+print("Masking images...")
+images = np.array([mask_image(image, r=rs[ind]) for ind, image in enumerate(images)])
+
 
 images = images.reshape((images.shape[0], 2*w, 2*w, 1))
 print("max pixel value: ", np.max(images))
