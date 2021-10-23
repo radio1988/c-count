@@ -84,10 +84,11 @@ if config['numClasses'] == 2:
 print("{} Split ratio, split into {} training crops and {} validating crops".\
       format(config['training_ratio'], train_crops.shape[0], val_crops.shape[0]))
 
-print('For training split:')
-train_crops = balance_by_duplication(train_crops)
-print('For validation split:')
-val_crops = balance_by_duplication(val_crops)  #todo: skip this if F1 working well
+if config['balancing']:
+    print('For training split:')
+    train_crops = balance_by_duplication(train_crops)
+#print('For validation split:')
+#val_crops = balance_by_duplication(val_crops)  #todo: skip this if F1 working well
 
 trainimages, trainlabels, trainrs = parse_crops(train_crops)
 valimages, vallabels, valrs = parse_crops(val_crops)
