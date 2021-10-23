@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from ..blob.misc import parse_crops
+from ..img.equalize import equalize
 
 def flat2image(flat_crop):
     from math import sqrt
@@ -78,7 +79,7 @@ def visualize_blob_detection(image, blob_locs,
 
 
 def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, 
-    image_scale=1, fname=None):
+    image_scale=1, fname=None, equalization=True):
     '''
     input: flat_crop of a blob, e.g. (160006,)
     output: two plots
@@ -103,6 +104,9 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0,
     w = sqrt(len(flat_crop) - 6) / 2
     W = w * image_scale / 30
     area = flat_crop[6]
+
+    if equalization:
+        image = equalize(image)
 
     fig, ax = plt.subplots(figsize=(W, W))
     ax.set_title('Image for Labeling\ncurrent label:{}\n\
