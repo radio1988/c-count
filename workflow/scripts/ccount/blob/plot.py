@@ -78,8 +78,8 @@ def visualize_blob_detection(image, blob_locs,
         plt.show()
 
 
-def plot_flat_crop(flat_crop, blob_extention_ratio=1, blob_extention_radius=0, 
-    image_scale=1, fname=None, equalization=True):
+def plot_flat_crop(flat_crop, blob_extention_ratio=1.4, blob_extention_radius=10, 
+    image_scale=1, fname=None, equalization=False):
     '''
     input: flat_crop of a blob, e.g. (160006,)
     output: two plots
