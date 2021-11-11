@@ -1,24 +1,40 @@
 from ccount.img.read_czi import read_czi, parse_image_arrays
 
 from ccount.blob.io import save_crops, load_crops
-from ccount.blob.plot import visualize_blob_detection
+from ccount.blob.plot import visualize_blob_detection, visualize_blob_compare
 
 from pathlib import Path
 
-import argparse, os, re, yaml
+import argparse, os, re, yaml, textwrap
 import numpy as np
 
 
 def parse_cmd_and_prep ():
     parser = argparse.ArgumentParser(
-        description='\
-        Read czi and locs/crops, \
-        output images with blobs circled; \
-        CMD: visualize_locs_on_czi.py -locs locs.npy.gz \
-        -czi image.czi  -index 0  -config config.yaml \
-        -output image.blobs.jpg')
+                 formatter_class=argparse.RawDescriptionHelpFormatter,
+                 description=textwrap.dedent('''\
+                    Read czi and locs/crops, 
+                    output images with blobs circled; 
+
+                    CMD1: 
+                    visualize_locs_on_czi.py 
+                    -crops locs.npy.gz  
+                    -czi image.czi  
+                    -index 0  
+                    -output image.blobs.jpg 
+                    
+                    CMD2: 
+                    visualize_locs_on_czi.py 
+                    -crops locs.npy.gz 
+                    -crops2 ground_truth.locs.npy.gz       
+                    -czi image.czi  
+                    -index 0  
+                    -output image.blobs.jpg
+                    '''))
     parser.add_argument('-crops', type=str,
         help='locs/crops filename: path/xxx.npy.gz')
+    parser.add_argument('-crops2', type=str,
+        help='locs/crops filename, optional: path/ground_truth.npy.gz')
     parser.add_argument('-czi', type=str,
         help='czi image filename: path/xxx.czi')
     parser.add_argument('-index', type=int, default=0, 
@@ -30,22 +46,22 @@ def parse_cmd_and_prep ():
 
     args = parser.parse_args()
     print('-crops::', args.crops)
+    print('-crops2::', args.crops2)
     print('-czi:', args.czi)
     print('-index:', args.index)
-    print('-config:', args.config)
     print('-output:', args.output)
 
     Path(os.path.dirname(args.output)).mkdir(parents=True, exist_ok=True)
 
-    with open(args.config, 'r') as stream:
-        config = yaml.safe_load(stream)
+    # with open(args.config, 'r') as stream:
+    #     config = yaml.safe_load(stream)
 
-    return [args, config]
+    return [args]
 
 
 
 ##################Start####################
-[args, config] = parse_cmd_and_prep()
+[args] = parse_cmd_and_prep()
 
 image_arrays = read_czi(args.czi)
 image = parse_image_arrays(image_arrays, args.index)
@@ -53,9 +69,17 @@ image_arrays = []
 
 crops = load_crops(args.crops)
 
-visualize_blob_detection(
-	image, crops,
-	blob_extention_ratio=config['blob_extention_ratio'], 
-	blob_extention_radius=config['blob_extention_radius'], 
-	fname=args.output)
+if args.crops2 is None:
+    visualize_blob_detection(
+    image, crops,
+    fname=args.output)
+
+
+if args.crops2 is not None:
+    crops2 = load_crops(args.crops2)
+    visualize_blob_compare(
+    image, crops, crops2,
+    fname=args.output)
+
+
 

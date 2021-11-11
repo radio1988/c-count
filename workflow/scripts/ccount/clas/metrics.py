@@ -1,3 +1,5 @@
+import numpy as np
+
 
 def F1(y_pred, y_true):
     from keras import backend as K
@@ -32,22 +34,22 @@ def F1(y_pred, y_true):
     return f1
 
 
-def F1_calculation(classifications, labels):
+def F1_calculation(predictions, labels):
     print("F1_calculation for sure labels only")
     idx = (labels == 1) | (labels == 0)  # sure only
     labels = labels[idx, ]
-    classifications = classifications[idx, ]
+    predictions = predictions[idx, ]
 
 
-    TP = np.sum(np.round(classifications * labels))
+    TP = np.sum(np.round(predictions * labels))
     PP = np.sum(np.round(labels))
     recall = TP / (PP + 1e-7)
 
-    PP2 = np.sum(np.round(classifications))
+    PP2 = np.sum(np.round(predictions))
     precision = TP/(PP2 + 1e-7)
 
     F1 = 2*((precision*recall)/(precision+recall+1e-7))
 
-    print('Precition: {:.2f}%, Recall: {:.2f}%, F1: {:.2f}%'.format(precision*100, recall*100, F1*100))
+    print('Precision: {:.2f}%, Recall: {:.2f}%, F1: {:.2f}%'.format(precision*100, recall*100, F1*100))
 
-    return F1
+    return [precision, recall, F1]

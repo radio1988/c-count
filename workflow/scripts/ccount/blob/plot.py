@@ -16,7 +16,7 @@ def visualize_blob_detection(image, blob_locs,
     blob_extention_ratio=1.0, blob_extention_radius=0, fname=None):
     '''
     image: image where blobs were detected from
-    blob_locs: blob info array n x 3 [x, y, r], crops also works, only first 3 columns used
+    blob_locs: blob info array n x 4 [x, y, r, label], crops also works, only first 3 columns used
     blob_locs: if labels in the fourth column provided, use that to give colors to blobs
 
     output: image with yellow circles around blobs
@@ -63,6 +63,7 @@ def visualize_blob_detection(image, blob_locs,
                            fill=False) 
             ax.add_patch(GREEN)
     else:
+        print('no label provided')
         for loc in blob_locs[:, 0:3]:
             ax.set_title('Visualizing blobs')
             y, x, r = loc
@@ -77,6 +78,90 @@ def visualize_blob_detection(image, blob_locs,
     else:
         plt.show()
 
+
+def visualize_blob_compare(image, blob_locs, blob_locs2, 
+    blob_extention_ratio=1.0, blob_extention_radius=0, fname=None):
+    '''
+    image: image where blobs were detected from
+    blob_locs: blob info array n x 4 [x, y, r, label]
+    blob_locs2: ground truth
+
+    output: image with colored circles around blobs
+        GT, Label
+        0, 0, blue
+        1, 1, pink
+        0, 1, red
+        1, 0, purple
+    '''
+    from ..img.transform import down_scale
+    from ccount.clas.metrics import F1_calculation
+    px = 1/plt.rcParams['figure.dpi']
+
+    # blob_locs[:, 0:3] = blob_locs[:, 0:3]/scaling
+    #image = down_scale(image, scaling)
+    print("image shape:", image.shape)
+    print("blob shape:", blob_locs.shape, blob_locs2.shape)
+
+    if not blob_locs2.shape[1] == blob_locs.shape[1]:
+        raise ValueError('num of locs in crops and crops2 different')
+
+    if blob_locs.shape[1] <= 3 or blob_locs2.shape[1] <= 3 :
+        raise ValueError('crop or crops2 has no label')
+
+    labels = blob_locs[:,3]
+    labels2 = blob_locs2[:,3]
+    precision, recall, F1 = F1_calculation(labels, labels2)
+
+    fig, ax = plt.subplots(figsize=(image.shape[1]*px+0.5, image.shape[0]*px+0.5))
+    ax.imshow(image, 'gray')
+
+    ax.set_title('Visualizing blobs:\n\
+        Red: FP, Yellow: FN, Green: TP, Blue: TN\n\
+        Precision: {}, Recall: {}, F1: , {}'.format(precision, recall, F1))
+
+    fp = [gt == 0 and clas == 1 for gt, clas in zip(labels2, labels)]
+    fn = [gt == 1 and clas == 0 for gt, clas in zip(labels2, labels)]
+    tp = [gt == 1 and clas == 1 for gt, clas in zip(labels2, labels)]
+    tn = [gt == 0 and clas == 0 for gt, clas in zip(labels2, labels)]
+
+    for loc in blob_locs[fp,0:3]:
+        y, x, r = loc
+        FP = plt.Circle((x, y), 
+                       r * blob_extention_ratio + blob_extention_radius, 
+                       color=(1, 0, 0, 0.7), linewidth=2,
+                       fill=False) 
+        ax.add_patch(FP)
+
+    for loc in blob_locs[fn,0:3]:
+        y, x, r = loc
+        FN = plt.Circle((x, y), 
+                       r * blob_extention_ratio + blob_extention_radius, 
+                       color=(1, 1, 0, 0.7), linewidth=2,
+                       fill=False) 
+        ax.add_patch(FN)
+
+    for loc in blob_locs[tp,0:3]:
+        y, x, r = loc
+        TP = plt.Circle((x, y), 
+                       r * blob_extention_ratio + blob_extention_radius, 
+                       color=(0, 1, 0, 0.7), linewidth=2,
+                       fill=False) 
+        ax.add_patch(TP)
+
+
+    for loc in blob_locs[tn,0:3]:
+        y, x, r = loc
+        TN = plt.Circle((x, y), 
+                       r * blob_extention_ratio + blob_extention_radius, 
+                       color=(0, 0, 1, 0.7), linewidth=2,
+                       fill=False) 
+        ax.add_patch(TN)
+
+
+    if fname:
+        plt.savefig(fname)
+    else:
+        plt.show()
 
 def plot_flat_crop(flat_crop, blob_extention_ratio=1.4, blob_extention_radius=10, 
     image_scale=1, fname=None, equalization=False):
