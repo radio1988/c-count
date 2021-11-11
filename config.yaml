@@ -1,48 +1,48 @@
 ## User params ## 
 
-DATA_DIR: data/
+DATA_DIR: data/  # for czi files
 
-FORMAT: 2019
-WEIGHT1: /home/socolovsky_lab/ccount/dev2021/neg_training/FL.t.withNeg.hdf5
-WEIGHT2: None
+FORMAT: 2019 # 2019
+I: [1,2,3,4] # all valid index options for czi file
 
-I: [1,2,3,4]
+WEIGHT1: /home/socolovsky_lab/ccount/dev2021/neg_training/FL.t.withNeg.hdf5 # for classification input
+
+
+
 
 ## Advanced params ##
 # (Please don't change unless you're developer)
 
 # blob detection
-test_mode: False
-equalization: True  # hard code: yes in blob detection, no in CNN
-block_height: 2000
+test_mode: False  # only use small subset in blob detection for faster processing
+block_height: 2000 # for block equalization
 block_width: 2400  # if < 0, skip block equalization
-scaling_factor: 4  # 1, 2, 4 (08/23/2021 for blob_detection)
-max_sigma: 6 # 20-50
+blob_detection_scaling_factor: 4  # 1, 2, 4 (08/23/2021 for blob_detection)
+max_sigma: 6 # 6 for 8 bit
 min_sigma: 3  # 2-8
 num_sigma: 20  # smaller->faster, less accurate, 5-20
 threshold: 0.02
-blob_detection_visualization: True
-blob_extention_ratio: 1.0 # soft extend blob radius manually (1.4)
-blob_extention_radius: 0 # pixcels to extend (2)
-crop_width: 80  # padding width, which is cropped img width/2 (50)
-overlap: .8
-
+overlap: .8 # smaller than this, two blobs become one
+blob_detection_visualization: True  # jpg file with circles around blobs
+blob_extention_ratio: 1.4 # for vis in jpg
+blob_extention_radius: 10 # for vis in jpg
+crop_width: 80  # padding width, which is cropped img width/2 (50), in blob_cropping.py
 
 # classification
 # training and classification
-numClasses: 2  # if 2, all other than 1 will be zero
-classification_equalization: False  # wether use equ for model training/classification
-clas_scaling_factor: 1  # input scale down for model training
-r_ext_ratio: 1.0  # larger (1.4) for better view under augmentation
-r_ext_pixels: 0
+numClasses: 2  # if 2 is selected, 3[uncertain] 4[artifacts] will be 0; 5[unlabeled] will be discarded at all times
+classification_equalization: True  # for training/classification
+clas_scaling_factor: 2  # input scale down factor for training/classification
+r_ext_ratio: 1.4  # larger (1.4) for better view under augmentation
+r_ext_pixels: 10
 # training only
-aug_sample_size: 2000
-training_ratio: 0.7  # proportion of data to be in training set during split
-batch_size: 64  # default 64
-epochs: 300 # default 30
-patience: 3  # default 50
-learning_rate: 0.0001  # default 0.0001 (Adam)
-verbose: 2  # {0, 1, 2}
+aug_sample_size: 50000
+# training_ratio: 0.7  # proportion of data to be in training set during split
+batch_size: 256  # default 256
+epochs: 30 # default 30
+patience: 2  # default 2
+learning_rate: 0.001  # default 0.001 (Adam)
+verbose: 2  # {0, 1, 2} 
 
 # Notes
 

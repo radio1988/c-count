@@ -35,9 +35,11 @@ def parse_cmd_and_prep ():
 
     with open(args.c, 'r') as stream:
         config = yaml.safe_load(stream)
-    if config['scaling_factor'] not in [1,2,4]:
-        raise Exception('scaling_factor', scaling_factor, 'not implemented',
-                        'only support 1,2,4')
+    if config['blob_detection_scaling_factor'] not in [1,2,4]:
+        raise Exception(
+            'scaling_factor', config['blob_detection_scaling_factor'], 
+            'not implemented, only support 1,2,4'
+            )
 
     return [args, corename, config]
 
@@ -70,7 +72,7 @@ for i in range(len(image_arrays)):
 
     blob_locs = find_blob (
         1-image_equ, 
-        scaling_factor=config['scaling_factor'],
+        scaling_factor=config['blob_detection_scaling_factor'],
         max_sigma=config['max_sigma'], 
         min_sigma=config['min_sigma'], 
         num_sigma=config['num_sigma'], 

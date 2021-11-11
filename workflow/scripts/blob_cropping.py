@@ -40,9 +40,6 @@ def parse_cmd_and_prep ():
 
     with open(args.config, 'r') as stream:
         config = yaml.safe_load(stream)
-    if config['scaling_factor'] not in [1,2,4]:
-        raise Exception('scaling_factor', scaling_factor, 'not implemented',
-                        'only support 1,2,4')
 
     return [args, corename, config]
 
