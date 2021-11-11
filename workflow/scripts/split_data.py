@@ -38,6 +38,8 @@ crops = load_crops(args.crops)
 print(crops1.shape, crops2.shape)
 out_name1 = args.crops.replace(".npy.gz", "." + str(args.ratio) + ".npy.gz")
 out_name2 = args.crops.replace(".npy.gz", "." + str(round(1-args.ratio, 3)) + ".npy.gz")
+if out_name2 == out_name1:
+    out_name2 = out_name1 + "b"
 
 save_crops(crops1, out_name1)
 save_crops(crops2, out_name2)
