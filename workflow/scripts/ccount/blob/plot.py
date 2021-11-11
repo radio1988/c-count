@@ -80,7 +80,7 @@ def visualize_blob_detection(image, blob_locs,
 
 
 def visualize_blob_compare(image, blob_locs, blob_locs2, 
-    blob_extention_ratio=1.0, blob_extention_radius=0, fname=None):
+    blob_extention_ratio=1.4, blob_extention_radius=10, fname=None):
     '''
     image: image where blobs were detected from
     blob_locs: blob info array n x 4 [x, y, r, label]
@@ -117,7 +117,7 @@ def visualize_blob_compare(image, blob_locs, blob_locs2,
 
     ax.set_title('Visualizing blobs:\n\
         Red: FP, Yellow: FN, Green: TP, Blue: TN\n\
-        Precision: {}, Recall: {}, F1: , {}'.format(precision, recall, F1))
+        Precision: {:.3f}, Recall: {:.3f}, F1: , {:.3f}'.format(precision, recall, F1))
 
     fp = [gt == 0 and clas == 1 for gt, clas in zip(labels2, labels)]
     fn = [gt == 1 and clas == 0 for gt, clas in zip(labels2, labels)]
