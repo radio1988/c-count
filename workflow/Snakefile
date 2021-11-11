@@ -5,8 +5,7 @@ from scripts.ccount.snake.get_samples import get_samples
 
 DATA_DIR=config["DATA_DIR"]
 FORMAT=config["FORMAT"]
-WEIGHT1=config["WEIGHT1"]
-WEIGHT2=config["WEIGHT2"]
+WEIGHT=config["WEIGHT"]
 WKDIR=os.getcwd()
 
 SAMPLES=get_samples(DATA_DIR)
@@ -96,7 +95,7 @@ rule blob_cropping:
 rule classification:
     input:
         blob_crops='res/blob_crops/{s}.{i}.crops.npy.gz',
-        weight=WEIGHT1
+        weight=WEIGHT
     output:
         npy=temp("res/classification1/{s}.{i}.crops.clas.npy.gz"),
         txt="res/classification1/{s}.{i}.crops.clas.txt"

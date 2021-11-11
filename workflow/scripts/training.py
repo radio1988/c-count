@@ -12,7 +12,7 @@ from ccount.clas.balance_data import balance_by_duplication
 from ccount.clas.augment_images import augment_images
 from ccount.clas.metrics import F1, F1_calculation
 
-import sys, argparse, os, re, yaml, keras
+import sys, argparse, os, re, yaml, keras, textwrap
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -34,24 +34,34 @@ from collections import Counter
 def parse_cmd_and_prep ():
     # Construct the argument parser and parse the arguments
     parser = argparse.ArgumentParser(
-        description='load labeled crops.npy.gz, train model and output trained weights\n\
-         python workflow/scripts/training.py -crops ~/ccount/dev2021/training_data/FL/FL.t.npy.gz \
-         -config config.yaml -output test/test.hdf5')
-    parser.add_argument("-crops", type=str,
-                    help="labled blob-crops file, e.g. labeled/labeled.crops.npy.gz")
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent('''\
+            Function: Load labeled crops.npy.gz, train model and output trained weights
+            Usage: python workflow/scripts/training.py 
+            -crops_train labeled.train.npy.gz 
+            -crops_val labeled.validation.npy.gz
+            -config config.yaml 
+            -output trained/trained.hdf5
+            '''))
+    parser.add_argument("-crops_train", type=str,
+        help="labled blob-crops file for training, \
+        e.g. labeled.train.npy.gz ")
+    parser.add_argument("-crops_val", type=str,
+        help="labled blob-crops file for earlystop, \
+        e.g. labeled.validation.npy.gz")
     parser.add_argument("-config", type=str,
-                    help="config file, e.g. config.yaml")
+        help="config file, e.g. config.yaml")
     parser.add_argument("-output", type=str,
-                    help="output weights file, e.g. resources/weights/trained.hdf5")
+        help="output weights file, e.g. resources/weights/trained.hdf5")
 
     args = parser.parse_args()
-    print("labeled crops:", args.crops)
-    print("config file:", args.config)
-    print("output:", args.output)
+    print('\n'.join(f'{k}={v}' for k, v in vars(args).items())) # pring cmd
     odir = os.path.dirname(args.output)
     print("odir:", odir)
     Path(odir).mkdir(parents=True, exist_ok=True)
 
+    if not args.output.endswith('.hdf5'):
+        raise Exception('output name does not end with .hdf5')
     corename = args.output.replace(".hdf5", "")
     print("output corename:", corename)
     
@@ -63,26 +73,32 @@ def parse_cmd_and_prep ():
     return [args, corename, config]
 
 
-args, corename, config = parse_cmd_and_prep()
-
-crops = load_crops(args.crops)
-w = crop_width(crops)
-
-print("Removing unlabeled crops (label == 5)")
-crops = crops[crops[:, 3] != 5, :]
-crops_stat(crops)
-
-# set other laberls as no
-if config['numClasses'] == 2:
-    print("Remove uncertain and artifacts")  # todo: user decide
-    crops[crops[:, 3] == 3, 3] = 0  # uncertain
-    crops[crops[:, 3] == 4, 3] = 0  # artifacts, see ccount.blob.readme.txt
+def cleanup_crops(crops):
+    print("Removing unlabeled crops (label == 5)")
+    crops = crops[crops[:, 3] != 5, :]
     crops_stat(crops)
 
+    print("Set other laberls as no (label == 3[uncertain],4[artifacts])")
+    if config['numClasses'] == 2:
+        crops[crops[:, 3] == 3, 3] = 0  # uncertain
+        crops[crops[:, 3] == 4, 3] = 0  # artifacts, see ccount.blob.readme.txt
+        crops_stat(crops)
 
-[train_crops, val_crops] = split_data(crops, config['training_ratio'])
-print("{} Split ratio, split into {} training crops and {} validating crops".\
-      format(config['training_ratio'], train_crops.shape[0], val_crops.shape[0]))
+    return crops
+
+args, corename, config = parse_cmd_and_prep()
+
+train_crops = load_crops(args.crops_train)
+val_crops = load_crops(args.crops_val)
+
+w = crop_width(train_crops)
+
+train_crops = cleanup_crops(train_crops)
+val_crops = cleanup_crops(val_crops)
+
+
+print("Got {} training crops and {} validating crops".\
+    format(train_crops.shape[0], val_crops.shape[0]))
 
 if config['balancing']:
     print('For training split:')

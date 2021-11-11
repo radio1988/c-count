@@ -5,7 +5,7 @@ DATA_DIR: data/  # for czi files
 FORMAT: 2019 # 2019
 I: [1,2,3,4] # all valid index options for czi file
 
-WEIGHT1: /home/socolovsky_lab/ccount/dev2021/neg_training/FL.t.withNeg.hdf5 # for classification input
+WEIGHT1: trained.hdf5 # for classification input
 
 
 
@@ -32,12 +32,12 @@ crop_width: 80  # padding width, which is cropped img width/2 (50), in blob_crop
 # training and classification
 numClasses: 2  # if 2 is selected, 3[uncertain] 4[artifacts] will be 0; 5[unlabeled] will be discarded at all times
 classification_equalization: True  # for training/classification
+balancing: True
 clas_scaling_factor: 2  # input scale down factor for training/classification
 r_ext_ratio: 1.4  # larger (1.4) for better view under augmentation
 r_ext_pixels: 10
 # training only
 aug_sample_size: 50000
-# training_ratio: 0.7  # proportion of data to be in training set during split
 batch_size: 256  # default 256
 epochs: 30 # default 30
 patience: 2  # default 2
