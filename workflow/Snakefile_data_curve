@@ -40,7 +40,8 @@ rule subsampling:
 
 rule training: 
     input:
-        small_crop='res/small_data/{rate}.npy.gz'
+        small_crop='res/small_data/{rate}.npy.gz',
+        val_crop=DATA_VAL
     output:
         weight='res/weights/{rate}.hdf5'
     log:
@@ -54,8 +55,8 @@ rule training:
     shell:
         """
         python workflow/scripts/training.py \
-        -crops_train data/ashley.18500.train.npy.gz \
-        -crops_val data/ashley.18500.val.npy.gz \
+        -crops_train {input.small_crop} \
+        -crops_val {input.val_crop} \
         -config {CCOUNT_CONFIG} \
         -output {output.weight} \
         &> {log}
