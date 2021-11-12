@@ -105,6 +105,8 @@ positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 print("Saving classifications..")
 crops[:, 3] = classifications
 crops_stat(crops)
-np.save(args.output)
-os.system('gzip  -f ' + args.output.replace('.gz', ''))
-np.savetxt(args.output.replace('.npy.gz', '.txt', classifications.astype(int), fmt='%d')
+npy_name = args.output.replace('.gz', '')
+np.save(npy_name, crops) #xxx.npy
+os.system('gzip  -f ' + npy_name)
+txt_name = args.output.replace('.npy.gz', '.txt')
+np.savetxt(txt_name, classifications.astype(int), fmt='%d')
