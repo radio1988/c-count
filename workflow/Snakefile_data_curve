@@ -87,7 +87,7 @@ rule classification:
 
 rule evaluation:
     input:
-        clas='res/clas/{rate}.npy.gz' 
+        clas='res/clas/{rate}.npy.gz',
         data_val=DATA_VAL
     output:
         eval='res/eval/{rate}.txt'
