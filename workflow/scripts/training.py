@@ -101,10 +101,9 @@ print("Got {} training crops and {} validating crops".\
     format(train_crops.shape[0], val_crops.shape[0]))
 
 if config['balancing']:
-    print('For training split:')
+    print('Balancing for training split:')
     train_crops = balance_by_duplication(train_crops)
-#print('For validation split:')
-#val_crops = balance_by_duplication(val_crops)  #todo: skip this if F1 working well
+    
 
 trainimages, trainlabels, trainrs = parse_crops(train_crops)
 valimages, vallabels, valrs = parse_crops(val_crops)

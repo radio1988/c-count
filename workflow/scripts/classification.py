@@ -29,28 +29,21 @@ def parse_cmd_and_prep ():
                     help="weights file, e.g. resources/weights/trained.hdf5")
     parser.add_argument("-config", type=str,
                     help="config file, e.g. config.yaml")
-    parser.add_argument("-odir", type=str,
-                    help="odir, e.g. res/classification")
+    parser.add_argument("-output", type=str,
+                    help="output name, e.g. res/xxx.crops.clas.npy.gz")
 
     args = parser.parse_args()
-    print("crops:", args.crops)
-    print("weight:", args.weight)
-    print("config file:", args.config)
-    print("odir:", args.odir)
-    Path(args.odir).mkdir(parents=True, exist_ok=True)
 
-    corename = os.path.basename(args.crops)
-    corename = corename.replace(".npy", "")
-    corename = corename.replace(".gz", "")
-    corename = os.path.join(args.odir, corename)
-    print("output corename", corename)
+    print('\n'.join(f'{k}={v}' for k, v in vars(args).items()))
+
+    # Path(args.odir).mkdir(parents=True, exist_ok=True)
     
     with open(args.config, 'r') as stream:
         config = yaml.safe_load(stream)
     if config['clas_scaling_factor'] not in [1,2,4]:
         raise Exception(config['clas_scaling_factor'], 'not implemented', 'only support 1,2,4')
 
-    return [args, corename, config]
+    return [args, config]
 
 
 
@@ -60,7 +53,7 @@ def parse_cmd_and_prep ():
 
 # Communication
 # print('>>> Command:', sys.argv)
-args, corename, config = parse_cmd_and_prep()
+args, config = parse_cmd_and_prep()
 
 crops = load_crops(args.crops)
 w = crop_width(crops)
@@ -108,11 +101,10 @@ probs = model.predict(images)
 classifications = probs.argmax(axis=1)
 positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 
+# Save 
 print("Saving classifications..")
-np.savetxt(corename +'.clas.txt', classifications.astype(int), fmt='%d')
 crops[:, 3] = classifications
 crops_stat(crops)
-
-np.save(corename+'.clas.npy', crops)
-os.system('gzip  -f ' + corename+'.clas.npy')
-
+np.save(args.output)
+os.system('gzip  -f ' + args.output.replace('.gz', ''))
+np.savetxt(args.output.replace('.npy.gz', '.txt', classifications.astype(int), fmt='%d')

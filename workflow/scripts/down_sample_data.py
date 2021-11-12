@@ -9,14 +9,16 @@ def parse_cmd_and_prep ():
     	formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent('''\
         	>>> Usage: 
-        	split_data.py -crops crops.labled.npy.gz -ratio 0.7
+        	down_sample.py -crops crops.labled.npy.gz -ratio 0.1
         	>>> Output:
-        	crops.0.7.npy.gz cropts.0.3.npy.gz
+        	crops.0.1.npy.gz
         	'''))
     parser.add_argument("-crops", type=str,
         help="labled blob-crops file, e.g. labeled/labeled.crops.npy.gz")
     parser.add_argument("-ratio", type=float,
-        help="ratio of train/val/test, e.g. 0.7")
+        help="ratio of down-sampling e.g. 0.1")
+    parser.add_argument("-output", type=str,
+        help="e.g. output.npy.gz")
 
     args = parser.parse_args()
 
@@ -29,17 +31,8 @@ def parse_cmd_and_prep ():
 
 
 args = parse_cmd_and_prep()
-
 crops = load_crops(args.crops)
 
 [crops1, crops2] = split_data(crops, args.ratio)
-print(crops1.shape, crops2.shape)
-out_name1 = args.crops.replace(".npy.gz", "." + str(args.ratio) + ".npy.gz")
-out_name2 = args.crops.replace(".npy.gz", "." + str(round(1-args.ratio, 3)) + ".npy.gz")
-if out_name2 == out_name1:
-    out_name2 = out_name1.replace("npy.gz", "b.npy.gz")
-if out_name2 == out_name1:
-    raise ValueError("outname2 == outname1")
-
-save_crops(crops1, out_name1)
-save_crops(crops2, out_name2)
+print(crops1.shape)
+save_crops(crops1, args.output)

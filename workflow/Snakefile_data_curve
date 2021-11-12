@@ -1,0 +1,132 @@
+import os
+
+configfile: "config.data_curve.yaml"
+
+WKDIR=os.getcwd()
+DATA_TRAIN=config['DATA_TRAIN']
+DATA_VAL=config['DATA_VAL']
+SAMSPLING_RATES = config['sampling_rates']
+CCOUNT_CONFIG=config['CCOUNT_CONFIG']
+
+rule targets:
+    input:
+        subsamples=expand('res/small_data/{rate}.npy.gz', rate=SAMSPLING_RATES), 
+        weights=expand('res/weights/{rate}.hdf5', rate=SAMSPLING_RATES), 
+        classifications=expand('res/clas/{rate}.npy.gz', rate=SAMSPLING_RATES),
+        # trained_weights=expand("log/img/{s}.done", s=SAMPLES), 
+        # curve = 'data_curve.pdf'
+
+rule subsampling: 
+    input:
+        crop=DATA_TRAIN
+    output:
+        small_crop='res/small_data/{rate}.npy.gz'
+    log:
+        'res/small_data/{rate}.npy.gz.log'
+    benchmark:
+         'res/small_data/{rate}.npy.gz.benchmark'
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 16000
+    shell:
+        """
+        python workflow/scripts/down_sample_data.py \
+        -crops {input.crop} \
+        -ratio {wildcards.rate} \
+        -output {output.small_crop} \
+        &> {log}
+        """
+
+rule training: 
+    input:
+        small_crop='res/small_data/{rate}.npy.gz'
+    output:
+        weight='res/weights/{rate}.hdf5'
+    log:
+        'res/weights/{rate}.hdf5.log'
+    benchmark:
+         'res/weights/{rate}.hdf5.benchmark'
+    threads:
+        16
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 2000
+    shell:
+        """
+        python workflow/scripts/training.py \
+        -crops_train data/ashley.18500.train.npy.gz \
+        -crops_val data/ashley.18500.val.npy.gz \
+        -config {CCOUNT_CONFIG} \
+        -output {output.weight} \
+        &> {log}
+        """
+
+rule classification: 
+    input:
+        weight='res/weights/{rate}.hdf5',
+        data_val=DATA_VAL
+    output:
+        clas='res/clas/{rate}.npy.gz' # test
+    log:
+        'res/clas/{rate}.npy.gz.log'
+    benchmark:
+        'res/clas/{rate}.npy.gz.benchmark'
+    threads:
+        4
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 8000
+    shell:
+        """
+        python workflow/scripts/classification.py \
+        -crops {input.data_val} \
+        -config {CCOUNT_CONFIG} \
+        -weight {input.weight} \
+        -output {output.clas} \
+        &> {log}
+        """
+
+# rule classification:
+#     input:
+#         "res/classification1/{s}.{i}.clas.npy.gz"  # some will not exist, but just ignore warnings
+#     output:
+#         html="res/classification1/view/{s}.{i}.html"
+#     params:
+#         html="../res/classification1/view/{s}.{i}.html"
+#     log:
+#         "log/classification1/view/{s}.{i}.html.log"
+#     benchmark:
+#         "log/classification1/view/{s}.{i}.html.benchmark"
+#     threads:
+#         1
+#     resources:
+#         mem_mb=lambda wildcards, attempt: attempt * 8000
+#     shell:
+#         """
+#         mkdir -p res res/classification1 res/classification1/view
+#         fname={input} dir={WKDIR} \
+#         jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
+#         --output {params.html} &> {log}
+#         """
+        
+# rule evaluation:
+#     input:
+#         "res/classification1/{s}.{i}.clas.npy.gz"  # some will not exist, but just ignore warnings
+#     output:
+#         html="res/classification1/view/{s}.{i}.html"
+#     params:
+#         html="../res/classification1/view/{s}.{i}.html"
+#     log:
+#         "log/classification1/view/{s}.{i}.html.log"
+#     benchmark:
+#         "log/classification1/view/{s}.{i}.html.benchmark"
+#     threads:
+#         1
+#     resources:
+#         mem_mb=lambda wildcards, attempt: attempt * 8000
+#     shell:
+#         """
+#         mkdir -p res res/classification1 res/classification1/view
+#         fname={input} dir={WKDIR} \
+#         jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
+#         --output {params.html} &> {log}
+#         """
