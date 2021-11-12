@@ -13,7 +13,7 @@ rule targets:
         subsamples=expand('res/small_data/{rate}.npy.gz', rate=SAMSPLING_RATES), 
         weights=expand('res/weights/{rate}.hdf5', rate=SAMSPLING_RATES), 
         classifications=expand('res/clas/{rate}.npy.gz', rate=SAMSPLING_RATES),
-        # trained_weights=expand("log/img/{s}.done", s=SAMPLES), 
+        evaluations=expand('res/eval/{rate}.txt', rate=SAMSPLING_RATES),
         # curve = 'data_curve.pdf'
 
 rule subsampling: 
@@ -48,9 +48,9 @@ rule training:
     benchmark:
          'res/weights/{rate}.hdf5.benchmark'
     threads:
-        16
+        12
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 2000
+        mem_mb=lambda wildcards, attempt: attempt * 3000
     shell:
         """
         python workflow/scripts/training.py \
@@ -85,48 +85,25 @@ rule classification:
         &> {log}
         """
 
-# rule classification:
-#     input:
-#         "res/classification1/{s}.{i}.clas.npy.gz"  # some will not exist, but just ignore warnings
-#     output:
-#         html="res/classification1/view/{s}.{i}.html"
-#     params:
-#         html="../res/classification1/view/{s}.{i}.html"
-#     log:
-#         "log/classification1/view/{s}.{i}.html.log"
-#     benchmark:
-#         "log/classification1/view/{s}.{i}.html.benchmark"
-#     threads:
-#         1
-#     resources:
-#         mem_mb=lambda wildcards, attempt: attempt * 8000
-#     shell:
-#         """
-#         mkdir -p res res/classification1 res/classification1/view
-#         fname={input} dir={WKDIR} \
-#         jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
-#         --output {params.html} &> {log}
-#         """
-        
-# rule evaluation:
-#     input:
-#         "res/classification1/{s}.{i}.clas.npy.gz"  # some will not exist, but just ignore warnings
-#     output:
-#         html="res/classification1/view/{s}.{i}.html"
-#     params:
-#         html="../res/classification1/view/{s}.{i}.html"
-#     log:
-#         "log/classification1/view/{s}.{i}.html.log"
-#     benchmark:
-#         "log/classification1/view/{s}.{i}.html.benchmark"
-#     threads:
-#         1
-#     resources:
-#         mem_mb=lambda wildcards, attempt: attempt * 8000
-#     shell:
-#         """
-#         mkdir -p res res/classification1 res/classification1/view
-#         fname={input} dir={WKDIR} \
-#         jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
-#         --output {params.html} &> {log}
-#         """
+rule evaluation:
+    input:
+        clas='res/clas/{rate}.npy.gz' 
+        data_val=DATA_VAL
+    output:
+        eval='res/eval/{rate}.txt'
+    log:
+        'res/eval/{rate}.txt.log'
+    benchmark:
+        'res/eval/{rate}.txt.benchmark'
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 8000
+    shell:
+        """
+        python workflow/scripts/eval_classification.py \
+        {input.clas} \
+        {input.data_val} \
+        1>{output} \
+        2>{log}
+        """
