@@ -48,7 +48,7 @@ rule training:
     benchmark:
          'res/weights/{rate}.hdf5.benchmark'
     threads:
-        12
+        16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 3000
     shell:
