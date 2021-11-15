@@ -25,7 +25,7 @@ def augment_images(images, aug_sample_size):
             iaa.Flipud(0.5), # vertically flip 50% of all images
             sometimes(iaa.Affine(
                 # todo: more strict; no scaling down
-                scale=(0.5, 2), # larger range hoping to eliminate size classifier
+                scale=(1, 1.2), # larger range hoping to eliminate size classifier
                 translate_percent={"x": (-0.03, 0.03), "y": (-0.03, 0.03)},
                 rotate=(-360, 360), 
                 shear=(-16, 16), # shear by -16 to +16 degrees
