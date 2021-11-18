@@ -111,7 +111,7 @@ rule classification:
         """
         python workflow/scripts/classification.py  \
         -crops {input.blob_crops} -weight {input.weight} \
-        -config config.yaml -odir res/classification1 &> {log}
+        -config config.yaml -output {output.npy} &> {log}
         """
 
 
