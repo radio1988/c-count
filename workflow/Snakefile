@@ -169,8 +169,10 @@ rule view_clas_on_image:
     shell:
         """
         python workflow/scripts/visualize_locs_on_czi.py \
-        -crops {input.crop} -index {wildcards.i} \
-        -czi {input.czi} -config config.yaml \
+        -crops {input.crop} \
+        -index {wildcards.i} \
+        -czi {input.czi} \
+        -config config.yaml \
         -output {output} &> {log}
         """
 

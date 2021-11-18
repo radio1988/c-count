@@ -1,3 +1,7 @@
+import matplotlib
+matplotlib.use('Agg') 
+import matplotlib.pyplot as plt
+
 from ccount.img.read_czi import read_czi, parse_image_arrays
 
 from ccount.blob.io import save_crops, load_crops
