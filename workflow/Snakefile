@@ -22,6 +22,7 @@ rule targets:
         filter_crops=input_names(prefix='res/classification1/pos/', SAMPLES=SAMPLES,
                                  suffix=".crops.clas.npy.gz"),
         count_file='res/COUNT.csv',
+        area1_agg="res/areas.csv",
         view_clas_on_image=input_names(prefix="res/classification1/", SAMPLES=SAMPLES,
                                        suffix=".crops.clas.npy.gz.jpg")
 
@@ -30,7 +31,6 @@ rule targets:
         # area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
         #     suffix=".area.txt"),
         # count1="res/COUNT.csv",  # count from weight1
-        # area1_agg="res/areas.csv",
 
 rule czi2img:
     input:
@@ -178,7 +178,7 @@ rule view_clas_on_image:
 
 rule area_calculation:
     input:
-        "res/classification1/{s}.{i}.clas.npy.gz"
+        "res/classification1/{s}.{i}.crops.clas.npy.gz"
     output:
         txt="res/classification1/area/{s}.{i}.area.txt",
         npy="res/classification1/area/{s}.{i}.area.txt.npy.gz"
