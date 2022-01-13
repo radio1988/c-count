@@ -61,4 +61,4 @@ if len(sys.argv) < 3:
     sys.exit("cmd error")
 areaDF = get_areaDF_from_area_txts(sys.argv[1])
 print(areaDF.iloc[0:3, 0:2])
-areaDF.to_csv(sys.argv[2])
+areaDF.to_csv(sys.argv[2], float_format='%i')

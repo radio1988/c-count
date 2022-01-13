@@ -13,15 +13,16 @@ SAMPLES=get_samples(DATA_DIR)
 
 rule targets:
     input:
-        czi2img=expand("log/img/{s}.done", s=SAMPLES), 
-        blob_detection=expand("log/blob_locs/{s}.done", s=SAMPLES),
-        blob_cropping=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES, 
-                                  suffix='.crops.npy.gz'),
-        classification=input_names(prefix='res/classification1/', SAMPLES=SAMPLES,
-                                   suffix=".crops.clas.txt"),
-        filter_crops=input_names(prefix='res/classification1/pos/', SAMPLES=SAMPLES,
-                                 suffix=".crops.clas.npy.gz"),
+#        czi2img=expand("log/img/{s}.done", s=SAMPLES), # skipped, clas vis more helpful
+#        blob_detection=expand("log/blob_locs/{s}.done", s=SAMPLES),
+#        blob_cropping=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES, 
+#                                  suffix='.crops.npy.gz'),
+        # classification=input_names(prefix='res/classification1/', SAMPLES=SAMPLES,
+        #                            suffix=".crops.clas.txt"),
+        # filter_crops=input_names(prefix='res/classification1/pos/', SAMPLES=SAMPLES,
+        #                          suffix=".crops.clas.npy.gz"),
         count_file='res/COUNT.csv',
+        area1_agg="res/areas.csv",
         view_clas_on_image=input_names(prefix="res/classification1/", SAMPLES=SAMPLES,
                                        suffix=".crops.clas.npy.gz.jpg")
 
@@ -30,7 +31,6 @@ rule targets:
         # area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
         #     suffix=".area.txt"),
         # count1="res/COUNT.csv",  # count from weight1
-        # area1_agg="res/areas.csv",
 
 rule czi2img:
     input:
@@ -111,7 +111,7 @@ rule classification:
         """
         python workflow/scripts/classification.py  \
         -crops {input.blob_crops} -weight {input.weight} \
-        -config config.yaml -odir res/classification1 &> {log}
+        -config config.yaml -output {output.npy} &> {log}
         """
 
 
@@ -169,21 +169,23 @@ rule view_clas_on_image:
     shell:
         """
         python workflow/scripts/visualize_locs_on_czi.py \
-        -crops {input.crop} -index {wildcards.i} \
-        -czi {input.czi} -config config.yaml \
+        -crops {input.crop} \
+        -index {wildcards.i} \
+        -czi {input.czi} \
+        -config config.yaml \
         -output {output} &> {log}
         """
 
 rule area_calculation:
     input:
-        "res/classification1/{s}.{i}.clas.npy.gz"
+	    'res/classification1/pos/{s}.{i}.crops.clas.npy.gz'
     output:
-        txt="res/classification1/area/{s}.{i}.area.txt",
-        npy="res/classification1/area/{s}.{i}.area.txt.npy.gz"
+        txt='res/classification1/pos/area/{s}.{i}.area.txt',
+        npy='res/classification1/pos/area/{s}.{i}.area.npy.gz'
     log:
-        "res/classification1/area/{s}.{i}.area.log"
+        "res/classification1/pos/area/{s}.{i}.area.log"
     benchmark:
-        "res/classification1/area/{s}.{i}.area.benchmark"
+        "res/classification1/pos/area/{s}.{i}.area.benchmark"
     threads:
         1
     resources:
@@ -199,7 +201,7 @@ rule area_aggregation:
     '''
     input:
         input_names(SAMPLES=SAMPLES, 
-                    prefix="res/classification1/area/", suffix=".area.txt")
+                    prefix="res/classification1/pos/area/", suffix=".area.txt")
     output:
         "res/areas.csv"
     log:
@@ -210,7 +212,7 @@ rule area_aggregation:
         mem_mb=lambda wildcards, attempt: attempt * 1000
     shell:
         """
-        python workflow/scripts/aggr_area_info.py res/classification1/area/ res/areas.csv &> {log}
+        python workflow/scripts/aggr_area_info.py res/classification1/pos/area/ res/areas.csv &> {log}
         """
 
 rule view0:

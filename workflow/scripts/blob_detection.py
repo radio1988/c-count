@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('Agg') 
+import matplotlib.pyplot as plt
 from ccount.img.equalize import block_equalize
 from ccount.img.read_czi import read_czi, parse_image_arrays
 from ccount.img.auto_contrast import uint16_image_auto_contrast

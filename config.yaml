@@ -1,4 +1,5 @@
 ## User params ## 
+# data curve patience5, augmentation 80k
 
 DATA_DIR: data/  # for czi files
 
@@ -6,9 +7,6 @@ FORMAT: 2019 # 2019
 I: [1,2,3,4] # all valid index options for czi file
 
 WEIGHT1: trained.hdf5 # for classification input
-
-
-
 
 ## Advanced params ##
 # (Please don't change unless you're developer)
@@ -39,8 +37,8 @@ r_ext_pixels: 10
 balancing: True
 aug_sample_size: 50000
 batch_size: 256  # default 256
-epochs: 30 # default 30
-patience: 2  # default 2
+epochs: 50 # default 30
+patience: 5  # default 2
 learning_rate: 0.001  # default 0.001 (Adam)
 verbose: 2  # {0, 1, 2} 
 
