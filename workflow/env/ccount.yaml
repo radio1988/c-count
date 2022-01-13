@@ -1,4 +1,4 @@
-name: ccount-gpu
+name: ccount-env
 # conda env create -f ccount.yaml
 
 channels:
