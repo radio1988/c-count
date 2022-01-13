@@ -6,3 +6,5 @@ log/
 ._.DS*
 ._config.yaml
 test/
+*pyc
+*._*

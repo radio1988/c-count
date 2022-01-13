@@ -13,24 +13,19 @@ SAMPLES=get_samples(DATA_DIR)
 
 rule targets:
     input:
-#        czi2img=expand("log/img/{s}.done", s=SAMPLES), # skipped, clas vis more helpful
-#        blob_detection=expand("log/blob_locs/{s}.done", s=SAMPLES),
-#        blob_cropping=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES, 
-#                                  suffix='.crops.npy.gz'),
+        # czi2img=expand("log/img/{s}.done", s=SAMPLES), # skipped, clas vis more helpful
+        # blob_detection=expand("log/blob_locs/{s}.done", s=SAMPLES),
+        # blob_cropping=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES, 
+        #                          suffix='.crops.npy.gz'),
         # classification=input_names(prefix='res/classification1/', SAMPLES=SAMPLES,
         #                            suffix=".crops.clas.txt"),
         # filter_crops=input_names(prefix='res/classification1/pos/', SAMPLES=SAMPLES,
         #                          suffix=".crops.clas.npy.gz"),
+
         count_file='res/COUNT.csv',
         area1_agg="res/areas.csv",
         view_clas_on_image=input_names(prefix="res/classification1/", SAMPLES=SAMPLES,
                                        suffix=".crops.clas.npy.gz.jpg")
-
-#        view0=input_names(SAMPLES),
-#        view1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/view/"),
-        # area1=input_names(SAMPLES=SAMPLES, prefix="res/classification1/area/",
-        #     suffix=".area.txt"),
-        # count1="res/COUNT.csv",  # count from weight1
 
 rule czi2img:
     input:
@@ -76,7 +71,7 @@ rule blob_cropping:
         czi='data/{s}.czi',
         blob_locs_flag="log/blob_locs/{s}.done"
     output:
-        'res/blob_crops/{s}.{i}.crops.npy.gz'
+        temp('res/blob_crops/{s}.{i}.crops.npy.gz')
     threads:
         1
     resources:

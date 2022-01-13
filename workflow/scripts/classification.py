@@ -15,7 +15,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 from pyimagesearch.cnn.networks.lenet import LeNet
-from keras.optimizers import Adam
+from tensorflow.keras.optimizers import Adam
 from keras.utils import np_utils
 
 
