@@ -49,9 +49,9 @@ rule training:
     benchmark:
          'res/weights/{rate}.hdf5.benchmark'
     threads:
-        16
+        4
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 3000
+        mem_mb=lambda wildcards, attempt: attempt * 15000
     shell:
         """
         python workflow/scripts/training.py \
@@ -73,7 +73,7 @@ rule classification:
     benchmark:
         'res/clas/{rate}.npy.gz.benchmark'
     threads:
-        4
+        2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
