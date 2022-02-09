@@ -20,10 +20,10 @@ dependencies:
         - bioconda::snakemake=6.7.0
 
         # anaconda
-        - anaconda::pandas=1.1.5
-        - anaconda::scikit-image=0.17.2
-        - anaconda::scikit-learn=0.24.2
-        - anaconda::pillow=8.3.1
+        - anaconda::pandas=1.1
+        - anaconda::scikit-image=0.17
+        - anaconda::scikit-learn
+        - anaconda::pillow
         - anaconda::cmake
         - anaconda::jupyter
 
