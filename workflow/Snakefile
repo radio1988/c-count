@@ -21,7 +21,6 @@ rule targets:
         #                            suffix=".crops.clas.txt"),
         # filter_crops=input_names(prefix='res/classification1/pos/', SAMPLES=SAMPLES,
         #                          suffix=".crops.clas.npy.gz"),
-
         count_file='res/COUNT.csv',
         area1_agg="res/areas.csv",
         view_clas_on_image=input_names(prefix="res/classification1/", SAMPLES=SAMPLES,
