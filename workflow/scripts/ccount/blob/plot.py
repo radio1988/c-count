@@ -13,7 +13,7 @@ def flat2image(flat_crop):
 
 
 def visualize_blob_detection(image, blob_locs, 
-    blob_extention_ratio=1.0, blob_extention_radius=0, fname=None):
+    blob_extention_ratio=1.4, blob_extention_radius=10, fname=None):
     '''
     image: image where blobs were detected from
     blob_locs: blob info array n x 4 [x, y, r, label], crops also works, only first 3 columns used

@@ -1,4 +1,5 @@
-def area_calculation(img, r, plotting=False, fname='blob_binary_image.png'):
+def area_calculation(img, r, plotting=False, fname='blob_binary_image.png', 
+                    blob_extention_ratio=1.4, blob_extention_radius=10):
     '''
     read one image
     output area-of-pixels as int
@@ -22,6 +23,8 @@ def area_calculation(img, r, plotting=False, fname='blob_binary_image.png'):
     except ValueError: 
         #print("Ops, got blank blob crop")
         return (0)
+    
+    r = r * blob_extention_ratio + blob_extention_radius
 
     # cells as 1 (white), background as 0 (black)
     drops = ndimage.binary_fill_holes(img < val)  
