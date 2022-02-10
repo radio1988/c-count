@@ -19,8 +19,8 @@ blob_detection_scaling_factor: 4  # 1, 2, 4 (08/23/2021 for blob_detection)
 max_sigma: 6 # 6 for 8 bit
 min_sigma: 3  # 2-8
 num_sigma: 20  # smaller->faster, less accurate, 5-20
-threshold: 0.02
-overlap: .8 # smaller than this, two blobs become one
+threshold: 0.02  # 0.2?
+overlap: .8 # smaller than this, two blobs become one, 0.2?
 blob_detection_visualization: True  # jpg file with circles around blobs
 blob_extention_ratio: 1.4 # for vis in jpg
 blob_extention_radius: 10 # for vis in jpg
@@ -35,10 +35,10 @@ r_ext_ratio: 1.4  # larger (1.4) for better view under augmentation
 r_ext_pixels: 10
 # training only
 balancing: True
-aug_sample_size: 50000
-batch_size: 256  # default 256
-epochs: 50 # default 30
-patience: 5  # default 2
+aug_sample_size: 80000
+batch_size: 512  # default 256
+epochs: 100 # default 30
+patience: 15  # default 2
 learning_rate: 0.001  # default 0.001 (Adam)
 verbose: 2  # {0, 1, 2} 
 
