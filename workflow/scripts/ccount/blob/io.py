@@ -16,7 +16,9 @@ def load_locs(fname):
         else:
             raise Exception ("suffix not npy nor npy.gz")
         print(fname, array.shape)
-    return array
+        return array
+    else:
+        raise Exception ('input file', fname, 'not found')
 
 
 def load_crops(in_db_name, n_subsample=False, seed=1):
