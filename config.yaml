@@ -6,7 +6,7 @@ DATA_DIR: data/  # for czi files
 FORMAT: 2019 # 2019
 I: [1,2,3,4] # all valid index options for czi file
 
-WEIGHT1: trained.hdf5 # for classification input
+WEIGHT: trained.hdf5 # for classification input
 
 ## Advanced params ##
 # (Please don't change unless you're developer)
