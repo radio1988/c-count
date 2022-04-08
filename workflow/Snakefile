@@ -49,7 +49,7 @@ rule blob_detection:
         "data/{s}.czi"
     output:
         touch("log/blob_locs/{s}.done"), 
-        #input_names(SAMPLES=[{s}], prefix="res/blob_locs/", suffix='.locs.npy.gz')
+        #"res/blob_locs/{s}.{i}.crops.npy.gz"
     threads:
         1
     resources:
@@ -68,7 +68,8 @@ rule blob_detection:
 rule blob_cropping:
     input:
         czi='data/{s}.czi',
-        blob_locs_flag="log/blob_locs/{s}.done"
+        blob_locs_flag="log/blob_locs/{s}.done",
+        #blob_locs="res/blob_locs/{s}.{i}.crops.npy.gz"
     output:
         temp('res/blob_crops/{s}.{i}.crops.npy.gz')
     threads:
