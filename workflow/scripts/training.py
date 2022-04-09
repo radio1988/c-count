@@ -212,7 +212,7 @@ model.save_weights(args.output, overwrite=True)
 
 
 #### MANUAL boosting ### 
-if BOOSTING:
+if config['BOOSTING']:
     probs = model.predict(trainimages)
     classifications = probs.argmax(axis=1)
     # print('classifications:', classifications) # (1000,)
