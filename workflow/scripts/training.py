@@ -215,50 +215,33 @@ model.save_weights(args.output, overwrite=True)
 if config['BOOSTING']:
     probs = model.predict(trainimages)
     classifications = probs.argmax(axis=1)
-    # print('classifications:', classifications) # (1000,)
-    # print('trainlabels:',  trainlabels) #  (1000, 1)
 
     tricky_idx = trainlabels != classifications
-    print("tricky_idx.shape:", tricky_idx.shape)
-
-
-
-
     tricky_images = trainimages[tricky_idx] # (501, 40, 40, 1)
     tricky_labels = trainlabels[tricky_idx] #  
-    boost_size = min(len(tricky_labels), 20000)
-    tricky_images = tricky_images[0:boost_size]
-    tricky_labels = tricky_labels[0:boost_size]
-
     print("trainimages.shape:", trainimages.shape)
-    print("trainlabels2.shape:", trainlabels2.shape)
     print("tricky_images.shape:", tricky_images.shape )
-    print("tricky_labels.shape:", tricky_labels.shape)
 
-    for i in range(4):
+    for i in range(2):
         tricky_images = np.concatenate((tricky_images, tricky_images))
         tricky_labels = np.concatenate((tricky_labels, tricky_labels))
 
-    print("tricky_images.shape:", tricky_images.shape )
-    print("tricky_labels.shape:", tricky_labels.shape)
+    boost_size = min(len(tricky_labels), config['aug_sample_size']//4)
+    tricky_images = tricky_images[0:boost_size]
+    tricky_labels = tricky_labels[0:boost_size]
+    print(">>>duplicated tricky_images.shape:", tricky_images.shape )
+    print(">>>duplicated tricky_labels.shape:", tricky_labels.shape)
 
     tricky_labels2 = np_utils.to_categorical(tricky_labels, config['numClasses'])
     print("tricky_labels2.shape:", tricky_labels2.shape)
-
 
     retrain_images =  np.concatenate((tricky_images, trainimages))
     retrain_labels =  np.concatenate((tricky_labels, trainlabels))
     retrain_labels2 = np_utils.to_categorical(retrain_labels, config['numClasses'])
 
-
     print("retrain_images.shape:", retrain_images.shape )
     print("retrain_labels.shape:", retrain_labels.shape)
     print("retrain_labels2.shape:", retrain_labels2.shape)
-
-
-
-
-
 
     datagen.fit(retrain_images)
     model.fit_generator(datagen.flow(retrain_images, retrain_labels2, batch_size=config['batch_size']),
