@@ -4,20 +4,32 @@ import sys
 
 from ccount.blob.io import load_crops
 from ccount.clas.metrics import F1_calculation
+from ccount.blob.intersect import intersect_blobs
 
 
-print("usage:  python f1_score.py output/FL.t.pred.npy.gz ../data/FL.t.npy.gz  > f1_score.t.txt")
-#todo: calculate mean/median of f1_scores of many pairs of blobs
+print("usage:  python f1_score.py prediction.npy.gz truth.npy.gz > f1_score.t.txt")
+print("note0: the two files should have blobs or crops in them")
+print("note1: calculate based on the intersection of blobs in two files, \
+    different blobs will be discarded\n\n")
 
-def read_labels(fname):
-    blobs = load_crops(fname)
+def read_labels(blobs):
     labels = blobs[:, 3]
     labels[labels == 9] = 0  # for 2020 April labeled data (0, 1, -2 , 9)
     return labels
 
 name1 = sys.argv[1]  # prediction
 name2 = sys.argv[2]  # truth
-print(name1, name2)
-labels1 = read_labels(name1)
-labels2 = read_labels(name2)
-precision, recall, F1 = F1_calculation(labels1, labels2)
+#print(name1, name2)
+
+
+blobs1 = load_crops(name1)
+print()
+blobs2 = load_crops(name2)
+print()
+
+blobs1b, blobs2b = intersect_blobs(blobs1, blobs2)
+
+labels1b = read_labels(blobs1b)
+labels2b = read_labels(blobs2b)
+
+precision, recall, F1 = F1_calculation(labels1b, labels2b)

@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ccount.img.read_czi import read_czi, parse_image_arrays
 
 from ccount.blob.io import save_crops, load_crops
+from ccount.blob.intersect import intersect_blobs
 from ccount.blob.plot import visualize_blob_detection, visualize_blob_compare
 
 from pathlib import Path
@@ -81,6 +82,7 @@ if args.crops2 is None:
 
 if args.crops2 is not None:
     crops2 = load_crops(args.crops2)
+    crops, crops2 = intersect_blobs(crops, crops2)
     visualize_blob_compare(
     image, crops, crops2,
     fname=args.output)
