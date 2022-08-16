@@ -9,7 +9,7 @@ def parse_cmd_and_prep ():
     	formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent('''\
         	>>> Usage: 
-        	down_sample.py -crops crops.labled.npy.gz -ratio 0.1
+        	crops_sampling.py -crops crops.labled.npy.gz -ratio 0.1
         	>>> Output:
         	crops.0.1.npy.gz
         	'''))
