@@ -31,7 +31,7 @@ rule subsampling:
         mem_mb=lambda wildcards, attempt: attempt * 16000
     shell:
         """
-        python workflow/scripts/down_sample_data.py \
+        python workflow/scripts/crops_sampling.py \
         -crops {input.crop} \
         -ratio {wildcards.rate} \
         -output {output.small_crop} \
