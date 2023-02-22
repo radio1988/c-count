@@ -50,6 +50,7 @@ def parse_image_arrays (image_arrays, i = 0,  Format = '2019'):
             warnings.warn('area', i, 'is blank')
             return False
         image = image[min(nz0):max(nz0), min(nz1):max(nz1)]  # 0s
+        image[image>55000] = 0 # remove very bright outlier pixels, blackImageBug
         return image
         
         # if concatenation:
