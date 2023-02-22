@@ -1,0 +1,4 @@
+DATA_TRAIN: data/yungBMtrain.FL35kNoEpo.npy.gz
+DATA_VAL: data/yung.BM.val.npy.gz
+sampling_rates: [.1, .33,  1.0]
+CCOUNT_CONFIG: config.yaml

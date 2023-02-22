@@ -1,0 +1,4 @@
+DATA_TRAIN: data/ashley.BM.train.BM_NoEpo_35k_v3.npy.gz
+DATA_VAL: data/ashley.BM.val.npy.gz
+sampling_rates: [.1, .33,  1.0]
+CCOUNT_CONFIG: config.yaml
