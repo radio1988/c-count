@@ -8,6 +8,7 @@ def read_czi(fname, Format="2019"):
     fname=str(fname)
     Format=str(Format)
     print('read_czi:', fname)
+    print('Format', Format)
     if fname.endswith('czi'):
         if Format == '2019':
             image_obj = AICSImage(fname)

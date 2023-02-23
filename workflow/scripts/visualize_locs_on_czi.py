@@ -67,8 +67,10 @@ def parse_cmd_and_prep ():
 
 ##################Start####################
 [args] = parse_cmd_and_prep()
+with open(args.config, 'r') as stream:
+    config = yaml.safe_load(stream)
 
-image_obj = read_czi(args.czi)
+image_obj = read_czi(args.czi, Format=config['FORMAT'])
 image = parse_image_obj(image_obj, args.index)
 crops = load_crops(args.crops)
 
