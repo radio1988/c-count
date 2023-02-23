@@ -1,4 +1,4 @@
-from ccount.img.read_czi import read_czi, parse_image_arrays
+from ccount.img.read_czi import read_czi, parse_image_obj
 from ccount.img.auto_contrast import uint16_image_auto_contrast
 
 from ccount.blob.crop_blobs import crop_blobs
@@ -48,9 +48,8 @@ def parse_cmd_and_prep ():
 ##################Start####################
 [args, corename, config] = parse_cmd_and_prep()
 
-image_arrays = read_czi(args.czi, Format=config['FORMAT'])  # fast already
-image = parse_image_arrays(image_arrays, i=args.i, Format=config['FORMAT'])
-image_arrays = [] # todo: release RAM  08/21/21 use ~10G
+image_obj = read_czi(args.czi, Format=config['FORMAT'])  # fast already
+image = parse_image_obj(image_obj, i=args.i, Format=config['FORMAT'])
 image = uint16_image_auto_contrast(image)
 print('image.shape:', image.shape)
 

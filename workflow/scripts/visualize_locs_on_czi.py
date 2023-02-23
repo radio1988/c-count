@@ -2,7 +2,7 @@ import matplotlib
 matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 
-from ccount.img.read_czi import read_czi, parse_image_arrays
+from ccount.img.read_czi import read_czi, parse_image_obj
 
 from ccount.blob.io import save_crops, load_crops
 from ccount.blob.intersect import intersect_blobs
@@ -68,10 +68,8 @@ def parse_cmd_and_prep ():
 ##################Start####################
 [args] = parse_cmd_and_prep()
 
-image_arrays = read_czi(args.czi)
-image = parse_image_arrays(image_arrays, args.index)
-image_arrays = []
-
+image_obj = read_czi(args.czi)
+image = parse_image_obj(image_obj, args.index)
 crops = load_crops(args.crops)
 
 if args.crops2 is None:

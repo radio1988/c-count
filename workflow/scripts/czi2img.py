@@ -1,4 +1,4 @@
-from ccount.img.read_czi import read_czi, parse_image_arrays
+from ccount.img.read_czi import read_czi, parse_image_obj
 from ccount.img.auto_contrast import uint16_image_auto_contrast
 
 from pathlib import Path
@@ -35,16 +35,13 @@ def parse_cmd_and_prep ():
 ##################Start####################
 [args, config, ofname] = parse_cmd_and_prep()
 
-image_arrays = read_czi(args.i, Format=config['FORMAT'])
-for i in range(len(image_arrays)):
+image_obj = read_czi(args.i, Format=config['FORMAT'])
+for i in range(len(img_obj.scenes)):
 	print('For area', i)
-	image_arrays = read_czi(args.i, Format=config['FORMAT'])
-	image = parse_image_arrays(image_arrays, i=i, Format=config['FORMAT'])
-	image_arrays = []
+	image_obj = read_czi(args.i, Format=config['FORMAT'])
+	image = parse_image_obj(image_obj, i=i, Format=config['FORMAT'])
 	image = uint16_image_auto_contrast(image) # still uint16
 	
 	ofname_i = re.sub("jpg$", str(i)+".jpg", ofname)
 	imsave(ofname_i, image, cmap = "gray")
 	print('saved into', ofname_i)
-
-

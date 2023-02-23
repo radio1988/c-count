@@ -2,7 +2,7 @@ import matplotlib
 matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 from ccount.img.equalize import block_equalize
-from ccount.img.read_czi import read_czi, parse_image_arrays
+from ccount.img.read_czi import read_czi, parse_image_obj
 from ccount.img.auto_contrast import uint16_image_auto_contrast
 
 from ccount.blob.find_blob import find_blob
@@ -50,17 +50,15 @@ def parse_cmd_and_prep ():
 ##################Start####################
 [args, corename, config] = parse_cmd_and_prep()
 
-image_arrays = read_czi(args.i, Format=config['FORMAT'])  # fast already
-for i in range(len(image_arrays)):
+image_obj = read_czi(args.i, Format=config['FORMAT'])  # fast already
+for i in range(len(image_obj.scenes)):
     # names
     i=str(i)
     out_blob_fname = os.path.join(args.odir, corename+"."+i+".locs.npy")
     print("Searching blobs for area", i, "; output:", out_blob_fname)
 
-    image_arrays = read_czi(args.i, Format=config['FORMAT'])  # fast already
-    image = parse_image_arrays(image_arrays, i=i, Format=config['FORMAT'])
-    image_arrays = [] # todo: release RAM, 08/21/21 use ~10G
-
+    image_obj = read_czi(args.i, Format=config['FORMAT'])  # fast already
+    image = parse_image_obj(image_obj, i=i, Format=config['FORMAT'])
     image = uint16_image_auto_contrast(image) # still uint16
 
     if config['test_mode']:
