@@ -264,15 +264,17 @@ def show_rand_crops(crops, label_filter="na", num_shown=1,
     return (True)
 
 
-def pop_label_flat_crops(crops, random=True, seed=1, skip_labels=[0, 5]):
+def pop_label_flat_crops(crops, random=True, seed=1, skip_labels=[0,1,2,3]):
     '''
     input: 
         crops
     task: 
         plot padded crop, let user label them
     labels: 
-        no: 0, yes: 1, uncertain: 3, artifacts: 4, unlabeled: 5 
+        no: 0, yes: 1, groupB: 2, uncertain: 3, artifacts: 4, unlabeled: 5 
         never use neg values
+    skipLablels:
+        crops with current labels in these will be skipped, to save time
     output: 
         labeled array in the original order
     '''
@@ -308,9 +310,13 @@ def pop_label_flat_crops(crops, random=True, seed=1, skip_labels=[0, 5]):
             format(i + 1, num_to_label))
 
         if label == '1':
-            crops[idx[i], 3] = 1  # yes
+            crops[idx[i], 3] = 1 
         elif label == '0':
-            crops[idx[i], 3] = 0  # no
+            crops[idx[i], 3] = 0
+        elif label == '2':
+            crops[idx[i], 3] = 2
+        elif label == '3':
+            crops[idx[i], 3] = 3
         elif label == 's':
             pass
         elif label == 'b':
