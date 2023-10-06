@@ -22,3 +22,16 @@ def intersect_blobs(blobs1, blobs2):
     blobs1b = blobs1[idx1, :]
     blobs2b = blobs2[idx2, :]
     return (blobs1b, blobs2b)
+
+
+def setdiff_blobs(blobs1, blobs2):
+    blobs1 = sort_blobs(blobs1)
+    blobs2 = sort_blobs(blobs2)
+    tup1 = [tuple(x[0:2]) for x in blobs1]
+    tup2 = [tuple(x[0:2]) for x in blobs2]
+    set1 = set(tup1)
+    set2 = set(tup2)
+    setout = set1 - set2
+    idx1 = [x in setout for x in tup1]
+    blobsout = blobs1[idx1, :]
+    return (blobsout)
