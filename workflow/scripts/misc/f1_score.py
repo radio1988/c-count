@@ -1,4 +1,4 @@
-from ccount import load_blobs_db
+from ccount.blob.io import load_crops
 import numpy as np
 import pandas as pd
 from sklearn.metrics import f1_score
@@ -8,7 +8,7 @@ print("usage:  python f1_score.py output/FL.t.pred.npy.gz ../data/FL.t.npy.gz  >
 #todo: calculate mean/median of f1_scores of many pairs of blobs
 
 def read_labels(fname):
-    blobs = load_blobs_db(fname)
+    blobs = load_crops(fname)
     labels = blobs[:, 3]
     labels[labels == 9] = 0  # for 2020 April labeled data (0, 1, -2 , 9)
     return labels
