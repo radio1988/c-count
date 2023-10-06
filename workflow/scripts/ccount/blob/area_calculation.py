@@ -32,7 +32,7 @@ def area_calculation(img, r, plotting=False, fname='blob_binary_image.png',
     # mask out of the circle to be zero
     w = int(img.shape[0]/2)
     mask = np.zeros((2 * w, 2 * w)) 
-    rr, cc = disk(w - 1, w - 1, min(r, w - 1))
+    rr, cc = disk((w - 1, w - 1), min(r, w - 1))
     mask[rr, cc] = 1  # 1 is white
     
     # apply mask on binary image
