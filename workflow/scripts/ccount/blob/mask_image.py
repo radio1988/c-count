@@ -4,7 +4,7 @@ def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
     return: hard-masked image of [0,1] scale
     '''
     import numpy as np
-    from skimage.draw import circle
+    from skimage.draw import disk
     from ..img.auto_contrast import float_image_auto_contrast
     
     image = float_image_auto_contrast(image)
@@ -14,7 +14,7 @@ def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
 
     # hard mask creating training data
     mask = np.zeros((2 * w, 2 * w))  # zeros are masked to be black
-    rr, cc = circle(w - 1, w - 1, min(r_, w - 1))
+    rr, cc = disk(w - 1, w - 1, min(r_, w - 1))
     mask[rr, cc] = 1  # 1 is white
     hard_masked = (1 - (1 - image) * mask)
 

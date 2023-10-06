@@ -8,7 +8,7 @@ def area_calculation(img, r, plotting=False, fname='blob_binary_image.png',
     from ..img.auto_contrast import float_image_auto_contrast
     from ..img.equalize import equalize
     from skimage import io, filters
-    from skimage.draw import circle
+    from skimage.draw import disk
     from scipy import ndimage
     import numpy as np
     import matplotlib.pyplot as plt
@@ -32,7 +32,7 @@ def area_calculation(img, r, plotting=False, fname='blob_binary_image.png',
     # mask out of the circle to be zero
     w = int(img.shape[0]/2)
     mask = np.zeros((2 * w, 2 * w)) 
-    rr, cc = circle(w - 1, w - 1, min(r, w - 1))
+    rr, cc = disk(w - 1, w - 1, min(r, w - 1))
     mask[rr, cc] = 1  # 1 is white
     
     # apply mask on binary image
