@@ -9,7 +9,8 @@ def parse_cmd_and_prep ():
     	formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent('''\
         	>>> Usage: 
-        	split_data.py -crops crops.labled.npy.gz -ratio 0.7
+        	crops_split.py -crops crops.labled.npy.gz -ratio 0.7
+                >>> uncertain(3) and artifacts(4) will be viewed as negatives(0)
         	>>> Output:
         	crops.0.7.npy.gz cropts.0.3.npy.gz
         	'''))
@@ -31,6 +32,9 @@ def parse_cmd_and_prep ():
 args = parse_cmd_and_prep()
 
 crops = load_crops(args.crops)
+print('force uncertain (label=3) and artifacts (label=4) to neg')
+crops[crops[:, 3] == 3, 3] = 0  # uncertain
+crops[crops[:, 3] == 4, 3] = 0  # artifacts, see ccount.blob.readme.txt
 
 [crops1, crops2] = split_data(crops, args.ratio)
 print(crops1.shape, crops2.shape)
