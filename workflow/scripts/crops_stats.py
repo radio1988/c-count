@@ -6,13 +6,13 @@ from ccount.blob.io import load_crops, save_crops
 def parse_cmd_and_prep ():
     # Construct the argument parser and parse the arguments
     parser = argparse.ArgumentParser(
-    	formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent('''\
-        	>>> Usage: 
-        	crops_stats.py -crops crops.labled.npy.gz 
-        	>>> Output:
+                >>> Usage:
+                crops_stats.py -crops crops.labled.npy.gz
+                >>> Output:
                 stdout
-        	'''))
+                '''))
     parser.add_argument("-crops", type=str,
         help="labled blob-crops file, e.g. labeled/labeled.crops.npy.gz")
 

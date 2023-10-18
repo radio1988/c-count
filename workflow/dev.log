@@ -5,10 +5,6 @@
 4. Balancing data
 5. counting (classification)
 
-## Installation
-- install conda
-- `conda install skimage`
-
 ## Nomenclature:
 - image: the whole input czi, which contains many blocks
 - block: each block of image scanned by microscopy
