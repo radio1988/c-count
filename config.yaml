@@ -6,7 +6,7 @@ DATA_DIR: data/  # for czi files
 FORMAT: 2019 # 2019
 I: [1,2,3,4] # all valid index options for czi file
 
-WEIGHT: trained.hdf5 # for classification input
+WEIGHT: res/weights/1.0.hdf5 # for classification input
 
 ## Advanced params ##
 # (Please don't change unless you're developer)
@@ -28,9 +28,9 @@ crop_width: 80  # padding width, which is cropped img width/2 (50), in blob_crop
 
 # classification
 # training and classification
-BOOSTING: True
+BOOSTING: False
 numClasses: 2  # if 2 is selected, 3[uncertain] 4[artifacts] will be 0; 5[unlabeled] will be discarded at all times
-classification_equalization: True  # for training/classification
+classification_equalization: False  # for training/classification
 clas_scaling_factor: 2  # input scale down factor for training/classification
 r_ext_ratio: 1.4  # larger (1.4) for better view under augmentation
 r_ext_pixels: 10
@@ -39,7 +39,7 @@ balancing: True
 aug_sample_size: 80000
 batch_size: 512  # default 256
 epochs: 100 
-patience: 5  
+patience: 3  
 learning_rate: 0.001  # default 0.001 (Adam)
 verbose: 2  # {0, 1, 2} 
 
