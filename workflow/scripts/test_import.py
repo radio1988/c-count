@@ -134,7 +134,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from pyimagesearch.cnn.networks.lenet import LeNet
 from tensorflow.keras.optimizers import Adam
-from keras.utils import np_utils
+from keras.utils import to_categorical 
 # from tensorflow.python.client import device_lib
 from ccount.blob.io import load_crops, save_crops
 from ccount.blob.misc import crops_stat
@@ -184,7 +184,7 @@ from pyimagesearch.cnn.networks.lenet import LeNet
 from sklearn.model_selection import train_test_split
 from skimage.transform import rescale, resize, downscale_local_mean
 from tensorflow.keras.optimizers import Adam
-from keras.utils import np_utils
+from keras.utils import to_categorical 
 from keras.preprocessing.image import ImageDataGenerator
 from collections import Counter
 # from tensorflow.python.client import device_lib

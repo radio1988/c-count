@@ -22,7 +22,7 @@ from pyimagesearch.cnn.networks.lenet import LeNet
 from sklearn.model_selection import train_test_split
 from skimage.transform import rescale, resize, downscale_local_mean
 from tensorflow.keras.optimizers import Adam
-from keras.utils import np_utils
+from keras.utils import to_categorical 
 from keras.preprocessing.image import ImageDataGenerator
 from collections import Counter
 
@@ -152,8 +152,8 @@ print("max pixel value: ", np.max(trainimages))
 print("min pixel value: ", np.min(trainimages))
 
 # Categorize labels for softmax
-trainlabels2 = np_utils.to_categorical(trainlabels, config['numClasses'])
-vallabels2 = np_utils.to_categorical(vallabels, config['numClasses'])
+trainlabels2 = to_categorical(trainlabels, config['numClasses'])
+vallabels2 = to_categorical(vallabels, config['numClasses'])
 
 # Initialize the optimizer and model
 # todo: feature normalization (optional)
@@ -232,12 +232,12 @@ if config['BOOSTING']:
     print(">>>duplicated tricky_images.shape:", tricky_images.shape )
     print(">>>duplicated tricky_labels.shape:", tricky_labels.shape)
 
-    tricky_labels2 = np_utils.to_categorical(tricky_labels, config['numClasses'])
+    tricky_labels2 = to_categorical(tricky_labels, config['numClasses'])
     print("tricky_labels2.shape:", tricky_labels2.shape)
 
     retrain_images =  np.concatenate((tricky_images, trainimages))
     retrain_labels =  np.concatenate((tricky_labels, trainlabels))
-    retrain_labels2 = np_utils.to_categorical(retrain_labels, config['numClasses'])
+    retrain_labels2 = to_categorical(retrain_labels, config['numClasses'])
 
     print("retrain_images.shape:", retrain_images.shape )
     print("retrain_labels.shape:", retrain_labels.shape)
