@@ -1,10 +1,12 @@
 import numpy as np
-import math, os, re, sys
+import math, os, re, sys, cv2
 import matplotlib.pyplot as plt
 from PIL import Image
 from ccount.blob.io import load_crops, save_crops
 from ccount.img.read_czi import read_czi, parse_image_obj
 from ccount.blob.plot import visualize_blob_detection, visualize_blob_compare
+
+
 def read_colored_jpg(image_path):
     """
     Reads a JPG image and returns it as a colored PIL image object.
@@ -43,6 +45,7 @@ def is_orange(rgb_color):
   else:
       return False
 
+
 def find_unique_colors_in_circle(image, x, y, r):
     """
     Finds all unique colors within a circle in a PIL image.
@@ -67,7 +70,6 @@ def find_unique_colors_in_circle(image, x, y, r):
                 pixel_color = image.getpixel((i, j))
                 unique_colors.add(pixel_color)
     return unique_colors
-
 def find_unique_colors_at_circle(image, x, y, r):
     """
     Finds all unique colors at the circle in a PIL image.
@@ -83,7 +85,7 @@ def find_unique_colors_at_circle(image, x, y, r):
         A set containing all unique color tuples (R, G, B) found within the circle.
     """
     unique_colors = set()
-    width, height = image.size
+    width, height = image.size # test, reversed?
     # Iterate through pixels within the circle's bounding box
     for i in range(max(0, x - r), min(width - 1, x + r) + 1):
         for j in range(max(0, y - r), min(height - 1, y + r) + 1):
@@ -126,18 +128,54 @@ def find_non_white_pixels(fname):
     So you can remove white backgrounds, and only keep the foreground image
     :param fname:
     """
-    import cv2
     image = cv2.imread(fname)
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     thresh = 254  # Experiment with this value
     thresholded_image = np.where(gray_image < thresh, 255, 0)  # gray as 255, white as zero
     nonzero_pixels = np.nonzero(thresholded_image)  # non-zero indices
-    top = np.min(nonzero_pixels[0]) + 60 # todo: current setting specific, hard code
+    top = np.min(nonzero_pixels[0]) + 40 # todo: current setting specific, hard code
     left = np.min(nonzero_pixels[1]) + 50
     bottom = np.max(nonzero_pixels[0]) - 30
     right = np.max(nonzero_pixels[1])
     print(f"Bounding box coordinates (left, top, right, bottom): ({left}, {top}, {right}, {bottom})")
     return (left, top, right, bottom)
+
+
+def find_non_white_boundaries(fname, min_foreground_density = 0.2):
+    """
+    Input: filename
+    Output: the boundaries coordinates on the original image, for non-white image on white canvas
+    Params: have to have less than {max_white_density} white pixels in the row/column
+    """
+    image = cv2.imread(fname)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    thresh = 254  # Experiment with this value
+    thresholded_image = np.where(gray_image < thresh, 255, 0)  # gray as 255, white as zero
+    height, width = thresholded_image.shape
+    for r, row in enumerate(thresholded_image):
+        black_count = np.count_nonzero(row)
+        if black_count / width >= min_foreground_density:
+            top = r
+            break
+    for r in reversed(range(height)):
+        row = thresholded_image[r, :]
+        black_count = np.count_nonzero(row)
+        if black_count / width >= min_foreground_density:
+            bottom = r
+            break
+    for c in range(width):
+        column = thresholded_image[:, c]
+        black_count = np.count_nonzero(column)
+        if black_count / height >= min_foreground_density:
+            left = c
+            break
+    for c in reversed(range(width)):
+        column = thresholded_image[:, c]
+        black_count = np.count_nonzero(column)
+        if black_count / height >= min_foreground_density:
+            right = c
+            break
+    return(left, top, right, bottom)
 
 def find_dominant_color(colors):
     """
@@ -176,6 +214,11 @@ czi_file = sys.argv[2]
 npy_file = sys.argv[3]
 I = sys.argv[4]
 
+# czi_file = "1unitEpo_1-Stitching-01.czi"
+# img_file = '1unitEpo_1-Stitching-01.1.crops.clas.npy.gz.jpg'
+# # img_file = '../0_classification1_img/1unitEpo_1-Stitching-01.1.crops.clas.npy.gz.jpg'  # test, should have same label as npy
+# npy_file = '../npy/1unitEpo_1-Stitching-01.1.crops.clas.npy.gz'
+
 czi = read_czi(czi_file)
 czi_img = parse_image_obj(czi, I)  # czi_img.shape (8635, 10620) (h,w); 10620/8635 1.229878401852924
 
@@ -185,8 +228,11 @@ crops_new[:, 3] = 0
 
 # CROP AND SCALE JPG IMG
 img = read_colored_jpg(img_file)  # <PIL.Image.Image image mode=RGB size=10670x8685 at 0x17FD5DDB0> w/h
-left, top, right, bottom = find_non_white_pixels(img_file)  # Find foreground location
+left, top, right, bottom = find_non_white_boundaries(img_file)  # Find foreground location
 img = img.crop((left, top, right, bottom))  # size=8272x6759, w/h 8272/6759 1.2238496819056073
+img_gray = np.array(img.convert("L"))
+cv2.imwrite('test.jpg', img_gray)# test
+
 scale = math.sqrt(img.size[0]**2 + img.size[1]**2 )/ math.sqrt(czi_img.shape[1]**2 + czi_img.shape[0]**2)  # based on width
 
 D = {0:1, 1:0, 2:0, None:None}
@@ -196,12 +242,12 @@ for i in range(len(crops)):
     y = int(crops[i][0] * scale)  # max y: 8628
     x = int(crops[i][1] * scale)  # max x: 10616
     r = int((crops[i][2] * 1.4 + 10) * scale + 1) # expanded as usual x1.4 and +10
-    L_npy = crops[i][3] # Label from npy
+    L_npy = int(crops[i][3]) # Label from npy
 
     # look at color of the circle
     colors = find_unique_colors_at_circle(img, x, y, r)
     max_color, C = find_dominant_color(colors)
-    L_img = D[max_color]
+    L_img = int(D[max_color])
     if L_img != L_npy and L_img is not None:
         print("Confict for", i, "Label_npy:", L_npy, "Label_img:", L_img)
         # crop = crop_square_around_center(img, x, y, square_size=r * 2)
@@ -212,7 +258,7 @@ for i in range(len(crops)):
     for color_inside in colors_inside:
         if is_orange(color_inside):  # any single pixel is organge (re-labeling)
             crops_new[i][3] = 1  # mod crops
-            print("For", i, "Label_npy:", L_npy, "Label_img:", L_img, "Label_new:", 1, color_inside)
+            print("Orange:", i, "Label_npy:", L_npy, "Label_img:", L_img, "Label_new:", 1, color_inside)
             # crop = crop_square_around_center(img, x, y, square_size=r * 2)
             # plt.imshow(crop, 'gray')
             break
@@ -220,16 +266,16 @@ for i in range(len(crops)):
 
 img_gray = np.array(img.convert("L"))
 corename = os.path.basename(img_file).replace('.crops.clas.npy.gz.jpg', '') # '1unitEpo_1-Stitching-01.1'
+
+os.makedirs('new_npy', exist_ok=True)
+os.makedirs('jpg_check', exist_ok=True)
+os.makedirs('jpg_new', exist_ok=True)
+os.makedirs('jpg_change', exist_ok=True)
+os.makedirs('log', exist_ok=True)
+
+
 save_crops(crops_new, 'new_npy/' + corename + '.npy.gz')
 visualize_blob_detection(img_gray, crops*scale, fname = 'jpg_check/'+corename+'.align_check.jpg')
 visualize_blob_detection(czi_img, crops_new, fname = 'jpg_new/'+corename+'.new.jpg')
 visualize_blob_compare(czi_img, crops_new, crops, fname='jpg_change/'+corename+'.change.jpg')
-
-#
-# czi_file = "1unitEpo_1-Stitching-01.czi"
-# img_file = '1unitEpo_1-Stitching-01.1.crops.clas.npy.gz.jpg'
-# # img_file = '../0_classification1_img/1unitEpo_1-Stitching-01.1.crops.clas.npy.gz.jpg'  # test, should have same label as npy
-# npy_file = '../npy/1unitEpo_1-Stitching-01.1.crops.clas.npy.gz'
-#
-#
 
