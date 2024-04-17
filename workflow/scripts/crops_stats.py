@@ -1,20 +1,16 @@
 import argparse, textwrap
-from ccount.clas.split_data import split_data
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_crops
+from ccount.blob.misc import crops_stat
 
 
-def parse_cmd_and_prep ():
+def parse_cmd_and_prep():
     # Construct the argument parser and parse the arguments
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description=textwrap.dedent('''\
-                >>> Usage:
-                crops_stats.py -crops crops.labled.npy.gz
-                >>> Output:
-                stdout
-                '''))
+        description="Read crops.npy.gz or locs.npy.gz and give statistics about labels")
+
     parser.add_argument("-crops", type=str,
-        help="labled blob-crops file, e.g. labeled/labeled.crops.npy.gz")
+                        help="labled blob-crops file, e.g. labeled/labeled.crops.npy.gz")
 
     args = parser.parse_args()
 
@@ -22,6 +18,6 @@ def parse_cmd_and_prep ():
 
     return args
 
-
 args = parse_cmd_and_prep()
 crops = load_crops(args.crops)
+crops_stat(crops)

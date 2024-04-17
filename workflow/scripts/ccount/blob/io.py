@@ -1,11 +1,12 @@
+import gzip, os, subprocess
+import numpy as np
+
 def load_locs(fname):
     '''
     assuming reading fname.locs.npy.gz
     read into np.array
     '''
-    import gzip
-    import os
-    import numpy as np
+
 
     if os.path.isfile(fname):
         if fname.endswith('npy'):
@@ -27,9 +28,6 @@ def load_crops(in_db_name, n_subsample=False, seed=1):
     input: db fname from user (xxx.npy)
     output: array (crops format)
     '''
-    import gzip
-    import os
-    import numpy as np
     from .misc import crops_stat, crop_width, sub_sample
 
     if not os.path.isfile(in_db_name):
@@ -48,16 +46,14 @@ def load_crops(in_db_name, n_subsample=False, seed=1):
         print("subsampling to", n_subsample, "blobs")
         image_flat_crops = sub_sample(image_flat_crops, n_subsample, seed=seed)  
 
-    print("n-crop: {}, crop width: {}".\
-        format(len(image_flat_crops), crop_width(image_flat_crops)))
-    crops_stat(image_flat_crops)
+    # print("n-crop: {}, crop width: {}".\
+    #     format(len(image_flat_crops), crop_width(image_flat_crops)))
+    # crops_stat(image_flat_crops)
     
     return image_flat_crops
 
 
 def save_crops(crops, fname):
-    import subprocess, os
-    import numpy as np
     from .misc import crops_stat, crop_width
     from pathlib import Path
     print("Saving", fname)
@@ -71,8 +67,6 @@ def save_crops(crops, fname):
 
 
 def save_locs(crops, fname):
-    import subprocess, os
-    import numpy as np
     from .misc import crops_stat, crop_width
     from pathlib import Path
     print("Saving", fname)
