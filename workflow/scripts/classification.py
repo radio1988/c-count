@@ -104,6 +104,7 @@ positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 # Save 
 print("Saving classifications..")
 crops[:, 3] = classifications
+crops = crops[:, 0:4]
 crops_stat(crops)
 npy_name = args.output.replace('.gz', '')
 np.save(npy_name, crops) #xxx.npy
