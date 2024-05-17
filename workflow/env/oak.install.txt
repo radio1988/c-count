@@ -1,0 +1,61 @@
+    9  wget https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh
+   10  bash Anaconda3-2023.09-0-Linux-x86_64.sh 
+   13  bash Anaconda3-2023.09-0-Linux-x86_64.sh 
+   15  conda env create -n bio
+   16  conda create -n bio
+   17  conda update -n base -c defaults conda
+   18  conda install -c conda-forge mamba
+   20  conda env list
+   21  mamba install -c conda-forge jupyterlab
+   22  mamba
+   23  mamba --no-plugins install -c conda-forge jupyterlab
+   24  conda install -c conda-forge jupyterlab
+   27  rm Anaconda3-2023.09-0-Linux-x86_64.sh 
+   29  conda install -c conda-forge mamba
+   42  conda -V
+  102  conda env list
+  156  conda env create -f ccount.yaml 
+  157  mamba env create -f ccount.yaml 
+  169  mamba
+  185  conda env list
+  186  conda env create -n ccount
+  187  conda create -n ccount
+  188  mamba
+  189  mamba install -c anaconda pandas scikit-image scikit-learn pillow cmake
+  190  mamba install -c anaconda pandas
+  191  mamba
+  192  conda install -c conda-forge mamba
+  193  mamba install -c anaconda pandas scikit-image scikit-learn pillow cmake
+  194  mamba install -c anaconda pandas scikit-image scikit-learn
+  195  conda deactivate
+  196  conda update conda --all
+  197  conda create -n mamba python=3.11
+  198  conda activate mamba
+  199  conda install -c conda-forge mamba
+  200  mamba install -c anaconda pandas scikit-image scikit-learn pillow cmake
+  201  mamba install -y -c bioconda -c conda-forge snakemake=7.32.4
+  202  mamba install -y -c bioconda -c conda-forge tensorflow keras
+  203  mamba install -y -c bioconda -c conda-forge tensorflow 
+  214  mamba install -y -c bioconda -c conda-forge -c anaconda aicsimageio
+  220  mamba install -y -c bioconda -c conda-forge scikit-learn-intelex
+  221  mamba install -y -c bioconda -c conda-forge tensorflow=2.12.0 keras
+  222  history |grep mamba > txt
+  224  mamba install -y -c bioconda -c conda-forge tensorflow=2.12
+  226  mamba install -c anaconda  pillow
+  227  mamba install -c anaconda  cmake
+  228  conda install -c nvidia cuda-toolkit
+  229  mamba install -c nvidia cuda-toolkit
+  230  mamba install -y -c bioconda -c conda-forge tensorflow=2.12
+  244  conda env list
+  245  conda activate mamba
+  248  history |grep conda > conda.txt
+  249  history |grep mamba|conda > conda.txt
+  250  less conda.txt 
+  251  history |grep 'mamba | conda' > conda.txt
+  252  less conda.txt 
+  253  history |grep 'mamba|conda' > conda.txt
+  254  less conda.txt 
+  255  history |egrep -h 'mamba|conda' > conda.txt
+  256  less conda.txt 
+  257  rm conda.txt 
+  272  history |egrep -h 'mamba|conda' > oak.install.txt
