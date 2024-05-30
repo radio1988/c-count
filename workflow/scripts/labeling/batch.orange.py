@@ -1,4 +1,4 @@
-import re, os
+import re, os, sys
 
 
 def file_exists_safe(path):
@@ -19,13 +19,11 @@ def file_exists_safe(path):
     return False
 
 
-img_dir = '../1_ashley_label_img'
-czi_dir = '../czi'
-npy_dir = '../npy'
+img_dir =  sys.argv[1]  # '../1_ashley_label_img'
+czi_dir = sys.argv[2]  # '../czi'
+npy_dir = sys.argv[3]  # '../npy'  # locs for img-labeled
 
 files = os.listdir(img_dir)
-
-
 
 for file in files:
     if file.endswith('gz.jpg'):
@@ -43,6 +41,6 @@ for file in files:
             czi_path = os.path.join(czi_dir, czi_file)
             npy_path = os.path.join(npy_dir, npy_file)
             if file_exists_safe(img_path) and file_exists_safe(czi_path) and file_exists_safe(npy_path):
-                print("python jgp2npy.orange.py {} {} {} {} &> {}".format(img_path, czi_path, npy_path, I, log))
+                print("python jpg2npy.orange.py {} {} {} {} &> {}".format(img_path, czi_path, npy_path, I, log))
             else:
                 print(img_path, czi_path, npy_path)
