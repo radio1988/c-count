@@ -32,7 +32,7 @@ def visualize_blob_detection(image, blob_locs,
     ax.imshow(image, 'gray')
 
     print("blob shape:", blob_locs.shape)
-    if blob_locs.shape[1] > 4:
+    if blob_locs.shape[1] >= 4:
         ax.set_title('Visualizing blobs:\n\
             Red: Yes, Blue: No, Green: Others')
         labels = blob_locs[:,3]
