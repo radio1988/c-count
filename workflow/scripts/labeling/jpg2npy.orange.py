@@ -271,6 +271,7 @@ os.makedirs('labeled_npy', exist_ok=True)
 os.makedirs('labeled_npy/jpg', exist_ok=True)
 os.makedirs('labeled_npy/log', exist_ok=True)
 
-crops_stat(crops_new)
+count = crops_stat(crops_new)
+print(count)
 save_locs(crops_new, 'labeled_npy/' + corename + '.npy.gz')
 visualize_blob_detection(czi_img, crops_new, fname='labeled_npy/jpg/' + corename + '.jpg')
