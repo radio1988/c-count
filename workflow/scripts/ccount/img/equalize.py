@@ -2,17 +2,14 @@ import warnings
 from skimage import exposure
 import numpy as np
 
-
-
 def equalize(image):
     '''
     input: image: 2d-array
     output: image: 2d-array, 0 black, 1 white
     Contrast Limited Adaptive Histogram Equalization (CLAHE).
-    An algorithm for local contrast enhancement, that uses histograms computed over different tile regions of the image. Local details can therefore be enhanced even in regions that are darker or lighter than most of the image.
+    An algorithm for local contrast enhancement, that uses histograms computed over different tile regions of the image.
+    Local details can therefore be enhanced even in regions that are darker or lighter than most of the image.
     '''
-
-
     warnings.filterwarnings("ignore")
     return exposure.equalize_adapthist(image, clip_limit=0.01)  # Aug, 2019, cleaner image than 0.03
 
@@ -24,7 +21,6 @@ def block_equalize(image, block_height=2048, block_width=2048):
     stitch and return
     '''
     image_equ = np.empty(image.shape)
-
     if block_width <= 0:
         return equalize(image)
 
