@@ -3,12 +3,13 @@ import os
 from scripts.ccount.snake.input_names import input_names
 from scripts.ccount.snake.get_samples import get_samples
 
-DATA_DIR=config["DATA_DIR"]
-FORMAT=config["FORMAT"]
-WEIGHT=config["WEIGHT"]
-WKDIR=os.getcwd()
+DATA_DIR = config["DATA_DIR"]
+FORMAT = config["FORMAT"]
+WEIGHT = config["WEIGHT"]
+WKDIR = os.getcwd()
 
-SAMPLES=get_samples(DATA_DIR)
+SAMPLES = get_samples(DATA_DIR)
+
 # I=[1,2,3,4]
 
 rule targets:
@@ -23,8 +24,8 @@ rule targets:
         #                          suffix=".crops.clas.npy.gz"),
         count_file='res/COUNT.csv',
         area1_agg="res/areas.csv",
-        view_clas_on_image=input_names(prefix="res/classification1/", SAMPLES=SAMPLES,
-                                       suffix=".crops.clas.npy.gz.jpg")
+        view_clas_on_image=input_names(prefix="res/classification1/",SAMPLES=SAMPLES,
+            suffix=".crops.clas.npy.gz.jpg")
 
 rule czi2img:
     input:
@@ -43,13 +44,13 @@ rule czi2img:
         """
         python workflow/scripts/czi2img.py -i {input} -c config.yaml -odir res/img &> {log}
         """
-    
+
 rule blob_detection:
     input:
         "data/{s}.czi"
     output:
-        touch("log/blob_locs/{s}.done"), 
-        #"res/blob_locs/{s}.{i}.crops.npy.gz"
+        touch("log/blob_locs/{s}.done"),
+    #"res/blob_locs/{s}.{i}.crops.npy.gz"
     threads:
         1
     resources:
@@ -69,13 +70,13 @@ rule blob_cropping:
     input:
         czi='data/{s}.czi',
         blob_locs_flag="log/blob_locs/{s}.done",
-        #blob_locs="res/blob_locs/{s}.{i}.crops.npy.gz"
+    #blob_locs="res/blob_locs/{s}.{i}.crops.npy.gz"
     output:
         temp('res/blob_crops/{s}.{i}.crops.npy.gz')
     threads:
         1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 16000 # todo: how much
+        mem_mb=lambda wildcards, attempt: attempt * 16000  # todo: how much
     log:
         'log/blob_crops/{s}.{i}.crops.npy.gz.log'
     benchmark:
@@ -92,14 +93,15 @@ rule classification:
         blob_crops='res/blob_crops/{s}.{i}.crops.npy.gz',
         weight=WEIGHT
     output:
-        npy=temp("res/classification1/{s}.{i}.crops.clas.npy.gz"),
+        crops=temp("res/classification1/{s}.{i}.crops.clas.npy.gz"),
+        locs=temp("res/classification1/{s}.{i}.locs.clas.npy.gz"),
         txt="res/classification1/{s}.{i}.crops.clas.txt"
     threads:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 8000
     log:
-        "log/classification1/{s}.{i}.log" # todo: log deleted if job fail
+        "log/classification1/{s}.{i}.log"  # todo: log deleted if job fail
     benchmark:
         "log/classification1/{s}.{i}.benchmark"
     shell:
@@ -112,7 +114,7 @@ rule classification:
 
 rule aggr_count:
     input:
-        input_names(SAMPLES=SAMPLES, prefix="res/classification1/", suffix=".crops.clas.txt")
+        input_names(SAMPLES=SAMPLES,prefix="res/classification1/",suffix=".crops.clas.txt")
     output:
         "res/COUNT.csv"
     threads:
@@ -173,7 +175,7 @@ rule view_clas_on_image:
 
 rule area_calculation:
     input:
-	    'res/classification1/pos/{s}.{i}.crops.clas.npy.gz'
+        'res/classification1/pos/{s}.{i}.crops.clas.npy.gz'
     output:
         txt='res/classification1/pos/area/{s}.{i}.area.txt',
         npy='res/classification1/pos/area/{s}.{i}.area.npy.gz'
@@ -195,8 +197,8 @@ rule area_aggregation:
     Will aggreated all files under res/classification1/area, regardless of config.yaml
     '''
     input:
-        input_names(SAMPLES=SAMPLES, 
-                    prefix="res/classification1/pos/area/", suffix=".area.txt")
+        input_names(SAMPLES=SAMPLES,
+            prefix="res/classification1/pos/area/",suffix=".area.txt")
     output:
         "res/areas.csv"
     log:
