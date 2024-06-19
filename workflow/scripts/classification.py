@@ -3,7 +3,7 @@ from ccount.img.equalize import equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
 
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_crops, load_locs, save_crops, save_locs
 from ccount.blob.mask_image import mask_image
 from ccount.blob.misc import crops_stat, parse_crops, crop_width
 
@@ -104,10 +104,10 @@ positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 # Save 
 print("Saving classifications..")
 crops[:, 3] = classifications
-crops = crops[:, 0:4]
 crops_stat(crops)
-npy_name = args.output.replace('.gz', '')
-np.save(npy_name, crops) #xxx.npy
-os.system('gzip  -f ' + npy_name)
+
+save_locs(crops, args.output.replace('crops','locs'))  #todo: fix potential name bug in non-workflow situations
+save_crops(crops, args.output)
+
 txt_name = args.output.replace('.npy.gz', '.txt')
 np.savetxt(txt_name, classifications.astype(int), fmt='%d')
