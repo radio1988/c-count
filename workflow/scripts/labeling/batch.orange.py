@@ -19,7 +19,7 @@ def file_exists_safe(path):
     return False
 
 
-img_dir =  sys.argv[1]  # '../1_ashley_label_img'
+img_dir = sys.argv[1]  # '../1_ashley_label_img'
 czi_dir = sys.argv[2]  # '../czi'
 npy_dir = sys.argv[3]  # '../npy'  # locs for img-labeled
 
