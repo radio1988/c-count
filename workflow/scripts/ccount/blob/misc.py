@@ -48,21 +48,23 @@ def crops_stat(crops):
     :param crops:
     :return:
     '''
-    if crops.shape[1] >3:
+    if crops.shape[1] > 3:
+        [yes, no, uncertain, unlabeled] = [
+            sum(crops[:, 3] == 1), sum(crops[:, 3] == 0),
+            sum(crops[:, 3] == 3), sum(crops[:, 3] == 5)]
         print("{} Yes, {} No, {} Uncertain, {} Unlabeled".format(
-            sum(crops[:, 3] == 1),
-            sum(crops[:, 3] == 0),
-            sum(crops[:, 3] == 3),
-            sum(crops[:, 3] == 5),))
+            yes, no, uncertain, unlabeled))
+    else:
+        raise Exception("Crops does not contain label column")
     print("Total:", crops.shape[0])
-
+    return {'yes':yes, "no":no, 'uncertain':uncertain, 'unlabeled':unlabeled}
 
 def crop_width(image_flat_crops):
     from math import sqrt
-    if image_flat_crops.shape[1] == 3:
+    if image_flat_crops.shape[1] <= 6 + 4:
         raise Exception ('this file is locs file, not crops file')
-    return  int(sqrt(image_flat_crops.shape[1] - 6) / 2)
-
+    else:
+        return  int(sqrt(image_flat_crops.shape[1] - 6) / 2)
 
 
 def parse_crops(crops):
