@@ -10,8 +10,6 @@ WKDIR = os.getcwd()
 
 SAMPLES = get_samples(DATA_DIR)
 
-# I=[1,2,3,4]
-
 rule targets:
     input:
         # czi2img=expand("log/img/{s}.done", s=SAMPLES), # skipped, clas vis more helpful
@@ -25,7 +23,9 @@ rule targets:
         count_file='res/COUNT.csv',
         area1_agg="res/areas.csv",
         view_clas_on_image=input_names(prefix="res/classification1/",SAMPLES=SAMPLES,
-            suffix=".crops.clas.npy.gz.jpg")
+            suffix=".crops.clas.npy.gz.jpg"),
+        blob_locs=expand("res/classification1/{s}.{i}.locs.clas.npy.gz",s=SAMPLES,i=[0, 1, 2, 3]),
+        rulegraph="rulegraph.pdf"
 
 rule czi2img:
     input:
@@ -94,7 +94,7 @@ rule classification:
         weight=WEIGHT
     output:
         crops=temp("res/classification1/{s}.{i}.crops.clas.npy.gz"),
-        locs=temp("res/classification1/{s}.{i}.locs.clas.npy.gz"),
+        locs="res/classification1/{s}.{i}.locs.clas.npy.gz",
         txt="res/classification1/{s}.{i}.crops.clas.txt"
     threads:
         1
@@ -108,7 +108,7 @@ rule classification:
         """
         python workflow/scripts/classification.py  \
         -crops {input.blob_crops} -weight {input.weight} \
-        -config config.yaml -output {output.npy} &> {log}
+        -config config.yaml -output {output.crops} &> {log}
         """
 
 
@@ -256,3 +256,17 @@ rule view1:
         jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
         --output {params.html} &> {log}
         """
+
+rule Create_DAG:
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1000,
+    threads:
+        1
+    output:
+        dag="workflow.pdf",
+        rulegraph="rulegraph.pdf"
+    log:
+        "log/rulegraph.log"
+    shell:
+        "snakemake --dag targets |dot -Tpdf > {output.dag} 2> {log};"
+        "snakemake --rulegraph targets | dot -Tpdf > {output.rulegraph} 2>> {log}"
