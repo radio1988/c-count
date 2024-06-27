@@ -8,6 +8,10 @@ from ccount.blob.plot import visualize_blob_detection, visualize_blob_compare
 from ccount.blob.misc import crops_stat
 
 
+"""
+this is obsolete, just for archive
+"""
+
 def read_colored_jpg(image_path):
     """
     Reads a JPG image and returns it as a colored PIL image object.
