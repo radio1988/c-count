@@ -6,7 +6,7 @@ DATA_DIR: data/  # for czi files
 FORMAT: 2019 # 2019
 I: [1,2,3,4] # all valid index options for czi file
 
-WEIGHT: ~/ccount/ccount/resources/weights/FL_PFA/BM_FL_PFA.231012.hdf5
+WEIGHT: weight/weight.hdf5
 
 ## Advanced params ##
 # (Please don't change unless you're developer)
