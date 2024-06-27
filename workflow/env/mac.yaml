@@ -25,6 +25,7 @@ dependencies:
   - scikit-image
   - imgaug
   - aicsimageio
+  - graphviz
   - pip:
      - tensorflow-macos
      - tensorflow-metal
