@@ -7,6 +7,7 @@ def load_locs(fname):
     '''
     assuming reading fname.locs.npy.gz
     read into np.array
+    can also read crops without giving statistics
     '''
     if os.path.isfile(fname):
         if fname.endswith('npy'):

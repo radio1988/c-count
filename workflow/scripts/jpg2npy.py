@@ -253,7 +253,9 @@ else:
     czi_file = sys.argv[2]  # czi (raw img), e.g. '1unitEpo_1-Stitching-01.1.crops.clas.npy.gz.jpg'
     npy_file = sys.argv[3]  # locs or crops file (locs corresponding to circles in jpg-labeled), e.g. '../npy/1unitEpo_1-Stitching-01.1.crops.clas.npy.gz'
     I = sys.argv[4]  # [0,1,2,3] the index for czi files
-    corename = sys.argv[5]  # for outname, e.g. '1unitEpo_1-Stitching-01.1'
+    outname = sys.argv[5]  # for outname, e.g. '1unitEpo_1-Stitching-01.1.npy.gz'
+    if not outname.endswith('npy.gz'):
+        raise Exception ("outname has to end with npy.gz")
 
 # read czi
 czi = read_czi(czi_file)
@@ -311,18 +313,17 @@ for i in range(len(npy_based_locs)):
             npy_label = npy_based_locs[i][3]
             print("\nnpy_label:", npy_label)
 
-
-os.makedirs('labeled_npy', exist_ok=True)
-os.makedirs('labeled_npy/jpg', exist_ok=True)
-os.makedirs('labeled_npy/log', exist_ok=True)
-
 stats_dot = crops_stat(dot_based_locs)
 print("dot based stats:", stats_dot)
 #stats_cir = crops_stat(circle_based_locs)
 #print("circle based stats:", stats_cir)
-stats_npy = crops_stat(npy_based_locs)
-print("npy based stats:", stats_npy)
+
+if npy_based_locs.shape[1] > 3:
+    stats_npy = crops_stat(npy_based_locs)
+    print("npy based stats:", stats_npy)
 
 
-save_locs(dot_based_locs, 'labeled_npy/' + corename + '.npy.gz')
-visualize_blob_detection(czi_img, dot_based_locs, fname='labeled_npy/jpg/' + corename + '.jpg')
+outdir = os.path.dirname(outname)
+os.makedirs(outdir, exist_ok=True)
+save_locs(dot_based_locs,  outname)
+visualize_blob_detection(czi_img, dot_based_locs, fname=outname.replace(".npy.gz",".jpg"))
