@@ -1,5 +1,3 @@
-
-
 rule jpg2locs:
     """
     900M RAM usage on Mac

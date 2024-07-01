@@ -3,6 +3,10 @@ import os
 from scripts.ccount.snake.input_names import input_names
 from scripts.ccount.snake.get_samples import get_samples
 
+"""
+COUNT
+"""
+
 DATA_DIR = config["DATA_DIR"]
 FORMAT = config["FORMAT"]
 WEIGHT = config["WEIGHT"]

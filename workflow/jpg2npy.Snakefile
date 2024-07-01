@@ -58,4 +58,4 @@ rule targets:
 
 
 
-include: 'rules/jpg2locs.smk'
+include: 'rules/jpg2locs.smk'  # 900M RAM usage for each job

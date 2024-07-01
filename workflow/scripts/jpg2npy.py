@@ -21,9 +21,17 @@ Args:
 Process:
 - Read czi, get scene for the index
 - Find circles with x,y,r from locs file
-- Look for color inside the cicles
+- Look for color inside the cicles (has orange dot or not, one pixel is good enough)
 - if orange, mark pos, else, no
 - save results in locs file (x,y,r,L)
+
+Params:
+- Orange:
+        red > 200 and green > 70 and blue < 20 and red > green * 1.4
+        # ashley: color_inside: (210, 86, 16)
+        # logan: color_inside: (243, 151, 14)
+        # john: color_inside: (248, 151, 12)
+
 
 Returns:
 - locs file (x,y,r,L)
@@ -291,12 +299,13 @@ for i in range(len(npy_based_locs)):
     x = int(npy_based_locs[i][1] * scale)  # max x: 10616
     r = int((npy_based_locs[i][2] * 1.4 + 10) * scale + 1)  # expanded as usual x1.4 and +10
 
-    # look at color of the circle
+    # look at color OF the circle
     colors = find_unique_colors_at_circle(img, x, y, r)  # find the color of the circle (r to r-5)
     max_color, C = find_dominant_color(colors)
-    circle_label = int(D[max_color])  # label read from circle in jpg
+    circle_label = D[max_color]  # label read from circle in jpg, 0, 1, None
 
-    # look at the color of the dot in the circle
+
+    # look at the color of the dot IN the circle
     colors_inside = find_unique_colors_in_circle(img, x, y, r)
     dot_label = 0
     for color_inside in colors_inside:

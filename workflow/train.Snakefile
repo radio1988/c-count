@@ -1,3 +1,8 @@
+"""
+Train
+"""
+
+
 import os
 
 configfile: "config.data_curve.yaml"
