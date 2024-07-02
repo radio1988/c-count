@@ -14,16 +14,16 @@ usage: python jpg2npy.py <labeled.jpg> <image.czi> <all_locs.npy.gz> <index> <ou
 Args:
 - labeled.jpg (str): images with user labeled orange dots in the circles
 - image.czi (str): raw image with four scenes 
-- all_loc.npy.gz: loc file with x,y,r saved or x,y,r,L saved. all locs will be scanned for label dots inside the circle
+- all_loc.npy.gz: loc file with y,x,r saved or y,x,r,L saved. all locs will be scanned for label dots inside the circle
 - index: scene index [0, 1, 2, 3]
 - outname: prefix for outputs, e.g. sample1
 
 Process:
 - Read czi, get scene for the index
-- Find circles with x,y,r from locs file
+- Find circles with y,x,r from locs file
 - Look for color inside the cicles (has orange dot or not, one pixel is good enough)
 - if orange, mark pos, else, no
-- save results in locs file (x,y,r,L)
+- save results in locs file (y,x,r,L)
 
 Params:
 - Orange:
@@ -34,7 +34,7 @@ Params:
 
 
 Returns:
-- locs file (x,y,r,L)
+- locs file (y,x,r,L)
 
 Example:
 under ccount/workflow/scripts/test/jpg2npy/
@@ -273,9 +273,9 @@ czi_img = parse_image_obj(czi, I)  # czi_img.shape (8635, 10620) (h,w); 10620/86
 npy_based_locs = load_locs(npy_file)  # either crops or locs are converted to locs
 
 if npy_based_locs.shape[1] > 3:
-    npy_based_locs = npy_based_locs[:, 0:4]  # x,y,r,L
+    npy_based_locs = npy_based_locs[:, 0:4]  # y,x,r,L
 else:
-    npy_based_locs = npy_based_locs[:, 0:3]  # x,y,r
+    npy_based_locs = npy_based_locs[:, 0:3]  # y,x,r
 
 dot_based_locs = npy_based_locs.copy()
 dot_based_locs = dot_based_locs[:, 0:3]  # remove labels

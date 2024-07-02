@@ -14,7 +14,7 @@ def parse_cmd_and_prep ():
                     help="output, e.g. merged.crops.npy.gz")
 
     args = parser.parse_args()
-    print("crops:", args.crops)
+    print("input-crops:", len(args.crops), args.crops)
     print("output:", args.output)
 
     odir=os.path.dirname(args.output)
@@ -32,5 +32,6 @@ for i, crop_name in enumerate(args.crops):
     else:
         print("Merging...")
         output_crops = np.vstack((output_crops, crops))
+        crops_stat(output_crops)
 
 save_crops(output_crops, args.output)

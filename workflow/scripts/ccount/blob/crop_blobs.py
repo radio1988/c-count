@@ -8,9 +8,9 @@ def pad_with(vector, pad_width, iaxis, kwargs):
     return vector
 
 
-def crop_blobs(blobs, image, label = 5, area=0, place_holder=0, crop_width=80):
+def crop_blobs(locs, image, area=0, place_holder=0, crop_width=80):
     '''
-    input1: blobs, blob info [n, 0:3], [y, x, r]
+    input1: locs [n, 0:3], [y, x, r] or labels [n, 0:4], [y, x, r, L]
     input2: image, corresponding image
     plt: cropped images
     return: cropped padded images in a flattened 2d-array, with meta data in the first 6 numbers
@@ -21,17 +21,19 @@ def crop_blobs(blobs, image, label = 5, area=0, place_holder=0, crop_width=80):
     '''
     import numpy as np
 
-    # White padding so that blobs on the edge can get cropped image
+    # White padding so that locs on the edge can get cropped image
     padder = max(np.max(image), 1)
     padded = np.pad(image, crop_width, pad_with, padder=padder)  # 1 = white padding, 0 = black padding
 
     # crop for each blob
-    #flat_crops = np.empty((0, int(6 + 2 * crop_width * 2 * crop_width)))
-    L = []
-    n_total = blobs.shape[0]
-    for i, blob in enumerate(blobs):
+    crops = []
+    for i, blob in enumerate(locs):
         y, x, r = blob[0:3]  # conter-intuitive order
-        #print("cropping blob {}/{}  x:{} y:{} r:{}".format(i, n_total, x, y, r))
+
+        if locs.shape[1] > 3:
+            L = blob[3]
+        else:
+            L = -1  # unlabeled
         y_ = int(y + crop_width)
         x_ = int(x + crop_width)  # adj for padding
 
@@ -41,7 +43,7 @@ def crop_blobs(blobs, image, label = 5, area=0, place_holder=0, crop_width=80):
 
         flat_crop = np.insert(
             cropped_img.flatten(), [0, 0, 0, 0, 0, 0], 
-            [y, x, r, label, area, place_holder])  # -1 unlabeled
-        L.append(flat_crop)
-    return np.array(L)
+            [y, x, r, L, area, place_holder])  # -1 unlabeled
+        crops.append(flat_crop)
+    return np.array(crops)
 

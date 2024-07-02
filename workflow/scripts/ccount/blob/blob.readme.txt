@@ -13,6 +13,6 @@ flat_crop/blob_crop/crop: flat of crop
 
 image: image of crop (2d array)
 
-blob_locs: meta part of a blob, shape: n-blobs x [x,y,r]
+blob_locs: meta part of a blob, shape: n-blobs [y,x,r], or [y,x,r,L]
 
 

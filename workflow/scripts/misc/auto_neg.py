@@ -62,7 +62,7 @@ print('pos_loc_file:', pos_loc_file, exists(pos_loc_file))
 out_name = './auto_neg/' + name + '.labeled.npy.gz'
 
 # READ DATA
-pos_locs = load_locs(pos_loc_file)  # contains x,y,z in the first 3 columns
+pos_locs = load_locs(pos_loc_file)  # contains y,x,r in the first 3 columns
 
 czi = read_czi(czi_file)  # image array of 4 scanned areas
 image = parse_image_obj(czi, i=image_index)  # one of the scanned areas, takes 30s to load
@@ -76,7 +76,7 @@ from ccount.blob.intersect import setdiff_blobs
 all_loc_file =  './res/blob_locs/' + name + '.locs.npy.gz' # pos and neg, to autocreate negs
 print('all_loc_file:', all_loc_file, exists(all_loc_file))
 
-all_locs = load_locs(all_loc_file)  # contains x,y,z in the first 3 columns
+all_locs = load_locs(all_loc_file)  # contains y,x,r in the first 3 columns
 all_locs.shape
 
 auto_neg_locs = setdiff_blobs(all_locs, pos_locs)

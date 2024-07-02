@@ -1,14 +1,21 @@
+"""
+reads czi, locs.npy.gz, config.yaml
+outputs crops.npy.gz
+"""
+
 from ccount.img.read_czi import read_czi, parse_image_obj
 from ccount.img.auto_contrast import uint16_image_auto_contrast
 
 from ccount.blob.crop_blobs import crop_blobs
 from ccount.blob.io import save_crops, load_locs
+from ccount.blob.misc import crops_stat
+
 
 from pathlib import Path
 import argparse, os, re, matplotlib, subprocess, yaml
 
 
-def parse_cmd_and_prep ():
+def parse_cmd_and_prep():
     # ARGS
     parser = argparse.ArgumentParser(
         description='''\
@@ -18,15 +25,15 @@ def parse_cmd_and_prep ():
         -locs res/blob_locs/IL17A_POINT1_EPO_1.0.locs.npy.gz -i 0 
         -config config.yaml -o res/blob_crops/IL17A_POINT1_EPO_1.0.crops.npy.gz''')
     parser.add_argument('-czi', type=str,
-        help='czi file name: path/xxx.czi')
-    parser.add_argument('-locs', type=str, default="path/blobs.locs.npy.gz", 
-        help='blob_locs file name, in npy.gz format')
+                        help='czi file name: path/xxx.czi')
+    parser.add_argument('-locs', type=str, default="path/blobs.locs.npy.gz",
+                        help='blob_locs file name, in npy.gz format')
     parser.add_argument('-i', type=int,
-        help='area index, e.g. 1,2,3,4')
+                        help='area index, e.g. 1,2,3,4')
     parser.add_argument('-config', type=str,
-        help='path/config.yaml')
+                        help='path/config.yaml')
     parser.add_argument('-o', type=str, default="path/blobs.crops.npy.gz",
-        help='outfname, in npy.gz format')
+                        help='outfname, in npy.gz format')
 
     args = parser.parse_args()
     print('czi fname:', args.czi)
@@ -44,19 +51,19 @@ def parse_cmd_and_prep ():
     return [args, corename, config]
 
 
-
-##################Start####################
 [args, corename, config] = parse_cmd_and_prep()
 
+print("\nreading image:")
 image_obj = read_czi(args.czi, Format=config['FORMAT'])  # fast already
 image = parse_image_obj(image_obj, i=args.i, Format=config['FORMAT'])
 image = uint16_image_auto_contrast(image)
 print('image.shape:', image.shape)
 
+print("\nreading locs:")
 blob_locs = load_locs(args.locs)
-print('blob_locs.shape:', blob_locs.shape)
 
+print('\ncropping from image and locs:')
 image_flat_crops = crop_blobs(blob_locs, image, crop_width=config['crop_width'])
-print('blob_crops.shape:', image_flat_crops.shape)
+crops_stat(image_flat_crops)
 
 save_crops(image_flat_crops, args.o)
