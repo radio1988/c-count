@@ -8,6 +8,7 @@ def load_locs(fname):
     assuming reading fname.locs.npy.gz
     read into np.array
     can also read crops without giving statistics
+    x,y,z,L,crop-flatten
     '''
     if os.path.isfile(fname):
         if fname.endswith('npy'):
@@ -18,6 +19,10 @@ def load_locs(fname):
         else:
             raise Exception("suffix not npy nor npy.gz")
         print(fname, array.shape)
+        if array.shape[1] > 3:  # if with label
+            crops_stat(array)
+        if array.shape[1] > 4:
+            print("n-crop: {}, crop width: {}".format(len(array), crop_width(array)))
         return array
     else:
         raise Exception('input file', fname, 'not found')
@@ -25,42 +30,27 @@ def load_locs(fname):
 
 def load_crops(in_db_name):
     '''
-    use parameters: db_name
-    input: db fname from user (xxx.npy)
-    output: array (crops format)
+    alias for load_locs
     '''
     image_flat_crops = load_locs(in_db_name)
-
-    if (image_flat_crops.shape[1] > 3):  # with label
-        crops_stat(image_flat_crops)
-
-    if (image_flat_crops.shape[1] > 4 + 4):
-        print("n-crop: {}, crop width: {}". \
-              format(len(image_flat_crops), crop_width(image_flat_crops)))
-
     return image_flat_crops
-
-
-def save_crops(crops, fname):
-    from .misc import crops_stat, crop_width
-    from pathlib import Path
-    print("Saving crops:", fname)
-    Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
-    crops_stat(crops)
-    print('dim:', crops.shape)
-    print('width:', crop_width(crops))
-    fname = fname.replace(".npy.gz", ".npy")
-    np.save(fname, crops)
-    subprocess.run("gzip -f " + fname, shell=True, check=True)
 
 
 def save_locs(crops, fname):
     from .misc import crops_stat, crop_width
     from pathlib import Path
     crops = crops[:, 0:4]
-    print("Saving locs:", fname)
     Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
     print('dim:', crops.shape)
+    if crops.shape[1] > 4:
+        print('width:', crop_width(crops))
+        print("Saving crops:", fname)
+    else:
+        print("Saving locs:", fname)
     fname = fname.replace(".npy.gz", ".npy")
     np.save(fname, crops)
     subprocess.run("gzip -f " + fname, shell=True, check=True)
+
+
+def save_crops(crops, fname):
+    save_locs(crops, fname)
