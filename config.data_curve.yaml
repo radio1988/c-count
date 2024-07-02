@@ -1,5 +1,0 @@
-DATA_TRAIN: npy/run4_BM_FL_PFA.ruiV1.npy.gz
-DATA_VAL: npy/PFA.ruiv1.realistic.val.npy.gz
-#sampling_rates: [.00625, .0125, .025, .05, .1, .2, .4, .8, 1.0]
-sampling_rates: [.25, .5, 1.0]
-CCOUNT_CONFIG: config.yaml

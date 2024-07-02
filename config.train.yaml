@@ -1,0 +1,4 @@
+DATA_TRAIN: data/npy/ashley.bm200717.0.8.npy.gz
+DATA_VAL: data/npy/ashley.bm200717.0.2.npy.gz
+sampling_rates: [.125, .25, .5, 1.0]
+CCOUNT_CONFIG: config.yaml

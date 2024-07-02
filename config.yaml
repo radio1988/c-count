@@ -1,7 +1,7 @@
 ## User params ## 
 # data curve patience5, augmentation 80k
 
-DATA_DIR: data/  # for czi files
+DATA_DIR: data/czi  # for czi files
 
 FORMAT: 2019 # 2019
 I: [1,2,3,4] # all valid index options for czi file

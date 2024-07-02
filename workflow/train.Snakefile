@@ -5,7 +5,7 @@ Train
 
 import os
 
-configfile: "config.data_curve.yaml"
+configfile: "config.train.yaml"
 
 WKDIR=os.getcwd()
 DATA_TRAIN=config['DATA_TRAIN']

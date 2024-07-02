@@ -37,9 +37,24 @@ def load_crops(in_db_name):
 
 
 def save_locs(crops, fname):
+    """
+    if crop, trim to xyrL then save locs
+    """
     from .misc import crops_stat, crop_width
     from pathlib import Path
-    crops = crops[:, 0:4]
+    if crops.shape[1] > 4:
+        crops = crops[:, 0:4]
+    Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
+    print('dim:', crops.shape)
+    fname = fname.replace(".npy.gz", ".npy")
+    print("Saving locs:", fname)
+    np.save(fname, crops)
+    subprocess.run("gzip -f " + fname, shell=True, check=True)
+
+
+def save_crops(crops, fname):
+    from .misc import crops_stat, crop_width
+    from pathlib import Path
     Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
     print('dim:', crops.shape)
     if crops.shape[1] > 4:
@@ -50,7 +65,3 @@ def save_locs(crops, fname):
     fname = fname.replace(".npy.gz", ".npy")
     np.save(fname, crops)
     subprocess.run("gzip -f " + fname, shell=True, check=True)
-
-
-def save_crops(crops, fname):
-    save_locs(crops, fname)
