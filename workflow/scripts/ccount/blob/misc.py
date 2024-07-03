@@ -58,8 +58,7 @@ def crops_stat(crops):
             yes, no, uncertain, artifact, unlabeled))
     else:
         raise Exception("Crops does not contain label column")
-    print("Total:", crops.shape[0])
-    return {'yes': yes, "no": no, 'uncertain': uncertain, 'unlabeled': unlabeled}
+    return {'yes': yes, "no": no, 'uncertain': uncertain, 'artifact': artifact, 'unlabeled': unlabeled}
 
 
 def crop_width(image_flat_crops):
