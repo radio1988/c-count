@@ -207,6 +207,8 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1.4, blob_extention_radius=10
     else:
         plt.show()
 
+    plt.close('all')
+
     return image
 
 
