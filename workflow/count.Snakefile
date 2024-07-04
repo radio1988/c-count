@@ -272,5 +272,5 @@ rule Create_DAG:
     log:
         "log/rulegraph.log"
     shell:
-        "snakemake --dag targets |dot -Tpdf > {output.dag} 2> {log};"
-        "snakemake --rulegraph targets | dot -Tpdf > {output.rulegraph} 2>> {log}"
+        "snakemake -s workflow/count.Snakefile --dag targets |dot -Tpdf > {output.dag} 2> {log};"
+        "snakemake -s workflow/count.Snakefile  --rulegraph targets | dot -Tpdf > {output.rulegraph} 2>> {log}"
