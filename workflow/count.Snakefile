@@ -33,7 +33,7 @@ rule targets:
 
 rule czi2img:
     input:
-        "data/{s}.czi"
+        os.path.join(config['DATA_DIR'], "{s}.czi")
     output:
         touch("log/img/{s}.done")
     threads:
@@ -51,7 +51,7 @@ rule czi2img:
 
 rule blob_detection:
     input:
-        "data/{s}.czi"
+        os.path.join(config['DATA_DIR'], "{s}.czi")
     output:
         touch("log/blob_locs/{s}.done"),
     #"res/blob_locs/{s}.{i}.crops.npy.gz"
@@ -72,7 +72,7 @@ rule blob_detection:
 
 rule blob_cropping:
     input:
-        czi='data/{s}.czi',
+        czi=os.path.join(config['DATA_DIR'], "{s}.czi"),
         blob_locs_flag="log/blob_locs/{s}.done",
     #blob_locs="res/blob_locs/{s}.{i}.crops.npy.gz"
     output:
@@ -156,7 +156,7 @@ rule filter_crops:
 rule view_clas_on_image:
     input:
         crop="res/classification1/{s}.{i}.crops.clas.npy.gz",
-        czi="data/{s}.czi"
+        czi=os.path.join(config['DATA_DIR'], "{s}.czi")
     output:
         "res/classification1/{s}.{i}.crops.clas.npy.gz.jpg"
     threads:
