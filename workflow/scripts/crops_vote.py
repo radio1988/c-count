@@ -55,8 +55,8 @@ binary2 = labels2b == 1
 binary_output = logical_and(binary1, binary2)
 label_output = [int(x) for x in binary_output]
 
-labels1b[:, 3] = label_output
+blobs1b[:, 3] = label_output
 # crops_stat(labels1b)
 
-save_crops(labels1b, outname)
+save_crops(blobs1b, outname)
 
