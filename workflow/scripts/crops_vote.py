@@ -39,24 +39,18 @@ name2 = sys.argv[2]  # label set B
 outname = sys.argv[3]
 
 blobs1 = load_crops(name1)
-print()
 blobs2 = load_crops(name2)
-print()
 
-blobs1b, blobs2b = intersect_blobs(blobs1, blobs2)
+labels1 = read_labels(blobs1)
+labels2 = read_labels(blobs2)
+precision, recall, F1 = F1_calculation(labels1, labels2)
 
-labels1b = read_labels(blobs1b)
-labels2b = read_labels(blobs2b)
-
-precision, recall, F1 = F1_calculation(labels1b, labels2b)
-
-binary1 = [x == 1 for x in labels1b]
-binary2 = labels2b == 1
+binary1 = [x == 1 for x in labels1]
+binary2 = [x == 1 for x in labels2]
 binary_output = logical_and(binary1, binary2)
 label_output = [int(x) for x in binary_output]
 
-blobs1b[:, 3] = label_output
-# crops_stat(labels1b)
+blobs1[:, 3] = label_output
 
-save_crops(blobs1b, outname)
+save_crops(blobs1, outname)
 
