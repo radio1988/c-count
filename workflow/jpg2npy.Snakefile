@@ -1,4 +1,6 @@
 import os
+from scripts.ccount.snake.input_names import input_names
+
 
 
 """
@@ -55,7 +57,8 @@ SAMPLES, SCENES = get_jpg_samples(INPUT_PATH)
 rule targets:
     input:
         label_locs=expand('res/label_locs/{scene}.label.npy.gz',scene=SCENES),
-        label_crops=expand('res/label_crops/{scene}.LABEL.npy.gz',scene=SCENES)
+        label_crops=expand('res/label_crops/{scene}.LABEL.npy.gz',scene=SCENES),
+        label_count="res/count.label.csv"
 
 
 rule jpg2locs:
@@ -69,19 +72,39 @@ rule jpg2locs:
     output:
         label_locs='res/label_locs/{sample}.{sceneIndex}.label.npy.gz'
     log:
-        'res/label_locs/{sample}.{sceneIndex}.log.txt'
+        'res/label_locs/{sample}.{sceneIndex}.label.npy.gz.txt'
     shell:
-        "python workflow/scripts/jpg2npy.py {input.jpg} {input.czi} {input.blob_locs} {wildcards.sceneIndex} {output.label_locs} &> {log}"
+        "python workflow/scripts/jpg2npy.py {input.jpg} {input.czi} {input.blob_locs} \
+        {wildcards.sceneIndex} {output.label_locs} &> {log}"
 
 rule locs2crops:
     input:
         label_locs='res/label_locs/{sample}.{sceneIndex}.label.npy.gz',
         czi="data/czi/{sample}.czi",
     output:
-        'res/label_crops/{sample}.{sceneIndex}.LABEL.npy.gz'
+        npy='res/label_crops/{sample}.{sceneIndex}.LABEL.npy.gz',
+        txt='res/label_crops/{sample}.{sceneIndex}.LABEL.npy.gz.txt'
     log:
-        'res/label_crops/{sample}.{sceneIndex}.LABEL.npy.gz.log.txt'
+        'res/label_crops/{sample}.{sceneIndex}.LABEL.npy.gz.log'
     shell:
         "python workflow/scripts/blob_cropping.py -czi {input.czi} -locs {input.label_locs} -i {wildcards.sceneIndex} \
-        -config config.yaml -o {output} &> {log}"
+        -config config.yaml -o {output.npy} > {output.txt} 2> {log}"
 
+
+rule aggr_label_count:
+    input:
+        input_names(SAMPLES=SAMPLES, prefix="res/label_locs/", suffix=".label.npy.gz.txt")
+    output:
+        "res/count.label.csv"
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1000
+    priority:
+        100
+    log:
+        "res/count.label.csv.log"
+    shell:
+        """
+        python workflow/scripts/aggr_label_count.py {input} {output} &> {log}
+        """
