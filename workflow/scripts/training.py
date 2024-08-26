@@ -74,14 +74,23 @@ def parse_cmd_and_prep ():
 
 
 def cleanup_crops(crops):
-    print("Removing unlabeled crops (label == 5)")
-    crops = crops[crops[:, 3] != 5, :]
+    print("Removing unlabeled crops (labelled as 5)")
+    unlabeled_idx = crops[:, 3] == 5
+    print('num unlabeled crops: {}'.format(sum(unlabeled_idx)))
+    crops = crops[~unlabeled_idx, :]
     crops_stat(crops)
 
-    print("Set other laberls as no (label == 3[uncertain],4[artifacts])")
+    print("Removing uncertain crops (labelled as 3)")
+    uncertain_idx = crops[:, 3] == 3  # uncertain
+    print('num uncertain crops: {}'.format(sum(uncertain_idx)))
+    crops = crops[~uncertain_idx, :]
+    crops_stat(crops)
+
     if config['numClasses'] == 2:
-        crops[crops[:, 3] == 3, 3] = 0  # uncertain
-        crops[crops[:, 3] == 4, 3] = 0  # artifacts, see ccount.blob.readme.txt
+        print("Set artifacts (labelled as 4) as NEG")
+        artifacts_idx = crops[:, 3] == 4
+        print('num artifacts: {}'.format(sum(artifacts_idx)))
+        crops[artifacts_idx, 3] = 0  # artifacts, see ccount.blob.readme.txt
         crops_stat(crops)
 
     return crops
@@ -102,7 +111,7 @@ print("Got {} training crops and {} validating crops".\
 
 if config['balancing']:
     print('Balancing for training split:')
-    train_crops = balance_by_duplication(train_crops)
+    train_crops = balance_by_duplication(train_crops, maxN=480000)  # balance so yes = maxN//2, no = maxN//2
     
 
 trainimages, trainlabels, trainrs = parse_crops(train_crops)
@@ -112,7 +121,7 @@ trainrs = trainrs * config['r_ext_ratio'] + config['r_ext_ratio']
 valrs = valrs * config['r_ext_ratio'] + config['r_ext_ratio']
 
 print("Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
-trainimages = augment_images(trainimages, config['aug_sample_size'])  # todo: augment to more samples
+trainimages, trainlabels, trainrs = augment_images(trainimages, trainlabels, trainrs, config['aug_sample_size'])
 
 ## match sample size of labels and rs with augmented images
 while trainrs.shape[0] < config['aug_sample_size']:
