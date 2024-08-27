@@ -6,7 +6,6 @@ from ccount.blob.io import load_crops, save_crops
 from ccount.blob.mask_image import mask_image
 from ccount.blob.misc import crops_stat, parse_crops, crop_width
 
-
 from ccount.clas.split_data import split_data
 from ccount.clas.balance_data import balance_by_duplication
 from ccount.clas.augment_images import augment_crops
@@ -17,21 +16,21 @@ import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
 
-
 from pyimagesearch.cnn.networks.lenet import LeNet
 from sklearn.model_selection import train_test_split
 from skimage.transform import rescale, resize, downscale_local_mean
 from tensorflow.keras.optimizers import Adam
-from keras.utils import to_categorical 
+from keras.utils import to_categorical
 from keras.preprocessing.image import ImageDataGenerator
 from collections import Counter
+
 
 # Show CPU/GPU info
 # from tensorflow.python.client import device_lib
 # print(device_lib.list_local_devices())
 
 
-def parse_cmd_and_prep ():
+def parse_cmd_and_prep():
     # Construct the argument parser and parse the arguments
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -44,18 +43,18 @@ def parse_cmd_and_prep ():
             -output trained/trained.hdf5
             '''))
     parser.add_argument("-crops_train", type=str,
-        help="labled blob-crops file for training, \
+                        help="labled blob-crops file for training, \
         e.g. labeled.train.npy.gz ")
     parser.add_argument("-crops_val", type=str,
-        help="labled blob-crops file for earlystop, \
+                        help="labled blob-crops file for earlystop, \
         e.g. labeled.validation.npy.gz")
     parser.add_argument("-config", type=str,
-        help="config file, e.g. config.yaml")
+                        help="config file, e.g. config.yaml")
     parser.add_argument("-output", type=str,
-        help="output weights file, e.g. resources/weights/trained.hdf5")
+                        help="output weights file, e.g. resources/weights/trained.hdf5")
 
     args = parser.parse_args()
-    print('\n'.join(f'{k}={v}' for k, v in vars(args).items())) # pring cmd
+    print('\n'.join(f'{k}={v}' for k, v in vars(args).items()))  # pring cmd
     odir = os.path.dirname(args.output)
     print("odir:", odir)
     Path(odir).mkdir(parents=True, exist_ok=True)
@@ -64,10 +63,10 @@ def parse_cmd_and_prep ():
         raise Exception('output name does not end with .hdf5')
     corename = args.output.replace(".hdf5", "")
     print("output corename:", corename)
-    
+
     with open(args.config, 'r') as stream:
         config = yaml.safe_load(stream)
-    if config['clas_scaling_factor'] not in [1,2,4]:
+    if config['clas_scaling_factor'] not in [1, 2, 4]:
         raise Exception(config['clas_scaling_factor'], 'not implemented', 'only support 1,2,4')
 
     return [args, corename, config]
@@ -95,6 +94,7 @@ def cleanup_crops(crops):
 
     return crops
 
+
 args, corename, config = parse_cmd_and_prep()
 
 train_crops = load_crops(args.crops_train)
@@ -105,14 +105,15 @@ w = crop_width(train_crops)
 train_crops = cleanup_crops(train_crops)
 val_crops = cleanup_crops(val_crops)
 
-
-print("Got {} training crops and {} validating crops".\
-    format(train_crops.shape[0], val_crops.shape[0]))
+print("Training Crops:")
+crops_stat(train_crops)
+print("Val Crops:")
+crops_stat(val_crops)
 
 if config['balancing']:
     print('Balancing for training split:')
-    train_crops = balance_by_duplication(train_crops, maxN=480000)  # balance so yes = maxN//2, no = maxN//2
-    
+    train_crops = balance_by_duplication(train_crops, maxN=480000)
+    # balance so yes = maxN//2, no = maxN//2
 
 trainimages, trainlabels, trainrs = parse_crops(train_crops)
 valimages, vallabels, valrs = parse_crops(val_crops)
@@ -121,7 +122,8 @@ trainrs = trainrs * config['r_ext_ratio'] + config['r_ext_ratio']
 valrs = valrs * config['r_ext_ratio'] + config['r_ext_ratio']
 
 print("Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
-trainimages, trainlabels, trainrs = augment_crops(trainimages, trainlabels, trainrs, config['aug_sample_size'])
+trainimages, trainlabels, trainrs = augment_crops(trainimages, trainlabels,
+                                                  trainrs, config['aug_sample_size'])
 
 ## match sample size of labels and rs with augmented images
 while trainrs.shape[0] < config['aug_sample_size']:
@@ -134,11 +136,13 @@ print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
 print('pixel value max', np.max(trainimages), 'min', np.min(trainimages))
 
 print("Downscaling images by ", config['clas_scaling_factor'])
-trainimages = np.array([down_scale(image, scaling_factor=config['clas_scaling_factor']) for image in trainimages])
-valimages = np.array([down_scale(image, scaling_factor=config['clas_scaling_factor']) for image in valimages])
-w = int(w/config['clas_scaling_factor'])
-trainrs = trainrs/config['clas_scaling_factor']
-valrs = valrs/config['clas_scaling_factor']
+trainimages = np.array([down_scale(image, scaling_factor=config['clas_scaling_factor'])
+                        for image in trainimages])
+valimages = np.array([down_scale(image, scaling_factor=config['clas_scaling_factor'])
+                      for image in valimages])
+w = int(w / config['clas_scaling_factor'])
+trainrs = trainrs / config['clas_scaling_factor']
+valrs = valrs / config['clas_scaling_factor']
 
 # todo: more channels (scaled + equalized + original)
 if config['classification_equalization']:
@@ -151,12 +155,14 @@ trainimages = np.array([float_image_auto_contrast(image) for image in trainimage
 valimages = np.array([float_image_auto_contrast(image) for image in valimages])
 
 print("Masking images...")
-trainimages = np.array([mask_image(image, r=trainrs[ind]) for ind, image in enumerate(trainimages)])
-valimages = np.array([mask_image(image, r=valrs[ind]) for ind, image in enumerate(valimages)])
+trainimages = np.array([mask_image(image, r=trainrs[ind])
+                        for ind, image in enumerate(trainimages)])
+valimages = np.array([mask_image(image, r=valrs[ind])
+                      for ind, image in enumerate(valimages)])
 
 # Reshape for model
-trainimages = trainimages.reshape((trainimages.shape[0], 2*w, 2*w, 1))
-valimages = valimages.reshape((valimages.shape[0], 2*w, 2*w, 1))
+trainimages = trainimages.reshape((trainimages.shape[0], 2 * w, 2 * w, 1))
+valimages = valimages.reshape((valimages.shape[0], 2 * w, 2 * w, 1))
 print("max pixel value: ", np.max(trainimages))
 print("min pixel value: ", np.min(trainimages))
 
@@ -168,7 +174,8 @@ vallabels2 = to_categorical(vallabels, config['numClasses'])
 # todo: feature normalization (optional)
 print("[INFO] compiling model...")
 opt = Adam(lr=config['learning_rate'])
-model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w, numClasses=config['numClasses'],
+model = LeNet.build(numChannels=1, imgRows=2 * w, imgCols=2 * w,
+                    numClasses=config['numClasses'],
                     weightsPath=None)
 model.compile(loss="categorical_crossentropy", optimizer=opt,
               metrics=[F1])
@@ -200,76 +207,75 @@ datagen.fit(trainimages)
 
 model.fit_generator(datagen.flow(trainimages, trainlabels2, batch_size=config['batch_size']),
                     validation_data=(valimages, vallabels2),
-                    steps_per_epoch=len(trainimages) / config['batch_size'], epochs=config['epochs'],
+                    steps_per_epoch=len(trainimages) / config['batch_size'],
+                    epochs=config['epochs'],
                     callbacks=callbacks_list,
                     verbose=config['verbose'])
 
 # Evaluation of the model
 print("[INFO] evaluating...")
 (loss, f1) = model.evaluate(trainimages, trainlabels2,
-                                  batch_size=config['batch_size'], verbose=config['verbose'])
+                            batch_size=config['batch_size'], verbose=config['verbose'])
 print("[INFO] training F1: {:.2f}%".format(f1 * 100))
 
 print("[INFO] evaluating...")
-(loss,  f1) = model.evaluate(valimages, vallabels2,
-                                  batch_size=config['batch_size'], verbose=config['verbose'])
+(loss, f1) = model.evaluate(valimages, vallabels2,
+                            batch_size=config['batch_size'], verbose=config['verbose'])
 print("[INFO] validation F1: {:.2f}%".format(f1 * 100))
-
 
 print("[INFO] dumping weights to file...")
 model.save_weights(args.output, overwrite=True)
 
-
-#### MANUAL boosting ### 
+#### MANUAL boosting ###
 if config['BOOSTING']:
     probs = model.predict(trainimages)
     classifications = probs.argmax(axis=1)
 
     tricky_idx = trainlabels != classifications
-    tricky_images = trainimages[tricky_idx] # (501, 40, 40, 1)
-    tricky_labels = trainlabels[tricky_idx] #  
+    tricky_images = trainimages[tricky_idx]  # (501, 40, 40, 1)
+    tricky_labels = trainlabels[tricky_idx]  #
     print("trainimages.shape:", trainimages.shape)
-    print("tricky_images.shape:", tricky_images.shape )
+    print("tricky_images.shape:", tricky_images.shape)
 
     for i in range(2):
         tricky_images = np.concatenate((tricky_images, tricky_images))
         tricky_labels = np.concatenate((tricky_labels, tricky_labels))
 
-    boost_size = min(len(tricky_labels), config['aug_sample_size']//4)
+    boost_size = min(len(tricky_labels), config['aug_sample_size'] // 4)
     tricky_images = tricky_images[0:boost_size]
     tricky_labels = tricky_labels[0:boost_size]
-    print(">>>duplicated tricky_images.shape:", tricky_images.shape )
+    print(">>>duplicated tricky_images.shape:", tricky_images.shape)
     print(">>>duplicated tricky_labels.shape:", tricky_labels.shape)
 
     tricky_labels2 = to_categorical(tricky_labels, config['numClasses'])
     print("tricky_labels2.shape:", tricky_labels2.shape)
 
-    retrain_images =  np.concatenate((tricky_images, trainimages))
-    retrain_labels =  np.concatenate((tricky_labels, trainlabels))
+    retrain_images = np.concatenate((tricky_images, trainimages))
+    retrain_labels = np.concatenate((tricky_labels, trainlabels))
     retrain_labels2 = to_categorical(retrain_labels, config['numClasses'])
 
-    print("retrain_images.shape:", retrain_images.shape )
+    print("retrain_images.shape:", retrain_images.shape)
     print("retrain_labels.shape:", retrain_labels.shape)
     print("retrain_labels2.shape:", retrain_labels2.shape)
 
     datagen.fit(retrain_images)
-    model.fit_generator(datagen.flow(retrain_images, retrain_labels2, batch_size=config['batch_size']),
+    model.fit_generator(datagen.flow(retrain_images, retrain_labels2,
+                                     batch_size=config['batch_size']),
                         validation_data=(valimages, vallabels2),
-                        steps_per_epoch=len(retrain_images) / config['batch_size'], epochs=config['epochs'],
+                        steps_per_epoch=len(retrain_images) / config['batch_size'],
+                        epochs=config['epochs'],
                         callbacks=callbacks_list,
                         verbose=config['verbose'])
 
     print("[INFO] evaluating...")
     (loss, f1) = model.evaluate(trainimages, trainlabels2,
-                                      batch_size=config['batch_size'], verbose=config['verbose'])
+                                batch_size=config['batch_size'], verbose=config['verbose'])
     print("[INFO] training F1: {:.2f}%".format(f1 * 100))
 
     print("[INFO] evaluating...")
-    (loss,  f1) = model.evaluate(valimages, vallabels2,
-                                      batch_size=config['batch_size'], verbose=config['verbose'])
+    (loss, f1) = model.evaluate(valimages, vallabels2,
+                                batch_size=config['batch_size'], verbose=config['verbose'])
     print("[INFO] validation F1: {:.2f}%".format(f1 * 100))
-
 
     print("[INFO] dumping weights to file...")
     model.save_weights(args.output, overwrite=True)
-
