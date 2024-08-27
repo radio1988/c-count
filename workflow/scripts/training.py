@@ -109,24 +109,10 @@ crops_stat(train_crops)
 print("Val Crops:")
 crops_stat(val_crops)
 
-# balancing
-if config['balancing']:
-    print('Balancing for training split:')
-    train_crops = balance_by_duplication(train_crops, maxN=config['aug_sample_size'])
-    # balance so yes = maxN//2, no = maxN//2
-
 trainimages, trainlabels, trainrs = parse_crops(train_crops)
 valimages, vallabels, valrs = parse_crops(val_crops)
-
 trainrs = trainrs * config['r_ext_ratio'] + config['r_ext_ratio']
 valrs = valrs * config['r_ext_ratio'] + config['r_ext_ratio']
-
-# augmentation
-print("Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
-trainimages, trainlabels, trainrs = augment_crops(trainimages, trainlabels, trainrs,
-                                                  config['aug_sample_size'])
-print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
-print('pixel value max', np.max(trainimages), 'min', np.min(trainimages))
 
 # downscale
 print("Downscaling images by ", config['clas_scaling_factor'])
@@ -138,9 +124,22 @@ w = int(w / config['clas_scaling_factor'])
 trainrs = trainrs / config['clas_scaling_factor']
 valrs = valrs / config['clas_scaling_factor']
 
+# # balancing
+# if config['balancing']:
+#     print('Balancing for training split:')
+#     train_crops = balance_by_duplication(train_crops, maxN=config['aug_sample_size'])
+#     # balance so yes = maxN//2, no = maxN//2
+
+# augmentation
+print("Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
+trainimages, trainlabels, trainrs = augment_crops(trainimages, trainlabels, trainrs,
+                                                  config['aug_sample_size'])
+print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
+print('pixel value max', np.max(trainimages), 'min', np.min(trainimages))
+
 # equalization (skipped)
 if config['classification_equalization']:
-    print("Equalizing images...") # todo: more channels (scaled + equalized + original)
+    print("Equalizing images...")  # todo: more channels (scaled + equalized + original)
     trainimages = np.array([equalize(image) for image in trainimages])
     valimages = np.array([equalize(image) for image in valimages])
 

@@ -37,6 +37,7 @@ def balance_by_duplication(blobs, maxN=160000):
     only yes/no considered
     undistinguishable not altered
     result randomized to avoid problems in training
+    input: crops
     :return: balanced blobs (with less samples)
     '''
     print('Before balancing:')
