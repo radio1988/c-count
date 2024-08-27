@@ -142,6 +142,8 @@ def augment_and_balance(images, labels, rs, N):
     - only consider POS and NEG, others discarded
     - POS and NEG augmented to N//2 separately
     - POS and NEG Merged and shuffled
+    - The augmented images always contains the originals if N >= n(images)
+    - When N < n(images) downsampling will happen, no augmentation will happen
     '''
     pos_idx = labels == 1
     neg_idx = labels == 0
@@ -155,7 +157,7 @@ def augment_and_balance(images, labels, rs, N):
     images_pos, labels_pos, rs_pos = augment_crops(images_pos, labels_pos, rs_pos, N//2)
     images_neg, labels_neg, rs_neg = augment_crops(images_neg, labels_neg, rs_neg, N//2)
 
-    images = np.vstack(images_pos, images_neg)
+    images = np.vstack((images_pos, images_neg))
     labels = labels_pos + labels_neg
     rs = rs_pos + rs_neg
 
