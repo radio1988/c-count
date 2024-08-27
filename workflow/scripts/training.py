@@ -112,7 +112,7 @@ crops_stat(val_crops)
 
 if config['balancing']:
     print('Balancing for training split:')
-    train_crops = balance_by_duplication(train_crops, maxN=480000)
+    train_crops = balance_by_duplication(train_crops, maxN=config['aug_sample_size'])
     # balance so yes = maxN//2, no = maxN//2
 
 trainimages, trainlabels, trainrs = parse_crops(train_crops)
@@ -122,16 +122,8 @@ trainrs = trainrs * config['r_ext_ratio'] + config['r_ext_ratio']
 valrs = valrs * config['r_ext_ratio'] + config['r_ext_ratio']
 
 print("Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
-trainimages, trainlabels, trainrs = augment_crops(trainimages, trainlabels,
-                                                  trainrs, config['aug_sample_size'])
-
-## match sample size of labels and rs with augmented images
-while trainrs.shape[0] < config['aug_sample_size']:
-    trainrs = np.concatenate((trainrs, trainrs))
-    trainlabels = np.concatenate((trainlabels, trainlabels))
-trainrs = trainrs[0:config['aug_sample_size']]
-trainlabels = trainlabels[0:config['aug_sample_size']]
-
+trainimages, trainlabels, trainrs = augment_crops(trainimages, trainlabels, trainrs,
+                                                  config['aug_sample_size'])
 print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
 print('pixel value max', np.max(trainimages), 'min', np.min(trainimages))
 
