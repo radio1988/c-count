@@ -121,11 +121,11 @@ def augment_and_balance(images, labels, rs, N):
     labels = labels_pos + labels_neg
     rs = rs_pos + rs_neg
 
-    rnd_idx = list(range(len(labels)))
-    random.shuffle(rnd_idx)
-    images = images[rnd_idx, ]
-    labels_pos = labels[rnd_idx]
-    rs = rs[rnd_idx]
+    # rnd_idx = list(range(len(labels)))
+    # random.shuffle(rnd_idx)
+    # images = images[rnd_idx, ]
+    # labels_pos = labels[rnd_idx]
+    # rs = rs[rnd_idx]
 
     return images, labels, rs
 
