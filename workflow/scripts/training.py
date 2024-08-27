@@ -9,7 +9,7 @@ from ccount.blob.misc import crops_stat, parse_crops, crop_width
 
 from ccount.clas.split_data import split_data
 from ccount.clas.balance_data import balance_by_duplication
-from ccount.clas.augment_images import augment_images
+from ccount.clas.augment_images import augment_crops
 from ccount.clas.metrics import F1, F1_calculation
 
 import sys, argparse, os, re, yaml, keras, textwrap
