@@ -56,8 +56,7 @@ def area_calculations(crops,
                       blob_extention_ratio=1.4, blob_extention_radius=10,
                       plotting=False):
     '''
-    only calculate for blobs matching the filter
-    '''
+    only calculate for blobs matching the filter'''
     from ccount.blob.misc import parse_crops
 
     images, labels, rs = parse_crops(crops)
