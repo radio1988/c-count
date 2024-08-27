@@ -98,9 +98,6 @@ def augment_crops(images, labels, Rs, aug_sample_size):
     images = images_[0:aug_sample_size, :]
     labels = labels_[0:aug_sample_size]
     Rs = Rs_[0:aug_sample_size]
-    print('shape:', images.shape, 'after augment_images')
-    print('len labels:', len(labels))
-    print('len Rs:', len(Rs))
     images = images.reshape(len(images), w, w)  # formatting back
     images = np.array([float_image_auto_contrast(image) for image in images])
     return images, labels, Rs
