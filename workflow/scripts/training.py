@@ -121,6 +121,9 @@ def augment_and_balance(images, labels, rs, N):
     labels = labels_pos + labels_neg
     rs = rs_pos + rs_neg
 
+    print("Inside augment_and_balance function:")
+    print(Counter(labels).items())
+
     # rnd_idx = list(range(len(labels)))
     # random.shuffle(rnd_idx)
     # images = images[rnd_idx, ]
@@ -163,12 +166,12 @@ trainrs = trainrs / config['clas_scaling_factor']
 valrs = valrs / config['clas_scaling_factor']
 
 # augmentation
-print(">>> Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
+print(">>> Before Aug:", trainimages.shape, trainlabels.shape, trainrs.shape)
 print(Counter(trainlabels).items())
 
 trainimages, trainlabels, trainrs = augment_and_balance(trainimages, trainlabels, trainrs,
                                                         config['aug_sample_size'])
-print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
+print("After Aug:",  trainimages.shape, trainlabels.shape, trainrs.shape)
 print(Counter(trainlabels).items())
 print('pixel value max', np.max(trainimages), 'min', np.min(trainimages))
 
