@@ -80,16 +80,13 @@ def parse_cmd_and_prep():
 def cleanup_crops(crops):
     unlabeled_idx = crops[:, 3] == 5  # unlabeled removed
     crops = crops[~unlabeled_idx, :]
-    crops_stat(crops)
 
     uncertain_idx = crops[:, 3] == 3  # uncertain removed
     crops = crops[~uncertain_idx, :]
-    crops_stat(crops)
 
     if config['numClasses'] == 2:
         artifacts_idx = crops[:, 3] == 4  # artifacts as NEG
         crops[artifacts_idx, 3] = 0  # artifacts, see ccount.blob.readme.txt
-        crops_stat(crops)
 
     return crops
 
@@ -97,9 +94,9 @@ def cleanup_crops(crops):
 args, corename, config = parse_cmd_and_prep()
 
 # read data
-print("Reading Training Crops:")
+print(">>> Reading Training Crops:")
 train_crops = load_crops(args.crops_train)
-print("Reading Val Crops:")
+print(">>> Reading Val Crops:")
 val_crops = load_crops(args.crops_val)
 w = crop_width(train_crops)
 print("Crop width: {}".format(w))
@@ -117,7 +114,7 @@ trainrs = trainrs * config['r_ext_ratio'] + config['r_ext_ratio']
 valrs = valrs * config['r_ext_ratio'] + config['r_ext_ratio']
 
 # downscale
-print("Downscaling images by ", config['clas_scaling_factor'])
+print(">>> Downscaling images by ", config['clas_scaling_factor'])
 trainimages = np.array([down_scale(image, scaling_factor=config['clas_scaling_factor'])
                         for image in trainimages])
 valimages = np.array([down_scale(image, scaling_factor=config['clas_scaling_factor'])
@@ -133,7 +130,7 @@ valrs = valrs / config['clas_scaling_factor']
 #     # balance so yes = maxN//2, no = maxN//2
 
 # augmentation
-print("Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
+print(">>> Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
 trainimages, trainlabels, trainrs = augment_crops(trainimages, trainlabels, trainrs,
                                                   config['aug_sample_size'])
 print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
@@ -141,15 +138,15 @@ print('pixel value max', np.max(trainimages), 'min', np.min(trainimages))
 
 # equalization (skipped)
 if config['classification_equalization']:
-    print("Equalizing images...")  # todo: more channels (scaled + equalized + original)
+    print(">>> Equalizing images...")  # todo: more channels (scaled + equalized + original)
     trainimages = np.array([equalize(image) for image in trainimages])
     valimages = np.array([equalize(image) for image in valimages])
 
-print("Normalizing images...")
+print(">>> Normalizing images...")
 trainimages = np.array([float_image_auto_contrast(image) for image in trainimages])
 valimages = np.array([float_image_auto_contrast(image) for image in valimages])
 
-print("Masking images...")
+print(">>> Masking images...")
 trainimages = np.array([mask_image(image, r=trainrs[ind])
                         for ind, image in enumerate(trainimages)])
 valimages = np.array([mask_image(image, r=valrs[ind])
