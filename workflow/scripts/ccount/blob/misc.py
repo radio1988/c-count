@@ -78,8 +78,8 @@ def parse_crops(crops):
     flats = crops[:, 6:]
     w = crop_width(crops)  # width of img
     images = flats.reshape(len(flats), 2 * w, 2 * w)
-    labels = crops[:, 3]
-    rs = crops[:, 2]
+    labels = list(crops[:, 3])
+    rs = list(crops[:, 2])
 
     return images, labels, rs
 
