@@ -1,3 +1,5 @@
+import copy
+
 import imgaug as ia
 from imgaug import augmenters as iaa
 import numpy as np
@@ -40,8 +42,7 @@ def augment_images(images, aug_sample_size):
         random_order=True
     )
 
-    # todo: sped up
-    images_ = seq.augment_images(images)
+    images_ = images.copy()
     while images_.shape[0] < aug_sample_size:
         _ = seq.augment_images(images)
         images_ = np.vstack((images_, _))
@@ -85,15 +86,21 @@ def augment_crops(images, labels, Rs, aug_sample_size):
 
     w = images.shape[1]
     images = images.reshape(len(images), w, w, 1)  # formatting
-    while images.shape[0] < aug_sample_size:
-        images_ = seq.augment_images(images)
-        images = np.vstack((images, images_))
-        labels = np.concatenate((labels, labels))
-        Rs = np.concatenate((Rs, Rs))
-    images = images[0:aug_sample_size, :]
-    labels = labels[0:aug_sample_size]
-    Rs = Rs[0:aug_sample_size]
+
+    images_ = images.copy()
+    labels_ = copy.deepcopy(labels)
+    Rs_ = copy.deepcopy(Rs)
+    while images_.shape[0] < aug_sample_size:
+        _ = seq.augment_images(images)
+        images_ = np.vstack((images_, _))
+        labels_ = np.concatenate((labels_, labels))
+        Rs_ = np.concatenate((Rs_, Rs))
+    images = images_[0:aug_sample_size, :]
+    labels = labels_[0:aug_sample_size]
+    Rs = Rs_[0:aug_sample_size]
     print('shape:', images.shape, 'after augment_images')
+    print('len labels:', len(labels))
+    print('len Rs:', len(Rs))
     images = images.reshape(len(images), w, w)  # formatting back
     images = np.array([float_image_auto_contrast(image) for image in images])
     return images, labels, Rs

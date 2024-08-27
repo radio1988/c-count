@@ -121,7 +121,7 @@ trainrs = trainrs * config['r_ext_ratio'] + config['r_ext_ratio']
 valrs = valrs * config['r_ext_ratio'] + config['r_ext_ratio']
 
 print("Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
-trainimages, trainlabels, trainrs = augment_images(trainimages, trainlabels, trainrs, config['aug_sample_size'])
+trainimages, trainlabels, trainrs = augment_crops(trainimages, trainlabels, trainrs, config['aug_sample_size'])
 
 ## match sample size of labels and rs with augmented images
 while trainrs.shape[0] < config['aug_sample_size']:
