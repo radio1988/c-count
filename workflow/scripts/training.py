@@ -119,18 +119,13 @@ def augment_and_balance(images, labels, rs, N):
 
     images = np.vstack((images_pos, images_neg))
     labels = np.concatenate((labels_pos, labels_neg))
-    print('debug: labels len: {}'.format(len(labels)))
     rs = np.concatenate((rs_pos, rs_neg))
-    print('debug: rs len: {}'.format(len(rs)))
 
-    print("Inside augment_and_balance function:")
-    print(Counter(labels).items())
-
-    # rnd_idx = list(range(len(labels)))
-    # random.shuffle(rnd_idx)
-    # images = images[rnd_idx, ]
-    # labels_pos = labels[rnd_idx]
-    # rs = rs[rnd_idx]
+    rnd_idx = list(range(len(labels)))
+    random.shuffle(rnd_idx)
+    images = images[rnd_idx, ]
+    labels_pos = labels[rnd_idx]
+    rs = rs[rnd_idx]
 
     return images, labels, rs
 
