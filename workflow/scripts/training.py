@@ -107,8 +107,8 @@ def augment_and_balance(images, labels, rs, N):
     '''
     pos_idx = labels == 1
     neg_idx = labels == 0
-    images_pos = images[pos_idx,]
-    images_neg = images[neg_idx,]
+    images_pos = images[pos_idx, ]
+    images_neg = images[neg_idx, ]
     labels_pos = labels[pos_idx]
     labels_neg = labels[neg_idx]
     rs_pos = rs[pos_idx]
@@ -139,7 +139,6 @@ train_crops = load_crops(args.crops_train)
 print(">>> Reading Val Crops:")
 val_crops = load_crops(args.crops_val)
 w = crop_width(train_crops)
-print("Crop width: {}".format(w))
 
 train_crops = cleanup_crops(train_crops)
 val_crops = cleanup_crops(val_crops)
@@ -163,18 +162,14 @@ w = int(w / config['clas_scaling_factor'])
 trainrs = trainrs / config['clas_scaling_factor']
 valrs = valrs / config['clas_scaling_factor']
 
-# # balancing
-# if config['balancing']:
-#     print('Balancing for training split:')
-#     train_crops = balance_by_duplication(train_crops, maxN=config['aug_sample_size'])
-#     # balance so yes = maxN//2, no = maxN//2
-
 # augmentation
 print(">>> Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
+print(Counter(trainlabels).items())
 
 trainimages, trainlabels, trainrs = augment_and_balance(trainimages, trainlabels, trainrs,
                                                         config['aug_sample_size'])
 print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
+print(Counter(trainlabels).items())
 print('pixel value max', np.max(trainimages), 'min', np.min(trainimages))
 
 # equalization (skipped)
