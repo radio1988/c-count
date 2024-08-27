@@ -32,6 +32,7 @@ training.py
 - process: only POS and NEG blobs are considered, artifacts are NEGS, uncertains are ignored
 '''
 
+
 # Show CPU/GPU info
 # from tensorflow.python.client import device_lib
 # print(device_lib.list_local_devices())
@@ -92,6 +93,43 @@ def cleanup_crops(crops):
 
     return crops
 
+
+def augment_and_balance(images, labels, rs, N):
+    '''
+    input: [images, labels, rs, N], N is the goal of N images
+    output: [images, labels, rs], balanced and augmented if N > n(images)
+    process:
+    - only consider POS and NEG, others discarded
+    - POS and NEG augmented to N//2 separately
+    - POS and NEG Merged and shuffled
+    - The augmented images always contains the originals if N >= n(images)
+    - When N < n(images) downsampling will happen, no augmentation will happen
+    '''
+    pos_idx = labels == 1
+    neg_idx = labels == 0
+    images_pos = images[pos_idx,]
+    images_neg = images[neg_idx,]
+    labels_pos = labels[pos_idx]
+    labels_neg = labels[neg_idx]
+    rs_pos = rs[pos_idx]
+    rs_neg = rs[neg_idx]
+
+    images_pos, labels_pos, rs_pos = augment_crops(images_pos, labels_pos, rs_pos, N // 2)
+    images_neg, labels_neg, rs_neg = augment_crops(images_neg, labels_neg, rs_neg, N // 2)
+
+    images = np.vstack((images_pos, images_neg))
+    labels = labels_pos + labels_neg
+    rs = rs_pos + rs_neg
+
+    rnd_idx = list(range(len(labels)))
+    random.shuffle(rnd_idx)
+    images = images[rnd_idx, ]
+    labels_pos = labels[rnd_idx]
+    rs = rs[rnd_idx]
+
+    return images, labels, rs
+
+
 # parse cmd
 args, corename, config = parse_cmd_and_prep()
 
@@ -134,43 +172,8 @@ valrs = valrs / config['clas_scaling_factor']
 # augmentation
 print(">>> Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
 
-def augment_and_balance(images, labels, rs, N):
-    '''
-    input: [images, labels, rs, N], N is the goal of N images
-    output: [images, labels, rs], balanced and augmented if N > n(images)
-    process:
-    - only consider POS and NEG, others discarded
-    - POS and NEG augmented to N//2 separately
-    - POS and NEG Merged and shuffled
-    - The augmented images always contains the originals if N >= n(images)
-    - When N < n(images) downsampling will happen, no augmentation will happen
-    '''
-    pos_idx = labels == 1
-    neg_idx = labels == 0
-    images_pos = images[pos_idx, ]
-    images_neg = images[neg_idx, ]
-    labels_pos = labels[pos_idx]
-    labels_neg = labels[neg_idx]
-    rs_pos = rs[pos_idx]
-    rs_neg = rs[neg_idx]
-
-    images_pos, labels_pos, rs_pos = augment_crops(images_pos, labels_pos, rs_pos, N//2)
-    images_neg, labels_neg, rs_neg = augment_crops(images_neg, labels_neg, rs_neg, N//2)
-
-    images = np.vstack((images_pos, images_neg))
-    labels = labels_pos + labels_neg
-    rs = rs_pos + rs_neg
-
-    rnd_idx = random.shuffle(range(len(labels)))
-    images = images[rnd_idx, ]
-    labels_pos = labels[rnd_idx]
-    rs = rs[rnd_idx]
-
-    return images, labels, rs
-
-
 trainimages, trainlabels, trainrs = augment_and_balance(trainimages, trainlabels, trainrs,
-                                                  config['aug_sample_size'])
+                                                        config['aug_sample_size'])
 print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
 print('pixel value max', np.max(trainimages), 'min', np.min(trainimages))
 
