@@ -90,11 +90,12 @@ def augment_crops(images, labels, Rs, aug_sample_size):
     images_ = images.copy()
     labels_ = copy.deepcopy(labels)
     Rs_ = copy.deepcopy(Rs)
+
     while images_.shape[0] < aug_sample_size:
         _ = seq.augment_images(images)
         images_ = np.vstack((images_, _))
-        labels_ = np.concatenate((labels_, labels))
-        Rs_ = np.concatenate((Rs_, Rs))
+        labels_ = labels_ + labels
+        Rs_ = Rs_ + Rs
     images = images_[0:aug_sample_size, :]
     labels = labels_[0:aug_sample_size]
     Rs = Rs_[0:aug_sample_size]

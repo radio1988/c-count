@@ -119,7 +119,9 @@ def augment_and_balance(images, labels, rs, N):
 
     images = np.vstack((images_pos, images_neg))
     labels = labels_pos + labels_neg
+    print('debug: labels len: {}'.format(len(labels)))
     rs = rs_pos + rs_neg
+    print('debug: rs len: {}'.format(len(rs)))
 
     print("Inside augment_and_balance function:")
     print(Counter(labels).items())
