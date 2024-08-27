@@ -94,14 +94,13 @@ def cleanup_crops(crops):
 
     return crops
 
-
+# parse cmd
 args, corename, config = parse_cmd_and_prep()
 
+# read data
 train_crops = load_crops(args.crops_train)
 val_crops = load_crops(args.crops_val)
-
 w = crop_width(train_crops)
-
 train_crops = cleanup_crops(train_crops)
 val_crops = cleanup_crops(val_crops)
 
@@ -110,6 +109,7 @@ crops_stat(train_crops)
 print("Val Crops:")
 crops_stat(val_crops)
 
+# balancing
 if config['balancing']:
     print('Balancing for training split:')
     train_crops = balance_by_duplication(train_crops, maxN=config['aug_sample_size'])
@@ -121,12 +121,14 @@ valimages, vallabels, valrs = parse_crops(val_crops)
 trainrs = trainrs * config['r_ext_ratio'] + config['r_ext_ratio']
 valrs = valrs * config['r_ext_ratio'] + config['r_ext_ratio']
 
+# augmentation
 print("Before Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
 trainimages, trainlabels, trainrs = augment_crops(trainimages, trainlabels, trainrs,
                                                   config['aug_sample_size'])
 print("After Aug:", trainimages.shape, trainrs.shape, trainlabels.shape)
 print('pixel value max', np.max(trainimages), 'min', np.min(trainimages))
 
+# downscale
 print("Downscaling images by ", config['clas_scaling_factor'])
 trainimages = np.array([down_scale(image, scaling_factor=config['clas_scaling_factor'])
                         for image in trainimages])
@@ -136,9 +138,9 @@ w = int(w / config['clas_scaling_factor'])
 trainrs = trainrs / config['clas_scaling_factor']
 valrs = valrs / config['clas_scaling_factor']
 
-# todo: more channels (scaled + equalized + original)
+# equalization (skipped)
 if config['classification_equalization']:
-    print("Equalizing images...")
+    print("Equalizing images...") # todo: more channels (scaled + equalized + original)
     trainimages = np.array([equalize(image) for image in trainimages])
     valimages = np.array([equalize(image) for image in valimages])
 
@@ -166,14 +168,19 @@ vallabels2 = to_categorical(vallabels, config['numClasses'])
 # todo: feature normalization (optional)
 print("[INFO] compiling model...")
 opt = Adam(lr=config['learning_rate'])
-model = LeNet.build(numChannels=1, imgRows=2 * w, imgCols=2 * w,
+model = LeNet.build(numChannels=1,
+                    imgRows=2 * w,
+                    imgCols=2 * w,
                     numClasses=config['numClasses'],
                     weightsPath=None)
-model.compile(loss="categorical_crossentropy", optimizer=opt,
+model.compile(loss="categorical_crossentropy",
+              optimizer=opt,
               metrics=[F1])
 earlystop = keras.callbacks.EarlyStopping(monitor='val_loss',
-                                          min_delta=0, patience=config['patience'],
-                                          verbose=config['verbose'], mode='auto',
+                                          min_delta=0,
+                                          patience=config['patience'],
+                                          verbose=config['verbose'],
+                                          mode='auto',
                                           baseline=None, restore_best_weights=True)
 callbacks_list = [earlystop]
 
