@@ -1,6 +1,6 @@
-from ..blob.misc import crops_stat
 import numpy as np
-
+from ..blob.misc import crops_stat, parse_crops
+from ..clas.augment_images import augment_images
 
 
 def balance_by_removal(blobs):
@@ -49,14 +49,16 @@ def balance_by_duplication(blobs, maxN=160000):
     N_No = len(idx_no)
     # N_unsure = len(idx_unsure)
 
-    if N_No > maxN//2:
-        idx_no = np.random.choice(idx_no, maxN//2, replace=False)
-    if N_Yes > maxN//2:
-        idx_yes = np.random.choice(idx_yes, maxN//2, replace=False)
-    if N_Yes < maxN//2:
-        idx_yes = np.random.choice(idx_yes, maxN//2, replace=True)
-    if N_No > maxN//2:
-        idx_no = np.random.choice(idx_no, maxN//2, replace=True)
+    if N_Yes > maxN // 2:
+        idx_yes = np.random.choice(idx_yes, maxN // 2, replace=False)
+    if N_No > maxN // 2:
+        idx_no = np.random.choice(idx_no, maxN // 2, replace=False)
+    if N_Yes < maxN // 2:
+        idx_yes = np.random.choice(idx_yes, maxN // 2, replace=True)
+    if N_No < maxN // 2:
+        idx_no = np.random.choice(idx_no, maxN // 2, replace=True)
+
+    yes_images, yes_labels, yes_Rs = parse_crops(blobs[idx_yes,])
 
     idx_choice = np.concatenate([idx_yes, idx_no])
     np.random.shuffle(idx_choice)
@@ -66,4 +68,3 @@ def balance_by_duplication(blobs, maxN=160000):
     crops_stat(blobs)
 
     return blobs
-
