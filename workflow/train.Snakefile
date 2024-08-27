@@ -105,6 +105,8 @@ rule evaluation:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 8000
+    priority:
+        100
     shell:
         """
         python workflow/scripts/eval_classification.py \
