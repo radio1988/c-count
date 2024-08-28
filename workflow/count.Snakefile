@@ -17,8 +17,7 @@ SAMPLES = get_samples(DATA_DIR)
 rule targets:
     input:
         # czi2img=expand("log/img/{s}.done", s=SAMPLES), # skipped, clas vis more helpful
-        # blob_detection=expand("log/blob_locs/{s}.done", s=SAMPLES),
-        # blob_cropping=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES, 
+        # blob_cropping=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES,
         #                          suffix='.crops.npy.gz'),
         # classification=input_names(prefix='res/classification1/', SAMPLES=SAMPLES,
         #                            suffix=".crops.clas.txt"),
@@ -28,7 +27,8 @@ rule targets:
         area1_agg="res/areas.csv",
         view_clas_on_image=input_names(prefix="res/classification1/",SAMPLES=SAMPLES,
             suffix=".crops.clas.npy.gz.jpg"),
-        blob_locs=expand("res/classification1/{s}.{i}.locs.clas.npy.gz",s=SAMPLES,i=[0, 1, 2, 3]),
+        blob_locs=input_names(prefix="res/classification1/", SAMPLES=SAMPLES, suffix='.locs.clas.npy.gz'),
+#        blob_locs=expand("res/classification1/{s}.{i}.locs.clas.npy.gz",s=SAMPLES,i=[0, 1, 2, 3]),
         rulegraph="rulegraph.pdf"
 
 rule czi2img:
