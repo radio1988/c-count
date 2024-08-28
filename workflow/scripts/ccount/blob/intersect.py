@@ -15,6 +15,8 @@ def intersect_blobs(blobs1, blobs2):
     set1 = set(tup1)
     set2 = set(tup2)
     set_overlap = set1 & set2
+    if len(set_overlap) < max(len(set1), len(set2)): 
+        print('two crops are different, intersect less than input')
     if len(set1) != len(set_overlap):
         sys.stderr.write("blobs1 and blobs2 are different, intersection is taken after sorting\n\n")
     idx1 = [x in set_overlap for x in tup1]
