@@ -11,7 +11,7 @@ def sub_sample(A, n, seed=1):
     if n < 1:
         n = int(A.shape[0] * n)
 
-    if n < A.shape[0]:
+    if n <= A.shape[0]:
         np.random.seed(seed=seed)
         A = A[np.random.choice(A.shape[0], n, replace=False), :]
         np.random.seed(seed=None)
