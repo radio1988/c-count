@@ -21,7 +21,7 @@ from sklearn.model_selection import train_test_split
 from skimage.transform import rescale, resize, downscale_local_mean
 from tensorflow.keras.optimizers import Adam
 from keras.utils import to_categorical
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from collections import Counter
 
 
