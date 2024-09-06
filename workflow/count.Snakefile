@@ -53,7 +53,7 @@ rule blob_detection:
     input:
         os.path.join(config['DATA_DIR'], "{s}.czi")
     output:
-        touch("log/blob_locs/{s}.done"),
+        touch("res/blob_locs/{s}.done"),
     #"res/blob_locs/{s}.{i}.crops.npy.gz"
     threads:
         1
@@ -73,7 +73,7 @@ rule blob_detection:
 rule blob_cropping:
     input:
         czi=os.path.join(config['DATA_DIR'], "{s}.czi"),
-        blob_locs_flag="log/blob_locs/{s}.done",
+        blob_locs_flag="res/blob_locs/{s}.done",
     #blob_locs="res/blob_locs/{s}.{i}.crops.npy.gz"
     output:
         temp('res/blob_crops/{s}.{i}.crops.npy.gz')
