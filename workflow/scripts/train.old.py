@@ -40,7 +40,7 @@ def parse_cmd_and_prep():
             -crops_train labeled.train.npy.gz 
             -crops_val labeled.validation.npy.gz
             -config config.yaml 
-            -output trained/trained.hdf5
+            -output trained/trained.weights.h5
             '''))
     parser.add_argument("-crops_train", type=str,
                         help="labled blob-crops file for training, \
@@ -51,7 +51,7 @@ def parse_cmd_and_prep():
     parser.add_argument("-config", type=str,
                         help="config file, e.g. config.yaml")
     parser.add_argument("-output", type=str,
-                        help="output weights file, e.g. resources/weights/trained.hdf5")
+                        help="output weights file, e.g. resources/weights/trained.weights.h5")
 
     args = parser.parse_args()
     print('\n'.join(f'{k}={v}' for k, v in vars(args).items()))  # pring cmd
@@ -59,9 +59,9 @@ def parse_cmd_and_prep():
     print("odir:", odir)
     Path(odir).mkdir(parents=True, exist_ok=True)
 
-    if not args.output.endswith('.hdf5'):
-        raise Exception('output name does not end with .hdf5')
-    corename = args.output.replace(".hdf5", "")
+    if not args.output.endswith('.weights.h5'):
+        raise Exception('output name does not end with .weights.h5')
+    corename = args.output.replace(".weights.h5", "")
     print("output corename:", corename)
 
     with open(args.config, 'r') as stream:
@@ -106,7 +106,7 @@ val_crops = cleanup_crops(val_crops)
 
 print("Training Crops:")
 crops_stat(train_crops)
-print("Val Crops:")
+print("Val Crops:", flush=True)
 crops_stat(val_crops)
 
 # balancing
@@ -167,7 +167,7 @@ vallabels2 = to_categorical(vallabels, config['numClasses'])
 # Initialize the optimizer and model
 # todo: feature normalization (optional)
 print("[INFO] compiling model...")
-opt = Adam(lr=config['learning_rate'])
+opt = Adam(learning_rate=config['learning_rate'])
 model = LeNet.build(numChannels=1,
                     imgRows=2 * w,
                     imgCols=2 * w,
@@ -184,7 +184,7 @@ earlystop = keras.callbacks.EarlyStopping(monitor='val_loss',
                                           baseline=None, restore_best_weights=True)
 callbacks_list = [earlystop]
 
-print("[INFO] training...")
+print("[INFO] training...",  flush=True)
 # todo: add radius to model
 # todo: augmentation in batch training
 
@@ -192,8 +192,8 @@ print("[INFO] training...")
 datagen = ImageDataGenerator(
     featurewise_std_normalization=False,
     rotation_range=90,
-    shear_range=0.16,
-    zoom_range=0.1,
+    shear_range=0.05,
+    zoom_range=0.01,
     width_shift_range=0.03, height_shift_range=0.03,
     horizontal_flip=True, vertical_flip=True
 )
@@ -204,9 +204,9 @@ datagen.fit(trainimages)
 #           batch_size=config['batch_size'], epochs=config['epochs'],
 #           verbose=config['verbose'])
 
-model.fit_generator(datagen.flow(trainimages, trainlabels2, batch_size=config['batch_size']),
+model.fit(datagen.flow(trainimages, trainlabels2, batch_size=int(config['batch_size'])),
                     validation_data=(valimages, vallabels2),
-                    steps_per_epoch=len(trainimages) / config['batch_size'],
+                    steps_per_epoch= int(len(trainimages) / config['batch_size']),
                     epochs=config['epochs'],
                     callbacks=callbacks_list,
                     verbose=config['verbose'])
