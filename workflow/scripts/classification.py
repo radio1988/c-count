@@ -89,7 +89,7 @@ print("min pixel value: ", np.min(images))
 # Initialize the optimizer and model
 # todo: feature normalization (optional)
 print("Compiling model...")
-opt = Adam(lr=config['learning_rate'])
+opt = Adam(learning_rate=config['learning_rate'])
 model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w, numClasses=config['numClasses'],
                     weightsPath=args.weight)
 model.compile(loss="categorical_crossentropy", optimizer=opt, metrics=[F1])
