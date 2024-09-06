@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 from pyimagesearch.cnn.networks.lenet import LeNet
 from tensorflow.keras.optimizers import Adam
-from keras.utils import to_categorical 
+from tensorflow.keras.utils import to_categorical
 
 
 def parse_cmd_and_prep ():
