@@ -1,0 +1,39 @@
+name: ccount_metal
+channels:
+  - apple
+  - conda-forge
+  - bioconda
+subdirs:
+  - osx-arm64
+  - osx-64
+  - noarch
+
+dependencies:
+  - python=3.12
+  - pip>=19.0
+  - jupyter
+  - bioconda::snakemake=8.18
+  - scikit-learn
+  - scipy
+  - pandas
+  - pandas-datareader
+  - matplotlib
+  - pillow
+  - tqdm
+  - requests
+  - h5py
+  - pyyaml
+  - flask
+  - boto3
+  - ipykernel
+  - scikit-image
+  - imgaug
+  - aicsimageio
+  - graphviz
+  - pip:
+     - tensorflow-macos
+#     - tensorflow-metal
+     - bayesian-optimization
+     - gym
+     - kaggle
+  

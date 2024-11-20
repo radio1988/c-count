@@ -23,5 +23,5 @@ def float_image_auto_contrast(image):
     
     image = image - np.min(image)
     image = image / np.max(image)
-    image = image.astype(np.float)
+    image = image.astype(np.float16)
     return image

@@ -1,6 +1,11 @@
+"""
+Train
+"""
+
+
 import os
 
-configfile: "config.data_curve.yaml"
+configfile: "config.train.yaml"
 
 WKDIR=os.getcwd()
 DATA_TRAIN=config['DATA_TRAIN']
@@ -11,7 +16,7 @@ CCOUNT_CONFIG=config['CCOUNT_CONFIG']
 rule targets:
     input:
         subsamples=expand('res/small_data/{rate}.npy.gz', rate=SAMSPLING_RATES), 
-        weights=expand('res/weights/{rate}.hdf5', rate=SAMSPLING_RATES), 
+        weights=expand('res/weights/{rate}.weights.h5', rate=SAMSPLING_RATES), 
         classifications=expand('res/clas/{rate}.npy.gz', rate=SAMSPLING_RATES),
         evaluations=expand('res/eval/{rate}.txt', rate=SAMSPLING_RATES),
         # curve = 'data_curve.pdf'
@@ -43,11 +48,11 @@ rule training:
         small_crop='res/small_data/{rate}.npy.gz',
         val_crop=DATA_VAL
     output:
-        weight='res/weights/{rate}.hdf5'
+        weight='res/weights/{rate}.weights.h5'
     log:
-        'res/weights/{rate}.hdf5.log'
+        'res/weights/{rate}.weights.h5.log'
     benchmark:
-         'res/weights/{rate}.hdf5.benchmark'
+         'res/weights/{rate}.weights.h5.benchmark'
     threads:
         4
     resources:
@@ -64,7 +69,7 @@ rule training:
 
 rule classification: 
     input:
-        weight='res/weights/{rate}.hdf5',
+        weight='res/weights/{rate}.weights.h5',
         data_val=DATA_VAL
     output:
         clas='res/clas/{rate}.npy.gz' # test
@@ -100,6 +105,8 @@ rule evaluation:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 8000
+    priority:
+        100
     shell:
         """
         python workflow/scripts/eval_classification.py \

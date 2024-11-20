@@ -3,7 +3,7 @@ from ccount.img.equalize import equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
 
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_crops, load_locs, save_crops, save_locs
 from ccount.blob.mask_image import mask_image
 from ccount.blob.misc import crops_stat, parse_crops, crop_width
 
@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 from pyimagesearch.cnn.networks.lenet import LeNet
 from tensorflow.keras.optimizers import Adam
-from keras.utils import np_utils
+from tensorflow.keras.utils import to_categorical
 
 
 def parse_cmd_and_prep ():
@@ -89,7 +89,7 @@ print("min pixel value: ", np.min(images))
 # Initialize the optimizer and model
 # todo: feature normalization (optional)
 print("Compiling model...")
-opt = Adam(lr=config['learning_rate'])
+opt = Adam(learning_rate=config['learning_rate'])
 model = LeNet.build(numChannels=1, imgRows=2*w, imgCols=2*w, numClasses=config['numClasses'],
                     weightsPath=args.weight)
 model.compile(loss="categorical_crossentropy", optimizer=opt, metrics=[F1])
@@ -105,8 +105,9 @@ positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 print("Saving classifications..")
 crops[:, 3] = classifications
 crops_stat(crops)
-npy_name = args.output.replace('.gz', '')
-np.save(npy_name, crops) #xxx.npy
-os.system('gzip  -f ' + npy_name)
+
+save_locs(crops, args.output.replace('crops','locs'))  #todo: fix potential name bug in non-workflow situations
+save_crops(crops, args.output)
+
 txt_name = args.output.replace('.npy.gz', '.txt')
 np.savetxt(txt_name, classifications.astype(int), fmt='%d')

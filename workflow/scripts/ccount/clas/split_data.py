@@ -1,6 +1,7 @@
 def split_data(array, training_ratio):
     """
     Split into train and valid
+    seed is always 3
     :param array: 2D array, each row is a sample
     :param ratio: ratio of train in all, e.g. 0.7
     :return: two arrays

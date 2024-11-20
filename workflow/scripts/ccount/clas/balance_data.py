@@ -1,6 +1,6 @@
-from ..blob.misc import crops_stat
 import numpy as np
-
+from ..blob.misc import crops_stat, parse_crops
+from ..clas.augment_images import augment_images
 
 
 def balance_by_removal(blobs):
@@ -31,12 +31,13 @@ def balance_by_removal(blobs):
     return blobs
 
 
-def balance_by_duplication(blobs):
+def balance_by_duplication(blobs, maxN=160000):
     '''
     balance yes/no ratio to 1, by duplicating blobs in the under-represented group
     only yes/no considered
     undistinguishable not altered
     result randomized to avoid problems in training
+    input: crops
     :return: balanced blobs (with less samples)
     '''
     print('Before balancing:')
@@ -47,16 +48,20 @@ def balance_by_duplication(blobs):
     idx_unsure = np.arange(0, blobs.shape[0])[blobs[:, 3] == -2]
     N_Yes = len(idx_yes)
     N_No = len(idx_no)
-    N_unsure = len(idx_unsure)
+    # N_unsure = len(idx_unsure)
 
-    # todo: include unsure
-    if N_No > N_Yes:
-        print('number of No matched to Yes by re-sampling')
-        idx_yes = np.random.choice(idx_yes, N_No, replace=True)  # todo: some yes data lost when N_No small
-    elif N_Yes > N_No:
-        print('number of Yes matched to No by re-sampling')
-        idx_no = np.random.choice(idx_no, N_Yes, replace=True)
-    idx_choice = np.concatenate([idx_yes, idx_no, idx_unsure])  # 3 classes
+    if N_Yes > maxN // 2:
+        idx_yes = np.random.choice(idx_yes, maxN // 2, replace=False)
+    if N_No > maxN // 2:
+        idx_no = np.random.choice(idx_no, maxN // 2, replace=False)
+    if N_Yes < maxN // 2:
+        idx_yes = np.random.choice(idx_yes, maxN // 2, replace=True)
+    if N_No < maxN // 2:
+        idx_no = np.random.choice(idx_no, maxN // 2, replace=True)
+
+    yes_images, yes_labels, yes_Rs = parse_crops(blobs[idx_yes,])
+
+    idx_choice = np.concatenate([idx_yes, idx_no])
     np.random.shuffle(idx_choice)
     blobs = blobs[idx_choice, ]
 
@@ -64,4 +69,3 @@ def balance_by_duplication(blobs):
     crops_stat(blobs)
 
     return blobs
-

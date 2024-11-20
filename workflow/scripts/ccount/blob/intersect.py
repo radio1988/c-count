@@ -1,17 +1,19 @@
-#from ccount.blob.intersect import intersect_blobs
+# from ccount.blob.intersect import intersect_blobs
 import sys
 
+
 def sort_blobs(blobs):
-    blobs = blobs[blobs[:,2].argsort()]
-    blobs = blobs[blobs[:,1].argsort(kind='mergesort')]
-    blobs = blobs[blobs[:,0].argsort(kind='mergesort')]
+    blobs = blobs[blobs[:, 2].argsort()]
+    blobs = blobs[blobs[:, 1].argsort(kind='mergesort')]
+    blobs = blobs[blobs[:, 0].argsort(kind='mergesort')]
     return blobs
+
 
 def intersect_blobs(blobs1, blobs2):
     blobs1 = sort_blobs(blobs1)
     blobs2 = sort_blobs(blobs2)
-    tup1 = [tuple(x[0:2]) for x in blobs1]
-    tup2 = [tuple(x[0:2]) for x in blobs2]
+    tup1 = [tuple(x[0:3]) for x in blobs1]
+    tup2 = [tuple(x[0:3]) for x in blobs2]
     set1 = set(tup1)
     set2 = set(tup2)
     set_overlap = set1 & set2
