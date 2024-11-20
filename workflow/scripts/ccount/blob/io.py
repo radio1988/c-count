@@ -62,6 +62,12 @@ def save_crops(crops, fname):
         print("Saving crops:", fname)
     else:
         print("Saving locs:", fname)
-    fname = fname.replace(".npy.gz", ".npy")
-    np.save(fname, crops)
-    subprocess.run("gzip -f " + fname, shell=True, check=True)
+
+    if fname.endswith('.npy.gz'):
+        fname = fname.replace(".npy.gz", ".npy")
+        np.save(fname, crops)
+        subprocess.run("gzip -f " + fname, shell=True, check=True)
+    elif fname.endswith('.npy'):
+        np.save(fname, crops)
+    else:
+        raise Exception ('crop output suffix not .npy nor .npy.gz')

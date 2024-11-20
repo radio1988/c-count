@@ -5,7 +5,7 @@
 source activate ccount-env
 
 snakemake \
--s workflow/Snakefile_data_curve \
+-s workflow/train.Snakefile \
 -p -k --jobs 999 \
 --latency-wait 120 \
 --ri --restart-times 0 \
