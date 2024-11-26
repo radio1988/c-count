@@ -18,11 +18,13 @@ def load_locs(fname):
             array = np.load(f)
         else:
             raise Exception("suffix not npy nor npy.gz")
-        print(fname, array.shape)
+
         if array.shape[1] > 3:  # if with label
+            print("Read locs file: ", fname, array.shape)
             crops_stat(array)
         if array.shape[1] > 4:
-            print("n-crop: {}, crop width: {}".format(len(array), crop_width(array)))
+            print("Read crops file: ", fname, array.shape)
+            print("n-crop: {}, crop width: {}\n".format(len(array), crop_width(array)))
         return array
     else:
         raise Exception('input file', fname, 'not found')

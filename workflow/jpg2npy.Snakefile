@@ -6,12 +6,12 @@ from scripts.ccount.snake.input_names import input_names
 """
 Dir input assumptions:
 - data/czi
-- data/label_img: the sample names can't have dot `.` in them
+- data/label_img: the sample names can't have dot `.` in them, this is the folder for sample name collection
+- config.yaml: blob detection parameters, locs2crops parameters
 
 output assumptions:
 - res/label_locs
 - res/label_locs/vis/
-
 """
 
 
@@ -56,6 +56,7 @@ SAMPLES, SCENES = get_jpg_samples(INPUT_PATH)
 
 rule targets:
     input:
+        dag='dag.pdf',
         label_locs=expand('res/label_locs/{scene}.label.npy.gz',scene=SCENES),
         label_crops=expand('res/label_crops/{scene}.LABEL.npy.gz',scene=SCENES),
         label_count="res/count.label.csv"
@@ -72,7 +73,7 @@ rule jpg2locs:
     output:
         label_locs='res/label_locs/{sample}.{sceneIndex}.label.npy.gz'
     log:
-        'res/label_locs/{sample}.{sceneIndex}.label.npy.gz.txt'
+        'res/label_locs/{sample}.{sceneIndex}.label.npy.gz.log'
     shell:
         "python workflow/scripts/jpg2npy.py {input.jpg} {input.czi} {input.blob_locs} \
         {wildcards.sceneIndex} {output.label_locs} &> {log}"
@@ -81,6 +82,7 @@ rule locs2crops:
     input:
         label_locs='res/label_locs/{sample}.{sceneIndex}.label.npy.gz',
         czi="data/czi/{sample}.czi",
+        config='config.yaml'
     output:
         npy='res/label_crops/{sample}.{sceneIndex}.LABEL.npy.gz',
         txt='res/label_crops/{sample}.{sceneIndex}.LABEL.npy.gz.txt'
@@ -107,4 +109,21 @@ rule aggr_label_count:
     shell:
         """
         python workflow/scripts/aggr_label_count.py {input} {output} &> {log}
+        """
+
+
+rule Create_DAG:
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1000,
+    threads:
+        1
+    output:
+        "dag.pdf",
+        "rulegraph.pdf"
+    log:
+        "dag.log"
+    shell:
+        """
+        snakemake -s workflow/jpg2npy.Snakefile --dag targets 2> {log} | dot -Tpdf > {output[0]} 2>> {log}
+        snakemake  -s workflow/jpg2npy.Snakefile --rulegraph targets 2> {log}| dot -Tpdf > {output[1]} 2>> {log}
         """

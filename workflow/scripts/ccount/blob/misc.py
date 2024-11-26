@@ -54,17 +54,17 @@ def crops_stat(crops):
             sum(crops[:, 3] == 3), sum(crops[:, 3] == 4),
             sum(crops[:, 3] == 5)
         ]
-        print("{} Yes(1), {} No(0), {} Uncertain(3), {} artifacts(4), {} Unlabeled(5)".format(
+        print("{} Yes(1), {} No(0), {} Uncertain(3), {} artifacts(4), {} Unlabeled(5)\n".format(
             yes, no, uncertain, artifact, unlabeled))
     else:
-        raise Exception("Crops does not contain label column")
+        raise Exception("Crops does not contain label column\n")
     return {'yes': yes, "no": no, 'uncertain': uncertain, 'artifact': artifact, 'unlabeled': unlabeled}
 
 
 def crop_width(image_flat_crops):
     from math import sqrt
     if image_flat_crops.shape[1] <= 6 + 4:
-        raise Exception('this file is locs file, not crops file')
+        raise Exception("this file is locs file, not crops file\n")
     else:
         return int(sqrt(image_flat_crops.shape[1] - 6) / 2)
 
