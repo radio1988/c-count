@@ -1,8 +1,13 @@
-name: ccount_metal
+name: ccount
+# run `conda-env create -f mac.yaml` for installation of the env
+# run `pip install aicspylibczi` after that
+
 channels:
+  - defaults
   - apple
   - conda-forge
   - bioconda
+
 subdirs:
   - osx-arm64
   - osx-64
@@ -36,4 +41,4 @@ dependencies:
      - bayesian-optimization
      - gym
      - kaggle
-  
+     #- aicspylibczi
