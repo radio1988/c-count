@@ -58,8 +58,8 @@ rule targets:
     input:
         dag='dag.pdf',
         label_locs=expand('res/label_locs/{scene}.label.npy.gz',scene=SCENES),
-        label_crops=expand('res/label_crops/{scene}.LABEL.npy.gz',scene=SCENES),
-        label_count="res/count.label.csv"
+        label_crops=expand('res/label_crops/{scene}.label.npy.gz',scene=SCENES),
+        #label_count="res/count.label.csv"  #todo smart way to collect all scene filenames (some does not have all 4)
 
 
 rule jpg2locs:
@@ -84,10 +84,10 @@ rule locs2crops:
         czi="data/czi/{sample}.czi",
         config='config.yaml'
     output:
-        npy='res/label_crops/{sample}.{sceneIndex}.LABEL.npy.gz',
-        txt='res/label_crops/{sample}.{sceneIndex}.LABEL.npy.gz.txt'
+        npy='res/label_crops/{sample}.{sceneIndex}.label.npy.gz',
+        txt='res/label_crops/{sample}.{sceneIndex}.label.npy.gz.txt'
     log:
-        'res/label_crops/{sample}.{sceneIndex}.LABEL.npy.gz.log'
+        'res/label_crops/{sample}.{sceneIndex}.label.npy.gz.log'
     shell:
         "python workflow/scripts/blob_cropping.py -czi {input.czi} -locs {input.label_locs} -i {wildcards.sceneIndex} \
         -config config.yaml -o {output.npy} > {output.txt} 2> {log}"
@@ -126,4 +126,16 @@ rule Create_DAG:
         """
         snakemake -s workflow/jpg2npy.Snakefile --dag targets 2> {log} | dot -Tpdf > {output[0]} 2>> {log}
         snakemake  -s workflow/jpg2npy.Snakefile --rulegraph targets 2> {log}| dot -Tpdf > {output[1]} 2>> {log}
+        """
+
+rule reset:
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1000,
+    threads:
+        1
+    shell:
+        """
+        rm -f dag.pdf rulegraph.pdf dag.log
+        rm -f res/count.label.csv count.label.csv.log
+        rm -rf res/label_locs res/label_crops
         """
