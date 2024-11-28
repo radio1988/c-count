@@ -146,7 +146,7 @@ rule locs2crops:
         npy='res/label_crops/{sample}.{sceneIndex}.label.npy.gz',
         txt='res/label_crops/{sample}.{sceneIndex}.label.npy.gz.txt'
     log:
-        'res/label_crops/{sample}.{sceneIndex}.label.npy.gz.log'
+        'res/label_crops/log/{sample}.{sceneIndex}.label.npy.gz.log'
     shell:
         "python workflow/scripts/blob_cropping.py -czi {input.czi} -locs {input.label_locs} -i {wildcards.sceneIndex} \
         -config config.yaml -o {output.npy} > {output.txt} 2> {log}"

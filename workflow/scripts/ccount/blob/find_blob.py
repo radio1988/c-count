@@ -33,7 +33,6 @@ def find_blob(image_neg, scaling_factor=4,
     num_sigma: 20  # smaller->faster, less accurate, 5-20
     threshold: 0.1  # 0.02 too sensitive, 0.1 to ignore debris
     overlap: .2 # overlap larger than this, smaller blob gone, not sensitive
-    blob_detection_visualization: True  # jpg file with circles around blobs
     blob_extention_ratio: 1.4 # for vis in jpg
     blob_extention_radius: 10 # for vis in jpg
     crop_width: 80  # padding width, which is cropped img width/2 (50), in blob_cropping.py

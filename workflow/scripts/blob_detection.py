@@ -98,16 +98,14 @@ for i in range(len(image_obj.scenes)):
     save_locs(blob_locs, out_blob_fname)
 
     # Visualizing filtered blobs
-    # todo: split into another script to avoid RAM crash (curretly 4.5G usage, may reduce to 2.5G)
-    if config['blob_detection_visualization']:
-        Path(os.path.join(args.odir, "vis_blob_detection")).mkdir(parents=True, exist_ok=True)
-        out_img_fname = os.path.join(args.odir, "vis_blob_detection", corename + "." + i + ".jpg")
-        print("output_img_fname:", out_img_fname)
-        visualize_blobs_on_img(image, blob_locs,
-                                 blob_extention_ratio=config['blob_extention_ratio'],
-                                 blob_extention_radius=config['blob_extention_radius'],
-                                 fname=out_img_fname
-                                 )
+    Path(os.path.join(args.odir, "vis_blob_detection")).mkdir(parents=True, exist_ok=True)
+    out_img_fname = os.path.join(args.odir, "vis_blob_detection", corename + "." + i + ".jpg")
+    print("output_img_fname:", out_img_fname)
+    visualize_blobs_on_img(image, blob_locs,
+                             blob_extention_ratio=config['blob_extention_ratio'],
+                             blob_extention_radius=config['blob_extention_radius'],
+                             fname=out_img_fname
+                             )
 
 # test: skipped edge filter (we have neg plates now), 08/23/21
 # good_flats = remove_edge_crops(image_flat_crops)
