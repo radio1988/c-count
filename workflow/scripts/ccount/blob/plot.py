@@ -13,7 +13,7 @@ def flat2image(flat_crop):
     return image
 
 
-def visualize_blob_detection(image, blob_locs,
+def visualize_blobs_on_img(image, blob_locs,
         blob_extention_ratio=1.4, blob_extention_radius=10, fname=None):
     '''
     image: image where blobs were detected from
@@ -34,9 +34,6 @@ def visualize_blob_detection(image, blob_locs,
 
     print("blob shape:", blob_locs.shape)
     if blob_locs.shape[1] >= 4:
-        ax.set_title('Visualizing blobs:\n\
-            Red: Positive, Blue: Negative, Green: Maybe, Black: Others, Gray: Not-Labeled')
-
         labels = blob_locs[:, 3]
 
         idx0_negative = labels == 0
@@ -44,6 +41,15 @@ def visualize_blob_detection(image, blob_locs,
         idx3_maybe = labels == 3
         idx5_nolabel = labels == 5
         idx_others = [x not in [0, 1, 3, 5] for x in labels]
+
+        ax.set_title('Blob Visualization\n\
+            Red: Positive {}, Blue: Negative {}, Green: Maybe {}, Black: Others {}, Gray: Not-Labeled {}'.format(
+            sum(idx1_positive),
+            sum(idx0_negative),
+            sum(idx3_maybe),
+            sum(idx_others),
+            sum(idx5_nolabel)
+        ))
 
         for loc in blob_locs[idx0_negative, 0:3]:
             y, x, r = loc
@@ -101,8 +107,8 @@ def visualize_blob_detection(image, blob_locs,
             ax.add_patch(p_others)
     else:
         print('no labels available, all circles will be gray')
+        ax.set_title('Visualizing {} blobs (All are Not Labeled)'.format(blob_locs.shape[0]))
         for loc in blob_locs[:, 0:3]:
-            ax.set_title('Visualizing blobs (All are Not Labeled')
             y, x, r = loc
             p_yellow = plt.Circle(
                 (x, y),
