@@ -40,21 +40,38 @@ def load_crops(in_db_name):
 
 def save_locs(crops, fname):
     """
-    if crop, trim to xyrL then save locs
+    Input: np.array of crops or locs
+    Output: npy file (not npy.gz)
+
+    Note:
+    - if input are crops, trim to xyrL then save locs (to save space)
+    - even if fname is x.npy.gz will save into x.npy (locs file not big anyway)
     """
     from .misc import crops_stat, crop_width
     from pathlib import Path
+
+    # Trim crops to locs
     if crops.shape[1] > 4:
-        crops = crops[:, 0:4]
+        locs = crops[:, 0:4]
+
+    print('num of blob locs to save: {}'.format(locs.shape[0]))
+    print('locs are in yxrL format, only {} nums per row\n'.format(locs.shape[1]))
+
     Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
-    print('dim:', crops.shape)
+
     fname = fname.replace(".npy.gz", ".npy")
-    print("Saving locs:", fname)
-    np.save(fname, crops)
-    subprocess.run("gzip -f " + fname, shell=True, check=True)
+    print('Saving locs:', fname)
+    np.save(fname, locs)
+
+    subprocess.run('gzip -f ' + fname, shell=True, check=True)
+    print('\n')
 
 
 def save_crops(crops, fname):
+    """
+    Input: crops
+    Output: npy.gz or npy files
+    """
     from .misc import crops_stat, crop_width
     from pathlib import Path
     Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
