@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from ccount.blob.io import load_locs, save_locs
 from ccount.img.read_czi import read_czi, parse_image_obj
-from ccount.blob.plot import visualize_blob_detection, visualize_blob_compare
+from ccount.blob.plot import visualize_blobs_on_img, visualize_blob_compare
 from ccount.blob.misc import crops_stat
 
 
@@ -278,4 +278,4 @@ os.makedirs('labeled_npy/log', exist_ok=True)
 count = crops_stat(crops_new)
 print(count)
 save_locs(crops_new, 'labeled_npy/' + corename + '.npy.gz')
-visualize_blob_detection(czi_img, crops_new, fname='labeled_npy/jpg/' + corename + '.jpg')
+visualize_blobs_on_img(czi_img, crops_new, fname='labeled_npy/jpg/' + corename + '.jpg')

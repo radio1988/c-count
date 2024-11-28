@@ -6,7 +6,7 @@ from ccount.img.read_czi import read_czi, parse_image_obj
 
 from ccount.blob.io import save_crops, load_crops
 from ccount.blob.intersect import intersect_blobs
-from ccount.blob.plot import visualize_blob_detection, visualize_blob_compare
+from ccount.blob.plot import visualize_blobs_on_img, visualize_blob_compare
 
 from pathlib import Path
 
@@ -75,7 +75,7 @@ image = parse_image_obj(image_obj, args.index)
 crops = load_crops(args.crops)
 
 if args.crops2 is None:
-    visualize_blob_detection(
+    visualize_blobs_on_img(
     image, crops,
     fname=args.output)
 

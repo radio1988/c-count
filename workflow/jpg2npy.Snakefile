@@ -102,15 +102,15 @@ rule blob_detection:
         os.path.join(CZI_PATH, "{sample}.czi")
     output:
         npy = "res/blob_locs/{sample}.{sceneIndex}.locs.npy.gz",
-        jpg = "res/view/{sample}.{sceneIndex}.jpg"
-    threads:
-        1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 6000  # peaks at 4.5G on example 2024/11/27
+        jpg = "res/blob_locs/view/{sample}.{sceneIndex}.jpg"
     log:
         "res/blob_locs/log/{sample}.{sceneIndex}.log"
     benchmark:
         "res/blob_locs/log/{sample}.{sceneIndex}.benchmark"
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 6000  # peaks at 4.5G on example 2024/11/27
     shell:
         """
         python workflow/scripts/blob_detection.singleScene.py \
@@ -197,4 +197,5 @@ rule reset:
         rm -f dag.pdf rulegraph.pdf dag.log
         rm -f res/count.label.csv count.label.csv.log
         rm -rf res/label_locs res/label_crops
+        rm -rf .snakemake
         """

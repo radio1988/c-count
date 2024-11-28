@@ -9,7 +9,7 @@ from ccount.img.auto_contrast import uint16_image_auto_contrast
 from ccount.blob.find_blob import find_blob
 from ccount.blob.crop_blobs import crop_blobs
 from ccount.blob.io import save_locs
-from ccount.blob.plot import visualize_blob_detection
+from ccount.blob.plot import visualize_blobs_on_img
 
 from pathlib import Path
 
@@ -127,7 +127,7 @@ if config['blob_detection_visualization']:
     Path(os.path.join(args.odir, "view")).mkdir(parents=True, exist_ok=True)
     out_img_fname = os.path.join(args.odir, "view", plateName + "." + i + ".jpg")
     print("output_img_fname:", out_img_fname)
-    visualize_blob_detection(
+    visualize_blobs_on_img(
         image, blob_locs,
         blob_extention_ratio=config['blob_extention_ratio'],
         blob_extention_radius=config['blob_extention_radius'],

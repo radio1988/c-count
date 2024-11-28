@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from ccount.blob.io import load_crops, save_crops
 from ccount.img.read_czi import read_czi, parse_image_obj
-from ccount.blob.plot import visualize_blob_detection, visualize_blob_compare
+from ccount.blob.plot import visualize_blobs_on_img, visualize_blob_compare
 
 def read_colored_jpg(image_path):
     """
@@ -246,8 +246,8 @@ for dir in ('new_npy_green', 'jpg_check_green', 'jpg_new_green', 'jpg_change_gre
     os.makedirs(dir, exist_ok=True)
 
 save_crops(crops_new, 'new_npy_green/' + corename + '.npy.gz')
-visualize_blob_detection(img_gray, crops*scale, fname = 'jpg_check_green/'+corename+'.align_check.jpg')
-visualize_blob_detection(czi_img, crops_new, fname = 'jpg_new_green/'+corename+'.new.jpg')
+visualize_blobs_on_img(img_gray, crops*scale, fname = 'jpg_check_green/'+corename+'.align_check.jpg')
+visualize_blobs_on_img(czi_img, crops_new, fname = 'jpg_new_green/'+corename+'.new.jpg')
 visualize_blob_compare(czi_img, crops_new, crops, fname='jpg_change_green/'+corename+'.change.jpg')
 
 #

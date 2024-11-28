@@ -98,7 +98,7 @@ from ccount.img.auto_contrast import uint16_image_auto_contrast
 from ccount.blob.find_blob import find_blob
 from ccount.blob.crop_blobs import crop_blobs
 from ccount.blob.io import save_locs
-from ccount.blob.plot import visualize_blob_detection
+from ccount.blob.plot import visualize_blobs_on_img
 from pathlib import Path
 import argparse, os, re, yaml
 import numpy as np
@@ -201,7 +201,7 @@ import matplotlib.pyplot as plt
 from ccount.img.read_czi import read_czi, parse_image_obj
 from ccount.blob.io import save_crops, load_crops
 from ccount.blob.intersect import intersect_blobs
-from ccount.blob.plot import visualize_blob_detection, visualize_blob_compare
+from ccount.blob.plot import visualize_blobs_on_img, visualize_blob_compare
 from pathlib import Path
 import argparse, os, re, yaml, textwrap
 import numpy as np

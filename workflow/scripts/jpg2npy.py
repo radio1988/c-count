@@ -5,7 +5,7 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = None   # disables the warning
 from ccount.blob.io import load_locs, save_locs
 from ccount.img.read_czi import read_czi, parse_image_obj
-from ccount.blob.plot import visualize_blob_detection, visualize_blob_compare
+from ccount.blob.plot import visualize_blobs_on_img, visualize_blob_compare
 from ccount.blob.misc import crops_stat
 
 """
@@ -335,4 +335,4 @@ if npy_based_locs.shape[1] > 3:
 outdir = os.path.dirname(outname)
 os.makedirs(outdir, exist_ok=True)
 save_locs(dot_based_locs,  outname)
-visualize_blob_detection(czi_img, dot_based_locs, fname=outname.replace(".npy.gz",".jpg"))
+visualize_blobs_on_img(czi_img, dot_based_locs, fname=outname.replace(".npy.gz",".jpg"))
