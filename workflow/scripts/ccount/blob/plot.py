@@ -14,7 +14,7 @@ def flat2image(flat_crop):
 
 
 def visualize_blob_detection(image, blob_locs,
-                             blob_extention_ratio=1.4, blob_extention_radius=10, fname=None):
+        blob_extention_ratio=1.4, blob_extention_radius=10, fname=None):
     '''
     image: image where blobs were detected from
     blob_locs: blob info array n x 4 [x, y, r, label], crops also works, only first 3 columns used
@@ -35,44 +35,83 @@ def visualize_blob_detection(image, blob_locs,
     print("blob shape:", blob_locs.shape)
     if blob_locs.shape[1] >= 4:
         ax.set_title('Visualizing blobs:\n\
-            Red: Yes, Blue: No, Green: Others')
+            Red: Positive, Blue: Negative, Green: Maybe, Black: Others, Gray: Not-Labeled')
+
         labels = blob_locs[:, 3]
-        red = labels == 1
-        blue = labels == 0
-        green = [x not in [0, 1] for x in labels]
-        for loc in blob_locs[red, 0:3]:
-            y, x, r = loc
-            RED = plt.Circle((x, y),
-                             r * blob_extention_ratio + blob_extention_radius,
-                             color=(1, 0, 0, 0.7), linewidth=2,
-                             fill=False)
-            ax.add_patch(RED)
 
-        for loc in blob_locs[blue, 0:3]:
-            y, x, r = loc
-            BLUE = plt.Circle((x, y),
-                              r * blob_extention_ratio + blob_extention_radius,
-                              color=(0, 0, 1, 0.7), linewidth=2,
-                              fill=False)
-            ax.add_patch(BLUE)
+        idx0_negative = labels == 0
+        idx1_positive = labels == 1
+        idx3_maybe = labels == 3
+        idx5_nolabel = labels == 5
+        idx_others = [x not in [0, 1, 3, 5] for x in labels]
 
-        for loc in blob_locs[green, 0:3]:
+        for loc in blob_locs[idx0_negative, 0:3]:
             y, x, r = loc
-            GREEN = plt.Circle((x, y),
-                               r * blob_extention_ratio + blob_extention_radius,
-                               color=(0, 1, 0, 0.5), linewidth=2,
-                               fill=False)
-            ax.add_patch(GREEN)
+            p_negative = plt.Circle(
+                (x, y),
+                r * blob_extention_ratio + blob_extention_radius,
+                color=(0, 0, 1, 1),  # blue
+                linewidth=2,
+                fill=False
+            )
+            ax.add_patch(p_negative)
+
+        for loc in blob_locs[idx1_positive, 0:3]:
+            y, x, r = loc
+            p_positive = plt.Circle(
+                (x, y),
+                r * blob_extention_ratio + blob_extention_radius,
+                color=(1, 0, 0, 1),  # red
+                linewidth=2,
+                fill=False
+            )
+            ax.add_patch(p_positive)
+
+        for loc in blob_locs[idx3_maybe, 0:3]:
+            y, x, r = loc
+            p_maybe = plt.Circle(
+                (x, y),
+                r * blob_extention_ratio + blob_extention_radius,
+                color=(0, 1, 0, 1),  # green
+                linewidth=2,
+                fill=False
+            )
+            ax.add_patch(p_maybe)
+
+        for loc in blob_locs[idx5_nolabel, 0:3]:
+            y, x, r = loc
+            p_nolabel = plt.Circle(
+                (x, y),
+                r * blob_extention_ratio + blob_extention_radius,
+                color=(0.5, 0.5, 0.5, 1),  # gray
+                linewidth=2,
+                fill=False
+            )
+            ax.add_patch(p_nolabel)
+
+        for loc in blob_locs[idx_others, 0:3]:
+            y, x, r = loc
+            p_others = plt.Circle(
+                (x, y),
+                r * blob_extention_ratio + blob_extention_radius,
+                color=(1, 1, 1, 1),  # black
+                linewidth=2,
+                fill=False
+            )
+            ax.add_patch(p_others)
     else:
-        print('no label provided')
+        print('no labels available, all circles will be gray')
         for loc in blob_locs[:, 0:3]:
-            ax.set_title('Visualizing blobs')
+            ax.set_title('Visualizing blobs (All are Not Labeled')
             y, x, r = loc
-            YELLOW = plt.Circle((x, y),
-                                r * blob_extention_ratio + blob_extention_radius,
-                                color=(0.9, 0.9, 0, 0.5), linewidth=1,
-                                fill=False)
-            ax.add_patch(YELLOW)
+            p_yellow = plt.Circle(
+                (x, y),
+                r * blob_extention_ratio + blob_extention_radius,
+                color=(0.5, 0.5, 0.5, 1),  # gray
+                linewidth=2,
+                fill=False
+            )
+            ax.add_patch(p_yellow)
 
     if fname:
         plt.savefig(fname)
