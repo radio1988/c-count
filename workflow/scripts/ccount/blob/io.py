@@ -1,4 +1,6 @@
 import gzip, os, subprocess
+import sys
+
 import numpy as np
 from .misc import crops_stat, crop_width
 
@@ -44,27 +46,41 @@ def save_locs(crops, fname):
     Output: npy file (not npy.gz)
 
     Note:
-    - if input are crops, trim to xyrL then save locs (to save space)
+    - if input are crops, trim to xyrL formatted locs (to save space)
+    - if input are yxr formatted locs, padding to yxrL format with 5(unlabeled) labels
     - even if fname is x.npy.gz will save into x.npy (locs file not big anyway)
     """
     from .misc import crops_stat, crop_width
     from pathlib import Path
 
-    # Trim crops to locs
-    if crops.shape[1] > 4:
-        locs = crops[:, 0:4]
+    print('<save_locs>')
 
-    print('num of blob locs to save: {}'.format(locs.shape[0]))
-    print('locs are in yxrL format, only {} nums per row\n'.format(locs.shape[1]))
+    # Trim crops to locs
+    w = crops.shape[1]
+    if w > 4:
+        print('input locs array are crops (np.array with flattened crop image)')
+        print('trimming crops to locs in yxrL format')
+        locs = crops[:, 0:4]
+    elif w == 4:
+        print('input locs array is in yxrL format')
+        locs = crops
+    elif w == 3:
+        print('input locs array is in yxr format, it does not have an L (labels) column')
+        print('padding with "5" (i.e. unlabeled) as labels')
+        padding = np.full((crops.shape[0], 1), 5)  # 5:unlabeled
+        locs = np.hstack([crops, padding])
+    else:
+        sys.exit("locs/crops format error")
+
+    print('num of blob locs: {}'.format(locs.shape[0]))
 
     Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
 
-    fname = fname.replace(".npy.gz", ".npy")
-    print('Saving locs:', fname)
-    np.save(fname, locs)
+    tempName = fname.replace(".npy.gz", ".npy")
+    np.save(tempName, locs)
+    subprocess.run('gzip -f ' + tempName, shell=True, check=True)
 
-    subprocess.run('gzip -f ' + fname, shell=True, check=True)
-    print('\n')
+    print(fname, 'saved\n')
 
 
 def save_crops(crops, fname):
