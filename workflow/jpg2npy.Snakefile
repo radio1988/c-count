@@ -129,7 +129,7 @@ rule jpg2locs:
     output:
         label_locs='res/label_locs/{sample}.{sceneIndex}.label.npy.gz'
     log:
-        'res/label_locs/{sample}.{sceneIndex}.label.npy.gz.log'
+        'res/label_locs/log/{sample}.{sceneIndex}.label.npy.gz.log'
     shell:
         """
         python workflow/scripts/jpg2npy.py {input.jpg} {input.czi} {input.blob_locs} \
