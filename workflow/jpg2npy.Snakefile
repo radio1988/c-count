@@ -64,8 +64,8 @@ def get_samples_and_sceneIndexes_from_dir(LABEL_PATH):
     """
     Input: LABEL_PATH, e.g. data/label_img/
     Output:
-    - samples: a list of {sample}
-    - scenes: a list of {sample}.{sceneIndex}
+    - SAMPLES: a list of {sample}
+    - SCENES: a list of {sample}.{sceneIndex}
 
     e.g.
     # print(SAMPLES)
@@ -82,7 +82,7 @@ def get_samples_and_sceneIndexes_from_dir(LABEL_PATH):
     basenames = [os.path.splitext(filename)[0] for filename in
                  jpg_filenames]  # point5U_Epo_3-Stitching-11.1.crops.clas.npy.gz
     SCENES = [x.replace(IMG_SUFFIX,"") for x in basenames]  #  point5U_Epo_3-Stitching-11.1
-    SAMPLES = [get_sampleName_from_sceneName(x) for x in scenes]  # point5U_Epo_3-Stitching-11
+    SAMPLES = [get_sampleName_from_sceneName(x) for x in SCENES]  # point5U_Epo_3-Stitching-11
     return SAMPLES, SCENES
 
 
@@ -94,14 +94,15 @@ rule targets:
         dag='dag.pdf',
         label_locs=expand('res/label_locs/{scene}.label.npy.gz',scene=SCENES),
         label_crops=expand('res/label_crops/{scene}.label.npy.gz',scene=SCENES),
-        # label_count="res/count.label.csv"  #todo smart way to collect all scene filenames (some does not have all 4)
+        #label_count="res/count.label.csv"
 
 
 rule blob_detection:
     input:
         os.path.join(CZI_PATH, "{sample}.czi")
     output:
-        "res/blob_locs/{sample}.{sceneIndex}.locs.npy.gz"
+        npy = "res/blob_locs/{sample}.{sceneIndex}.locs.npy.gz",
+        jpg = "res/view/{sample}.{sceneIndex}.jpg"
     threads:
         1
     resources:
@@ -112,8 +113,8 @@ rule blob_detection:
         "res/blob_locs/log/{sample}.{sceneIndex}.benchmark"
     shell:
         """
-        python workflow/scripts/blob_detection.py \
-        -i {input} -c config.yaml -odir res/blob_locs &> {log}
+        python workflow/scripts/blob_detection.singleScene.py \
+        -input {input} -sceneIndex {wildcards.sceneIndex} -config config.yaml -odir res/blob_locs &> {log}
         """
 
 
@@ -134,6 +135,7 @@ rule jpg2locs:
         python workflow/scripts/jpg2npy.py {input.jpg} {input.czi} {input.blob_locs} \
         {wildcards.sceneIndex} {output.label_locs} &> {log}
         """
+
 
 rule locs2crops:
     input:
