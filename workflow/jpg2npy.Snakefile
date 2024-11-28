@@ -94,7 +94,7 @@ rule targets:
         dag='dag.pdf',
         label_locs=expand('res/label_locs/{scene}.label.npy.gz',scene=SCENES),
         label_crops=expand('res/label_crops/{scene}.label.npy.gz',scene=SCENES),
-        #label_count="res/count.label.csv"
+        label_count="res/count.label.csv"
 
 
 rule blob_detection:
@@ -154,7 +154,7 @@ rule locs2crops:
 
 rule aggr_label_count:
     input:
-        input_names(SAMPLES=SAMPLES, prefix="res/label_locs/", suffix=".label.npy.gz.txt")
+        expand('res/label_crops/{scene}.label.npy.gz.txt', scene = SCENES)
     output:
         "res/count.label.csv"
     threads:
