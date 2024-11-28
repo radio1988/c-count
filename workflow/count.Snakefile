@@ -31,44 +31,9 @@ rule targets:
 #        blob_locs=expand("res/classification1/{s}.{i}.locs.clas.npy.gz",s=SAMPLES,i=[0, 1, 2, 3]),
         rulegraph="rulegraph.pdf"
 
-rule czi2img:
-    input:
-        os.path.join(config['DATA_DIR'], "{s}.czi")
-    output:
-        touch("log/img/{s}.done")
-    threads:
-        1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 16000  # ~10.5G for '2019'
-    log:
-        "log/img/{s}.log"
-    benchmark:
-        "log/img/{s}.benchmark"
-    shell:
-        """
-        python workflow/scripts/czi2img.py -i {input} -c config.yaml -odir res/img &> {log}
-        """
+include: 'rules/czi2img.smk'
+include: 'rules/blob_detection.smk'
 
-rule blob_detection:
-    input:
-        os.path.join(config['DATA_DIR'], "{s}.czi")
-    output:
-        touch("res/blob_locs/{s}.done"),
-    #"res/blob_locs/{s}.{i}.crops.npy.gz"
-    threads:
-        1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 16000  # ~12G for '2019'
-    log:
-        "log/blob_locs/{s}.log"
-    benchmark:
-        "log/blob_locs/{s}.benchmark"
-    shell:
-        """
-        # todo: dynamic config.fname
-        python workflow/scripts/blob_detection.py \
-        -i {input} -c config.yaml -odir res/blob_locs &> {log}  
-        """
 
 rule blob_cropping:
     input:
