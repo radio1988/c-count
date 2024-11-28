@@ -2,64 +2,119 @@ import os
 from scripts.ccount.snake.input_names import input_names
 
 
-
 """
-Dir input assumptions:
-- data/czi
-- data/label_img: the sample names can't have dot `.` in them, this is the folder for sample name collection
+Input assumptions:
+- data/czi: raw plate images
+    - e.g. 'data/czi/{sample}.czi'
+- data/label_img: labeled jpg files.
+    - e.g. 'data/label_img/{sample}.{sceneIndex}' + IMG_SUFFIX + '.jpg'
+    - all jpg files will be used for sample and scene list collection.
+    - sample names should match czi files.
+    - no dots `.` in sample names
 - config.yaml: blob detection parameters, locs2crops parameters
 
 output assumptions:
+- res/blob_locs: can reuse previously detected blob_locs, to save time
+- res/crops_locs
 - res/label_locs
 - res/label_locs/vis/
+- res/count.label.csv: count table from labels
+
+Nomenclature:
+- sample: plate name
+- sceneIndex: there are 4 scenes in a plate with the Merav lab's setup
+
+Logic:
+- get samples and sceneIndexes from labeled jpg
+- get blob_locs from czi for the samples for the requested sceneIndexes only
+- get label_locs and label_crops for the requested sceneIndexes
+- aggregate count for them
 """
 
 
-INPUT_PATH = 'data/label_img'
+configfile: "config.yaml"
+CZI_PATH = 'data/czi'
+LABEL_PATH = 'data/label_img'
 IMG_SUFFIX = '.crops.clas.npy.gz'  # point5U_Epo_3-Stitching-11.1.crops.clas.npy.gz
 
 
-def sampleName_from_sceneName(sceneName):
+def get_sampleName_from_sceneName(sceneName):
     """
+    Input: sceneName (point5U_Epo_3-Stitching-11.1)
+    Output: sampleName (point5U_Epo_3-Stitching-11)
+
     assume there is no dot `.` in sample name
-    sceneName:  point5U_Epo_3-Stitching-11.1
-    sampleName:  point5U_Epo_3-Stitching-11
     """
     sampleName = sceneName.split('.')[0]
     return sampleName
 
 
-def sceneIndex_from_sceneName(sceneName):
+def get_sceneIndex_from_sceneName(sceneName):
     """
+    Input: sceneName (point5U_Epo_3-Stitching-11.1)
+    Output: sceneIndex (1)
+
     assume there is no dot `.` in sample name
-    sceneName:  point5U_Epo_3-Stitching-11.1
-    sceneIndex:  1
     """
     sceneIndex = sceneName.split('.')[1]
     return sceneIndex
 
 
-def get_jpg_samples(INPUT_PATH):
-    filenames = os.listdir(INPUT_PATH)
+def get_samples_and_sceneIndexes_from_dir(LABEL_PATH):
+    """
+    Input: LABEL_PATH, e.g. data/label_img/
+    Output:
+    - samples: a list of {sample}
+    - scenes: a list of {sample}.{sceneIndex}
+
+    e.g.
+    # print(SAMPLES)
+    # ['point5U_Epo_1-Stitching-09', 'point5U_Epo_1-Stitching-09', 'point5U_Epo_1-Stitching-09',
+    # 'point5U_Epo_1-Stitching-09', '1U_Epo_1-Stitching-01']
+    # print(SCENES)
+    # ['point5U_Epo_1-Stitching-09.3', 'point5U_Epo_1-Stitching-09.1', 'point5U_Epo_1-Stitching-09.2',
+    # 'point5U_Epo_1-Stitching-09.0', '1U_Epo_1-Stitching-01.2']
+
+    """
+    filenames = os.listdir(LABEL_PATH)
     jpg_filenames = [filename for filename in filenames if
                      filename.endswith(".jpg")]  # point5U_Epo_3-Stitching-11.1.crops.clas.npy.gz.jpg
     basenames = [os.path.splitext(filename)[0] for filename in
                  jpg_filenames]  # point5U_Epo_3-Stitching-11.1.crops.clas.npy.gz
-    scenes = [x.replace(IMG_SUFFIX,"") for x in basenames]  #  point5U_Epo_3-Stitching-11.1
-    samples = [sampleName_from_sceneName(x) for x in scenes]  # point5U_Epo_3-Stitching-11
-    return samples, scenes
+    SCENES = [x.replace(IMG_SUFFIX,"") for x in basenames]  #  point5U_Epo_3-Stitching-11.1
+    SAMPLES = [get_sampleName_from_sceneName(x) for x in scenes]  # point5U_Epo_3-Stitching-11
+    return SAMPLES, SCENES
 
 
-SAMPLES, SCENES = get_jpg_samples(INPUT_PATH)
-# print(SAMPLES)
-# print(SCENES)
+### START
+SAMPLES, SCENES = get_samples_and_sceneIndexes_from_dir(LABEL_PATH)
 
 rule targets:
     input:
         dag='dag.pdf',
         label_locs=expand('res/label_locs/{scene}.label.npy.gz',scene=SCENES),
         label_crops=expand('res/label_crops/{scene}.label.npy.gz',scene=SCENES),
-        #label_count="res/count.label.csv"  #todo smart way to collect all scene filenames (some does not have all 4)
+        # label_count="res/count.label.csv"  #todo smart way to collect all scene filenames (some does not have all 4)
+
+
+rule blob_detection:
+    input:
+        os.path.join(CZI_PATH, "{sample}.czi")
+    output:
+        "res/blob_locs/{sample}.{sceneIndex}.locs.npy.gz"
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 6000  # peaks at 4.5G on example 2024/11/27
+    log:
+        "res/blob_locs/log/{sample}.{sceneIndex}.log"
+    benchmark:
+        "res/blob_locs/log/{sample}.{sceneIndex}.benchmark"
+    shell:
+        """
+        python workflow/scripts/blob_detection.py \
+        -i {input} -c config.yaml -odir res/blob_locs &> {log}
+        """
 
 
 rule jpg2locs:
@@ -75,8 +130,10 @@ rule jpg2locs:
     log:
         'res/label_locs/{sample}.{sceneIndex}.label.npy.gz.log'
     shell:
-        "python workflow/scripts/jpg2npy.py {input.jpg} {input.czi} {input.blob_locs} \
-        {wildcards.sceneIndex} {output.label_locs} &> {log}"
+        """
+        python workflow/scripts/jpg2npy.py {input.jpg} {input.czi} {input.blob_locs} \
+        {wildcards.sceneIndex} {output.label_locs} &> {log}
+        """
 
 rule locs2crops:
     input:
