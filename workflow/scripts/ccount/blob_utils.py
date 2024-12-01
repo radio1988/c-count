@@ -57,7 +57,7 @@ def get_blob_statistics(blobs):
     n_cols = blobs.shape[1]
 
     if n_cols > 10:
-        print('crop width:', crop_width(crops))
+        print('crop width:', crop_width(blobs))
     elif n_cols >= 4:
         print('only yxrL, no img of crops included')
     elif n_cols == 3:

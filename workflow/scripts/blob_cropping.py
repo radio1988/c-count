@@ -3,33 +3,29 @@ reads czi, locs.npy.gz, config.yaml
 outputs crops.npy.gz
 """
 
-from ccount.img.read_czi import read_czi, parse_image_obj
-from ccount.img.auto_contrast import uint16_image_auto_contrast
-
-from ccount.blob.crop_blobs import crop_blobs
-from ccount.blob.io import save_crops, load_blobs
-from ccount.blob.misc import get_blob_statistics
-
+from ccount.img_utils import read_czi, parse_image_obj, uint16_image_auto_contrast
+from ccount.blob_utils import save_crops, load_blobs, crop_blobs, get_blob_statistics
 
 from pathlib import Path
-import argparse, os, re, matplotlib, subprocess, yaml
+import argparse, os, re, matplotlib, subprocess, yaml, sys
 
 
 def parse_cmd_and_prep():
     # ARGS
     parser = argparse.ArgumentParser(
         description='''\
-        >>> Function: read czi, blob_locs, output square crop images of each blob 
-        >>> Example cmd:
+        <blob_cropping.py>
+        Read czi, blob_locs, output square crop images of each blob 
+        Example cmd:
         python workflow/scripts/blob_cropping.py -czi data/IL17A_POINT1_EPO_1.czi 
         -locs res/blob_locs/IL17A_POINT1_EPO_1.0.locs.npy.gz -i 0 
         -config config.yaml -o res/blob_crops/IL17A_POINT1_EPO_1.0.crops.npy.gz''')
     parser.add_argument('-czi', type=str,
-                        help='czi file name: path/xxx.czi')
-    parser.add_argument('-locs', type=str, default="path/blobs.locs.npy.gz",
-                        help='blob_locs file name, in npy.gz format')
+                        help='czi file of a plate image, e.g. path/xxx.czi')
+    parser.add_argument('-locs', type=str,
+                        help='blob_locs file in npy.gz format, this script use yxr info from it to crop blobs')
     parser.add_argument('-i', type=int,
-                        help='area index, e.g. 1,2,3,4')
+                        help='scene index, as each czi file has multiple scenes, e.g. 0,1,2,3')
     parser.add_argument('-config', type=str,
                         help='path/config.yaml')
     parser.add_argument('-o', type=str, default="path/blobs.crops.npy.gz",
