@@ -1,5 +1,5 @@
 #import ccount
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_blobs, save_crops
 from ccount.blob.area_calculation import area_calculations
 import sys, subprocess
 import numpy as np
@@ -26,7 +26,7 @@ print('inname:', inname,
     "\noutname_txt", outname_txt, 
     "\noutname_crops", outname_crops)
 
-crops = load_crops(inname)
+crops = load_blobs(inname)
 areas = area_calculations(crops)
 
 # save txt

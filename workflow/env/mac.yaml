@@ -36,6 +36,7 @@ dependencies:
   - imgaug
   - aicsimageio
   - graphviz
+  - seaborn # for jupyterlab, EpoCurve (optional for main ccount`)
   - pip:
      - tensorflow-macos
 #     - tensorflow-metal

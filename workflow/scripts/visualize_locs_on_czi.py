@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from ccount.img.read_czi import read_czi, parse_image_obj
 
-from ccount.blob.io import save_crops, load_crops
+from ccount.blob.io import save_crops, load_blobs
 from ccount.blob.intersect import intersect_blobs
 from ccount.blob.plot import visualize_blobs_on_img, visualize_blob_compare
 
@@ -72,7 +72,7 @@ with open(args.config, 'r') as stream:
 
 image_obj = read_czi(args.czi, Format=config['FORMAT'])
 image = parse_image_obj(image_obj, args.index)
-crops = load_crops(args.crops)
+crops = load_blobs(args.crops)
 
 if args.crops2 is None:
     visualize_blobs_on_img(
@@ -81,7 +81,7 @@ if args.crops2 is None:
 
 
 if args.crops2 is not None:
-    crops2 = load_crops(args.crops2)
+    crops2 = load_blobs(args.crops2)
     crops, crops2 = intersect_blobs(crops, crops2)
     visualize_blob_compare(
     image, crops, crops2,

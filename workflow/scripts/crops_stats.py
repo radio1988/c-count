@@ -1,6 +1,6 @@
 import argparse, textwrap
-from ccount.blob.io import load_crops
-from ccount.blob.misc import crops_stat
+from ccount.blob.io import load_blobs
+from ccount.blob.misc import get_label_statistics
 
 
 def parse_cmd_and_prep():
@@ -19,5 +19,5 @@ def parse_cmd_and_prep():
     return args
 
 args = parse_cmd_and_prep()
-crops = load_crops(args.crops)
-crops_stat(crops)
+crops = load_blobs(args.crops)
+get_label_statistics(crops)

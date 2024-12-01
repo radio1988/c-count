@@ -1,5 +1,5 @@
-from ccount.blob.io import load_crops, save_crops
-from ccount.blob.misc import crops_stat
+from ccount.blob.io import load_blobs, save_crops
+from ccount.blob.misc import get_label_statistics
 from pathlib import Path
 import numpy as np
 import sys, argparse, os, re, yaml
@@ -26,12 +26,12 @@ def parse_cmd_and_prep ():
 args = parse_cmd_and_prep()
 
 for i, crop_name in enumerate(args.crops):
-    crops = load_crops(crop_name)
+    crops = load_blobs(crop_name)
     if i == 0:
         output_crops = crops
     else:
         print("Merging...")
         output_crops = np.vstack((output_crops, crops))
-        crops_stat(output_crops)
+        get_label_statistics(output_crops)
 
 save_crops(output_crops, args.output)

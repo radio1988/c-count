@@ -108,6 +108,6 @@ for i in range(len(image_obj.scenes)):
                              )
 
 # test: skipped edge filter (we have neg plates now), 08/23/21
-# good_flats = remove_edge_crops(image_flat_crops)
+# good_flats = remove_edge_crops(crops)
 # print("there are {} blobs passed edge filter".format(len(good_flats)))
-# good_flats = image_flat_crops
+# good_flats = crops

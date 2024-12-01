@@ -1,7 +1,7 @@
 # %matplotlib inline
 import sys, os
 from os import path
-from ccount.blob.io import load_crops
+from ccount.blob.io import load_blobs
 from ccount.blob.plot import show_rand_crops
 
 if len(sys.argv) == 6:
@@ -25,9 +25,9 @@ else:
     print("example: python crops_view.py  test.npy.gz  1  25  0  test_yes ")
     sys.exit("cmd err")
 
-image_flat_crops = load_crops(in_name)
+crops = load_blobs(in_name)
 
-show_rand_crops(crops=image_flat_crops,
+show_rand_crops(crops=crops,
                 label_filter=label_filter,
                 num_shown=num_shown,
                 fname=out_name,

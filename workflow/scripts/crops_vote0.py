@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import sys
 
-from ccount.blob.io import load_crops, save_crops
-from ccount.blob.misc import crops_stat
+from ccount.blob.io import load_blobs, save_crops
+from ccount.blob.misc import get_label_statistics
 from ccount.clas.metrics import F1_calculation
 from ccount.blob.intersect import intersect_blobs
 
@@ -43,8 +43,8 @@ name1 = sys.argv[1]  # label set A
 name2 = sys.argv[2]  # label set B
 outname = sys.argv[3]
 
-blobs1 = load_crops(name1)
-blobs2 = load_crops(name2)
+blobs1 = load_blobs(name1)
+blobs2 = load_blobs(name2)
 
 labels1 = read_labels(blobs1)
 labels2 = read_labels(blobs2)

@@ -3,9 +3,9 @@ from ccount.img.equalize import equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
 
-from ccount.blob.io import load_crops, load_locs, save_crops, save_locs
+from ccount.blob.io import load_blobs, load_blobs, save_crops, save_locs
 from ccount.blob.mask_image import mask_image
-from ccount.blob.misc import crops_stat, parse_crops, crop_width
+from ccount.blob.misc import get_label_statistics, parse_crops, crop_width
 
 from ccount.clas.metrics import F1
 
@@ -55,7 +55,7 @@ def parse_cmd_and_prep ():
 # print('>>> Command:', sys.argv)
 args, config = parse_cmd_and_prep()
 
-crops = load_crops(args.crops)
+crops = load_blobs(args.crops)
 w = crop_width(crops)
 print("crops:", crops[0:3, 0:5])
 
@@ -104,7 +104,7 @@ positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 # Save 
 print("Saving classifications..")
 crops[:, 3] = classifications
-crops_stat(crops)
+get_label_statistics(crops)
 
 save_locs(crops, args.output.replace('crops','locs'))  #todo: fix potential name bug in non-workflow situations
 save_crops(crops, args.output)

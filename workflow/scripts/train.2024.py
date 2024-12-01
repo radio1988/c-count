@@ -2,9 +2,9 @@ from ccount.img.equalize import equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
 
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_blobs, save_crops
 from ccount.blob.mask_image import mask_image
-from ccount.blob.misc import crops_stat, parse_crops, crop_width
+from ccount.blob.misc import get_label_statistics, parse_crops, crop_width
 
 
 from ccount.clas.split_data import split_data
@@ -76,20 +76,20 @@ def parse_cmd_and_prep ():
 def cleanup_crops(crops):
     print("Removing unlabeled crops (label == 5)")
     crops = crops[crops[:, 3] != 5, :]
-    crops_stat(crops)
+    get_label_statistics(crops)
 
     print("Set other laberls as no (label == 3[uncertain],4[artifacts])")
     if config['numClasses'] == 2:
         crops[crops[:, 3] == 3, 3] = 0  # uncertain
         crops[crops[:, 3] == 4, 3] = 0  # artifacts, see ccount.blob.readme.txt
-        crops_stat(crops)
+        get_label_statistics(crops)
 
     return crops
 
 args, corename, config = parse_cmd_and_prep()
 
-train_crops = load_crops(args.crops_train)
-val_crops = load_crops(args.crops_val)
+train_crops = load_blobs(args.crops_train)
+val_crops = load_blobs(args.crops_val)
 
 w = crop_width(train_crops)
 

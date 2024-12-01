@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import sys 
 
-from ccount.blob.io import load_crops
+from ccount.blob.io import load_blobs
 from ccount.clas.metrics import F1_calculation
 from ccount.blob.intersect import intersect_blobs
 
@@ -22,9 +22,9 @@ name2 = sys.argv[2]  # truth
 #print(name1, name2)
 
 
-blobs1 = load_crops(name1)
+blobs1 = load_blobs(name1)
 print()
-blobs2 = load_crops(name2)
+blobs2 = load_blobs(name2)
 print()
 
 blobs1b, blobs2b = intersect_blobs(blobs1, blobs2)

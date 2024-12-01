@@ -4,9 +4,45 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="jpg2npy.Snakefile: organize log">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="label/ draft folder removed">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/env/mac.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/env/mac.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/edge_detector_dev.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/edge_detector_dev.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/filter_merge.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/filter_merge.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/labeling.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/labeling.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/tracking.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/tracking.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/viewing_blobs.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/viewing_blobs.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/visualize_area_calculation.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/visualize_area_calculation.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/.ipynb_checkpoints/test_import-checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/.ipynb_checkpoints/test_import-checkpoint.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/area_calculation.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/area_calculation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_cropping.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_cropping.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_detection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_detection.singleScene.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_detection.singleScene.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/blob_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount/blob_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/clas/augment_images.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount/clas/augment_images.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/clas/balance_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount/clas/balance_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/classification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_filtering.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_filtering.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_labeling.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_labeling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_merging.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_merging.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_sampling.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_sampling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_split.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_split.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_stats.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_stats.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_viewing.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_viewing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_vote0.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_vote0.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_vote1.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_vote1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/eval_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/eval_classification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/misc/f1_score.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/misc/f1_score.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/test_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/test_import.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/train.2024.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/train.2024.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/train.old.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/train.old.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/training.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/visualize_locs_on_czi.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/visualize_locs_on_czi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/trash/blob_detection.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/trash/blob_detection.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,27 +118,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00014" summary="added graphviz for dot for dag">
-      <created>1719517787183</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1719517787183</updated>
-    </task>
-    <task id="LOCAL-00015" summary="added graphviz for dot for dag">
-      <created>1719517803528</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1719517803528</updated>
-    </task>
-    <task id="LOCAL-00016" summary="weight.hdf5">
-      <created>1719517823226</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1719517823226</updated>
     </task>
     <task id="LOCAL-00017" summary="works">
       <created>1719858294702</created>
@@ -426,7 +441,28 @@
       <option name="project" value="LOCAL" />
       <updated>1732781879635</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="jpg2npy.Snakefile: organize log, added view/jpg in check">
+      <created>1732990177800</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1732990177801</updated>
+    </task>
+    <task id="LOCAL-00064" summary="take blob/io.py blob/misc.py to blob_utils.py">
+      <created>1733029795494</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1733029795494</updated>
+    </task>
+    <task id="LOCAL-00065" summary="label/ draft folder removed">
+      <created>1733029875053</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1733029875053</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -451,9 +487,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="less print" />
-    <MESSAGE value="debug" />
-    <MESSAGE value="labels and rs use np.concatenate" />
     <MESSAGE value="priority of eval 100" />
     <MESSAGE value="blob_locs input names updated" />
     <MESSAGE value="vote0" />
@@ -476,6 +509,9 @@
     <MESSAGE value="blob_detection.smk and czi2img.smk split from count.Snakefile" />
     <MESSAGE value="jpg2npy.Snakefile: aggr_label_count takes correct amount of scenes" />
     <MESSAGE value="jpg2npy.Snakefile: organize log" />
-    <option name="LAST_COMMIT_MESSAGE" value="jpg2npy.Snakefile: organize log" />
+    <MESSAGE value="jpg2npy.Snakefile: organize log, added view/jpg in check" />
+    <MESSAGE value="take blob/io.py blob/misc.py to blob_utils.py" />
+    <MESSAGE value="label/ draft folder removed" />
+    <option name="LAST_COMMIT_MESSAGE" value="label/ draft folder removed" />
   </component>
 </project>

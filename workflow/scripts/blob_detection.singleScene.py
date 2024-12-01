@@ -135,4 +135,4 @@ visualize_blobs_on_img(
 
 # dev notes:
 # test: skipped edge filter (we have neg plates now), 08/23/21
-# good_flats = remove_edge_crops(image_flat_crops)
+# good_flats = remove_edge_crops(crops)

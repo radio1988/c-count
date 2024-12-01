@@ -118,7 +118,7 @@ rule blob_detection:
         """
 
 
-rule jpg2locs:
+rule labelImg2locs:
     """
     900M RAM usage on Mac
     """
@@ -127,7 +127,8 @@ rule jpg2locs:
         czi="data/czi/{sample}.czi",
         blob_locs="res/blob_locs/{sample}.{sceneIndex}.locs.npy.gz"
     output:
-        label_locs='res/label_locs/{sample}.{sceneIndex}.label.npy.gz'
+        label_locs='res/label_locs/{sample}.{sceneIndex}.label.npy.gz',
+        view='res/label_locs/{sample}.{sceneIndex}.label.jpg',
     log:
         'res/label_locs/log/{sample}.{sceneIndex}.label.npy.gz.log'
     shell:
@@ -144,34 +145,36 @@ rule locs2crops:
         config='config.yaml'
     output:
         npy='res/label_crops/{sample}.{sceneIndex}.label.npy.gz',
-        txt='res/label_crops/{sample}.{sceneIndex}.label.npy.gz.txt'
+        log='res/label_crops/log/{sample}.{sceneIndex}.label.npy.gz.log'
     log:
-        'res/label_crops/log/{sample}.{sceneIndex}.label.npy.gz.log'
+        'res/label_crops/log/{sample}.{sceneIndex}.label.npy.gz.err'
     shell:
-        "python workflow/scripts/blob_cropping.py -czi {input.czi} -locs {input.label_locs} -i {wildcards.sceneIndex} \
-        -config config.yaml -o {output.npy} > {output.txt} 2> {log}"
+        """
+        python workflow/scripts/blob_cropping.py -czi {input.czi} -locs {input.label_locs} -i {wildcards.sceneIndex} \
+        -config config.yaml -o {output.npy} > {output.log} 2> {log}
+        """
 
 
-rule aggr_label_count:
+rule aggr_label_based_count:
     input:
-        expand('res/label_crops/{scene}.label.npy.gz.txt', scene = SCENES)
+        expand('res/label_crops/log/{scene}.label.npy.gz.log', scene = SCENES)
     output:
         "res/count.label.csv"
+    log:
+        "res/count.label.csv.log"
     threads:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1000
     priority:
         100
-    log:
-        "res/count.label.csv.log"
     shell:
         """
         python workflow/scripts/aggr_label_count.py {input} {output} &> {log}
         """
 
 
-rule Create_DAG:
+rule create_dag:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1000,
     threads:

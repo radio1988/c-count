@@ -60,7 +60,7 @@ from aicsimageio import AICSImage
 from skimage.transform import rescale, resize, downscale_local_mean
 import os
 import re
-from ccount.blob.io import load_crops
+from ccount.blob.io import load_blobs
 import numpy as np
 import pandas as pd
 from sklearn.metrics import f1_score
@@ -79,7 +79,7 @@ import sys
 import pandas as pd
 import os
 #import ccount
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_blobs, save_crops
 from ccount.blob.area_calculation import area_calculations
 import sys, subprocess
 import numpy as np
@@ -87,7 +87,7 @@ import matplotlib.pyplot as plt
 from ccount.img.read_czi import read_czi, parse_image_obj
 from ccount.img.auto_contrast import uint16_image_auto_contrast
 from ccount.blob.crop_blobs import crop_blobs
-from ccount.blob.io import save_crops, load_locs
+from ccount.blob.io import save_crops, load_blobs
 from pathlib import Path
 import argparse, os, re, matplotlib, subprocess, yaml
 import matplotlib
@@ -124,9 +124,9 @@ from time import sleep
 from ccount.img.equalize import equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_blobs, save_crops
 from ccount.blob.mask_image import mask_image
-from ccount.blob.misc import crops_stat, parse_crops, crop_width
+from ccount.blob.misc import get_label_statistics, parse_crops, crop_width
 from ccount.clas.metrics import F1
 import sys, argparse, os, re, yaml, keras
 import numpy as np
@@ -136,22 +136,22 @@ from pyimagesearch.cnn.networks.lenet import LeNet
 from tensorflow.keras.optimizers import Adam
 from keras.utils import np_utils
 # from tensorflow.python.client import device_lib
-from ccount.blob.io import load_crops, save_crops
-from ccount.blob.misc import crops_stat
+from ccount.blob.io import load_blobs, save_crops
+from ccount.blob.misc import get_label_statistics
 import sys, argparse, os, re, yaml
 from pathlib import Path
-from ccount.blob.io import load_crops, save_crops
-from ccount.blob.misc import crops_stat
+from ccount.blob.io import load_blobs, save_crops
+from ccount.blob.misc import get_label_statistics
 import sys, argparse, os, re, yaml
 from pathlib import Path
-from ccount.blob.io import load_crops, save_crops
-from ccount.blob.misc import crops_stat
+from ccount.blob.io import load_blobs, save_crops
+from ccount.blob.misc import get_label_statistics
 from pathlib import Path
 import numpy as np
 import sys, argparse, os, re, yaml
 import argparse, textwrap
 from ccount.clas.split_data import split_data
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_blobs, save_crops
 from ccount.img.read_czi import read_czi, parse_image_obj
 from ccount.img.auto_contrast import uint16_image_auto_contrast
 from pathlib import Path
@@ -160,18 +160,18 @@ import argparse, os, re, yaml
 import numpy as np
 import pandas as pd
 import sys 
-from ccount.blob.io import load_crops
+from ccount.blob.io import load_blobs
 from ccount.clas.metrics import F1_calculation
 from ccount.blob.intersect import intersect_blobs
 import argparse, textwrap
 from ccount.clas.split_data import split_data
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_blobs, save_crops
 from ccount.img.equalize import equalize
 from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_blobs, save_crops
 from ccount.blob.mask_image import mask_image
-from ccount.blob.misc import crops_stat, parse_crops, crop_width
+from ccount.blob.misc import get_label_statistics, parse_crops, crop_width
 from ccount.clas.split_data import split_data
 from ccount.clas.balance_data import balance_by_duplication
 from ccount.clas.augment_images import augment_images
@@ -189,7 +189,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from collections import Counter
 # from tensorflow.python.client import device_lib
 import warnings
-from ccount.blob.io import load_crops
+from ccount.blob.io import load_blobs
 from ccount.blob.plot import show_rand_crops
 from math import sqrt
 import matplotlib
@@ -199,7 +199,7 @@ import sys, os
 import matplotlib
 import matplotlib.pyplot as plt
 from ccount.img.read_czi import read_czi, parse_image_obj
-from ccount.blob.io import save_crops, load_crops
+from ccount.blob.io import save_crops, load_blobs
 from ccount.blob.intersect import intersect_blobs
 from ccount.blob.plot import visualize_blobs_on_img, visualize_blob_compare
 from pathlib import Path

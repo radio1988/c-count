@@ -1,6 +1,6 @@
 import argparse, textwrap
 from ccount.clas.split_data import split_data
-from ccount.blob.io import load_crops, save_crops
+from ccount.blob.io import load_blobs, save_crops
 
 
 def parse_cmd_and_prep ():
@@ -31,7 +31,7 @@ def parse_cmd_and_prep ():
 
 args = parse_cmd_and_prep()
 
-crops = load_crops(args.crops)
+crops = load_blobs(args.crops)
 print('force uncertain (label=3) and artifacts (label=4) to neg')
 crops[crops[:, 3] == 3, 3] = 0  # uncertain
 crops[crops[:, 3] == 4, 3] = 0  # artifacts, see ccount.blob.readme.txt

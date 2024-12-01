@@ -1,8 +1,8 @@
 import sys, gc
 import numpy as np
 import pandas as pd
-from ccount.blob.io import load_crops, save_crops
-from ccount.blob.misc import crops_stat
+from ccount.blob.io import load_blobs, save_crops
+from ccount.blob.misc import get_label_statistics
 from ccount.blob.intersect import intersect_blobs
 from ccount.clas.metrics import F1_calculation
 
@@ -48,17 +48,17 @@ def main():
     else:
         print(sys.argv)
 
-    IN1 = load_crops(sys.argv[2 + 1])
+    IN1 = load_blobs(sys.argv[2 + 1])
     L1 = read_labels(IN1)
     del IN1
     gc.collect()
 
-    IN2 = load_crops(sys.argv[2 + 2])
+    IN2 = load_blobs(sys.argv[2 + 2])
     L2 = read_labels(IN2)
     del IN2
     gc.collect()
 
-    IN3 = load_crops(sys.argv[2 + 3])
+    IN3 = load_blobs(sys.argv[2 + 3])
     L3 = read_labels(IN3)
 
     COUNTS = count_votes([L1, L2, L3])
@@ -66,7 +66,7 @@ def main():
 
     IN3[:, 3] = L_FINAL
     print("\noutput crops stats:")
-    crops_stat(IN3)
+    get_label_statistics(IN3)
     save_crops(IN3, sys.argv[1])
 
 # Run the main function

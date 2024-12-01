@@ -4,7 +4,7 @@ import imgaug as ia
 from imgaug import augmenters as iaa
 import numpy as np
 from ccount.img.auto_contrast import float_image_auto_contrast
-from ..blob.misc import crops_stat, parse_crops, crop_width
+from ..blob.misc import get_label_statistics, parse_crops, crop_width
 
 
 
