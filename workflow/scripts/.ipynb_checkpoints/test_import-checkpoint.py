@@ -95,7 +95,7 @@ import matplotlib.pyplot as plt
 from ccount.img.equalize import block_equalize
 from ccount.img.read_czi import read_czi, parse_image_obj
 from ccount.img.auto_contrast import uint16_image_auto_contrast
-from ccount.blob.find_blob import find_blob
+from ccount.blob.find_blobs import find_blobs
 from ccount.blob.crop_blobs import crop_blobs
 from ccount.blob.io import save_locs
 from ccount.blob.plot import visualize_blobs_on_img

@@ -6,7 +6,7 @@ from ccount.img.equalize import block_equalize
 from ccount.img.read_czi import read_czi, parse_image_obj
 from ccount.img.auto_contrast import uint16_image_auto_contrast
 
-from ccount.blob.find_blob import find_blob
+from ccount.blob.find_blobs import find_blobs
 from ccount.blob.crop_blobs import crop_blobs
 from ccount.blob.io import save_locs
 from ccount.blob.plot import visualize_blobs_on_img
@@ -84,7 +84,7 @@ for i in range(len(image_obj.scenes)):
 
     image_equ = image_equ.astype(np.single)  # save RAM
 
-    blob_locs = find_blob(
+    blob_locs = find_blobs(
         1 - image_equ,
         scaling_factor=config['blob_detection_scaling_factor'],
         max_sigma=config['max_sigma'],

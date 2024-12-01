@@ -1,8 +1,16 @@
 import gzip, os, sys, subprocess
 import warnings
+import time
 import numpy as np
+import matplotlib.pyplot as plt
 from math import sqrt
 from pathlib import Path
+from scipy import ndimage
+from skimage import filters  # io skipped todo check
+from skimage.feature import blob_log  # blob_doh, blob_dog
+from skimage.draw import disk
+from img_utils import down_scale, equalize, float_image_auto_contrast
+from IPython.display import clear_output
 
 
 
@@ -57,7 +65,7 @@ def get_blob_statistics(blobs):
             sum(blobs[:, 3] == 1),
             sum(blobs[:, 3] == 3),
             sum(blobs[:, 3] == 4),
-            sum(blobs[:, 3] == 5)
+            sum(blobs[:, 3] == -1)
         ]
         print("Negatives: {}, Positives: {}, Maybes: {}, Artifacts: {}, Unlabeled: {}\n".format(
             negative, positive, maybe, artifact, unlabeled
@@ -165,7 +173,7 @@ def save_locs(crops, fname):
 
     Note:
     - if inputs are crops, trim to xyrL formatted locs (to save space)
-    - if inputs are yxr formatted locs, padding to yxrL format with 5(unlabeled) as labels
+    - if inputs are yxr formatted locs, padding to yxrL format with -1(unlabeled) as labels
     """
 
     print('<save_locs>')
@@ -187,8 +195,8 @@ def save_locs(crops, fname):
         locs = crops
     elif w == 3:
         print('input locs array is in yxr format, it does not have an L (labels) column')
-        print('padding with "5" (i.e. unlabeled) as labels')
-        padding = np.full((crops.shape[0], 1), 5)  # 5:unlabeled
+        print('padding with "-1" (i.e. unlabeled) as labels')
+        padding = np.full((crops.shape[0], 1), -1)  # 5:unlabeled
         locs = np.hstack([crops, padding])
     else:
         sys.exit("locs/crops format error")
@@ -201,19 +209,22 @@ def save_locs(crops, fname):
     subprocess.run('gzip -f ' + tempName, shell=True, check=True)
     print(fname, 'saved\n')
 
+
 def save_crops(crops, fname):
     """
     Input: crops
     Output: npy.gz or npy files
     """
     print("<save_crops>")
-    Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
+
     get_blob_statistics(crops)
+
+    Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
+
     if crops.shape[1] > 4:
-        print('width:', crop_width(crops))
-        print("Saving crops:", fname)
+        print("saving crops:", fname)
     else:
-        print("Saving locs:", fname)
+        print("saving locs:", fname)
 
     if fname.endswith('.npy.gz'):
         fname = fname.replace(".npy.gz", ".npy")
@@ -225,9 +236,9 @@ def save_crops(crops, fname):
         raise Exception('crop output suffix not .npy nor .npy.gz')
 
 
-def find_blob(image_neg, scaling_factor=4,
-              max_sigma=12, min_sigma=3, num_sigma=20, threshold=0.1, overlap=.2):
-    '''
+def find_blobs(image_neg, scaling_factor=4,
+               max_sigma=12, min_sigma=3, num_sigma=20, threshold=0.1, overlap=.2):
+    """
     Input:
     gray scaled image with bright blob on dark background (image_neg)
 
@@ -251,7 +262,7 @@ def find_blob(image_neg, scaling_factor=4,
 
     # larger num_sigma: more accurate boundry, slower, try 15
     # larger max_sigma: larger max blob size, slower
-    # threshold: larger, less low contrast stuff
+    # threshold: larger, less low contrast blobs
 
     Default Params (Rui 2024)
     blob_detection_scaling_factor: 4  # 1, 2, 4 (08/23/2021 for blob_detection)
@@ -263,18 +274,14 @@ def find_blob(image_neg, scaling_factor=4,
     blob_extention_ratio: 1.4 # for vis in jpg
     blob_extention_radius: 10 # for vis in jpg
     crop_width: 80  # padding width, which is cropped img width/2 (50), in blob_cropping.py
-    '''
-    from ..img.transform import down_scale
-    from skimage.feature import blob_log  # blob_doh, blob_dog
-    import time
-    from math import sqrt
-
-    print('image size:', image_neg.shape)
-
-    image_neg = down_scale(image_neg, scaling_factor)
-    print('scaled image size for blob detection:', image_neg.shape)
+    """
+    print("<find_blobs>")
 
     tic = time.time()
+    print('image size:', image_neg.shape)
+    print("scaling factor = {}".format(scaling_factor))
+    image_neg = down_scale(image_neg, scaling_factor)
+    print('scaled image size for faster blob detection:', image_neg.shape)
 
     blobs = blob_log(
         image_neg,
@@ -287,7 +294,6 @@ def find_blob(image_neg, scaling_factor=4,
 
     blobs[:, 2] = blobs[:, 2] * sqrt(2)  # adjust r
     blobs = blobs * scaling_factor  # scale back coordinates
-
     toc = time.time()
 
     print("blob detection time: {}s".format(round(toc - tic), 2))
@@ -296,9 +302,9 @@ def find_blob(image_neg, scaling_factor=4,
 
 
 def pad_with(vector, pad_width, iaxis, kwargs):
-    '''
+    """
     to make np.pad in crop_blobs work
-    '''
+    """
     pad_value = kwargs.get('padder', 10)
     vector[:pad_width[0]] = pad_value
     vector[-pad_width[1]:] = pad_value
@@ -306,50 +312,54 @@ def pad_with(vector, pad_width, iaxis, kwargs):
 
 
 def crop_blobs(locs, image, area=0, place_holder=0, crop_width=80):
-    '''
-    input1: locs [n, 0:3], [y, x, r] or labels [n, 0:4], [y, x, r, L]
-    input2: image, corresponding image
-    plt: cropped images
+    """
+    locs: locs [n, 0:3], [y, x, r] or labels [n, 0:4], [y, x, r, L]
+    image: image, corresponding image
+
     return: cropped padded images in a flattened 2d-array, with meta data in the first 6 numbers
 
     Algorithm:
     1. White padding
     2. Crop for each blob
-    '''
-    import numpy as np
 
+    @type crop_width: int
+    """
     # White padding so that locs on the edge can get cropped image
     padder = max(np.max(image), 1)
-    padded = np.pad(image, crop_width, pad_with, padder=padder)  # 1 = white padding, 0 = black padding
+    padded_img = np.pad(image, crop_width, pad_with, padder=padder)  # 1 = white padding, 0 = black padding
 
-    # crop for each blob
-    crops = []
+    num_locs = locs.shape[0]
+    crop_size = crop_width * 2  # todo seems confusing
+    flat_crop_size = crop_size * crop_size + 6  # 6 for y, x, r, L, area, place_holder
+
+    # Preallocate output array to save time
+    crops = np.empty((num_locs, flat_crop_size), dtype=padded_img.dtype)
+
     for i, blob in enumerate(locs):
-        y, x, r = blob[0:3]  # conter-intuitive order
+        y, x, r = blob[0:3]  # Counter-intuitive order, historical reasons
 
-        if locs.shape[1] > 3:
-            L = blob[3]
-        else:
-            L = -1  # unlabeled
+        L = blob[3] if locs.shape[1] > 3 else -1  # Unlabeled
         y_ = int(y + crop_width)
-        x_ = int(x + crop_width)  # adj for padding
+        x_ = int(x + crop_width)  # Adjust for padding
 
-        cropped_img = padded[
-                      y_ - crop_width: y_ + crop_width,
-                      x_ - crop_width: x_ + crop_width]  # x coordinates use columns to locate, vise versa
+        # Crop image
+        cropped_img = padded_img[
+                      y_ - crop_width:y_ + crop_width,
+                      x_ - crop_width:x_ + crop_width
+                      ]
 
-        flat_crop = np.insert(
-            cropped_img.flatten(), [0, 0, 0, 0, 0, 0],
-            [y, x, r, L, area, place_holder])  # -1 unlabeled
-        crops.append(flat_crop)
-    return np.array(crops)
+        # Flatten crop and concatenate metadata
+        flat_crop = cropped_img.flatten()
+        crops[i] = np.concatenate(([y, x, r, L, area, place_holder], flat_crop))
 
-
-# from ccount.blob.intersect import intersect_blobs
-import sys
+    return crops
 
 
 def sort_blobs(blobs):
+    """
+    blobs: yxrL
+    sorted by r, x, y
+    """
     blobs = blobs[blobs[:, 2].argsort()]
     blobs = blobs[blobs[:, 1].argsort(kind='mergesort')]
     blobs = blobs[blobs[:, 0].argsort(kind='mergesort')]
@@ -393,15 +403,12 @@ def mask_image(image, r=10, blob_extention_ratio=1, blob_extention_radius=0):
     input: one image [100, 100], and radius of the blob
     return: hard-masked image of [0,1] scale
     '''
-    import numpy as np
-    from skimage.draw import disk
-    from ..img.auto_contrast import float_image_auto_contrast
 
     image = float_image_auto_contrast(image)
 
     r_ = r * blob_extention_ratio + blob_extention_radius
     w = int(image.shape[0] / 2)
-
+    # todo: 24/11 speed?
     # hard mask creating training data
     mask = np.zeros((2 * w, 2 * w))  # zeros are masked to be black
     rr, cc = disk((w - 1, w - 1), min(r_, w - 1))
@@ -414,23 +421,15 @@ def mask_image(image, r=10, blob_extention_ratio=1, blob_extention_radius=0):
 def area_calculation(img, r,
                      plotting=False, outname=None,
                      blob_extention_ratio=1.4, blob_extention_radius=10):
-    '''
+    """
     read one image
     output area-of-pixels as int
     outname: outname for plotting, e.g. 'view_area_cal.pdf'
-    '''
-    # todo: increase speed
-    from ..img.auto_contrast import float_image_auto_contrast
-    from ..img.equalize import equalize
-    from skimage import io, filters
-    from skimage.draw import disk
-    from scipy import ndimage
-    import numpy as np
-    import matplotlib.pyplot as plt
+    """
+    # todo: 24/11 speed?
 
     # automatic thresholding method such as Otsu's (avaible in scikit-image)
-    img = float_image_auto_contrast(img)  # bad
-    # img = equalize(img)  # no use
+    img = float_image_auto_contrast(img)
 
     try:
         val = filters.threshold_yen(img)
@@ -470,7 +469,6 @@ def area_calculations(crops,
                       plotting=False):
     '''
     only calculate for blobs matching the filter'''
-    from ccount.blob.misc import parse_crops
 
     images, labels, rs = parse_crops(crops)
     areas = [area_calculation(image, r=rs[ind], plotting=plotting,
@@ -482,15 +480,7 @@ def area_calculations(crops,
     return (areas)
 
 
-import matplotlib.pyplot as plt
-import numpy as np
-from ..blob.misc import parse_crops
-from ..img.equalize import equalize
-
-
 def flat2image(flat_crop):
-    from math import sqrt
-    import numpy as np
     flat = flat_crop[6:]
     w = int(sqrt(len(flat)) / 2)
     image = np.reshape(flat, (w + w, w + w))
@@ -506,11 +496,8 @@ def visualize_blobs_on_img(image, blob_locs,
 
     output: image with yellow circles around blobs
     '''
-    from ..img.transform import down_scale
     px = 1 / plt.rcParams['figure.dpi']
 
-    # blob_locs[:, 0:3] = blob_locs[:, 0:3]/scaling
-    # image = down_scale(image, scaling)
     print("image shape:", image.shape)
 
     fig, ax = plt.subplots(figsize=(image.shape[1] * px + 0.5, image.shape[0] * px + 0.5))
@@ -523,8 +510,8 @@ def visualize_blobs_on_img(image, blob_locs,
         idx0_negative = labels == 0
         idx1_positive = labels == 1
         idx3_maybe = labels == 3
-        idx5_nolabel = labels == 5
-        idx_others = [x not in [0, 1, 3, 5] for x in labels]
+        idx5_nolabel = labels == -1
+        idx_others = [x not in [0, 1, 3, -1] for x in labels]
 
         ax.set_title('Blob Visualization\n\
             Red: Positive {}, Blue: Negative {}, Green: Maybe {}, Black: Others {}, Gray: Not-Labeled {}'.format(
@@ -623,12 +610,9 @@ def visualize_blob_compare(image, blob_locs, blob_locs2,
         0, 1, red
         1, 0, purple
     '''
-    from ..img.transform import down_scale
-    from ccount.clas.metrics import F1_calculation
+    from clas.metrics import F1_calculation
     px = 1 / plt.rcParams['figure.dpi']
 
-    # blob_locs[:, 0:3] = blob_locs[:, 0:3]/scaling
-    # image = down_scale(image, scaling)
     print("image shape:", image.shape)
     print("blob shape:", blob_locs.shape, blob_locs2.shape)
 
@@ -700,16 +684,17 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1.4, blob_extention_radius=10
         - left: original image with yellow circle
         - right: binary for area calculation
     '''
-    from ..img.auto_contrast import float_image_auto_contrast
-    import matplotlib.pyplot as plt
-    import numpy as np
-
     if len(flat_crop) >= 6:
         [y, x, r, label, area, place_holder] = flat_crop[0:6]
-    else:
+    elif len(flat_crop) >= 4:
+        [y, x, r, label] = flat_crop[0:4]
+        area = -1
+    elif len(flat_crop) >= 3:
         [y, x, r] = flat_crop[0:3]
-        label = 5
-        area = 0
+        label = -1
+        area = -1
+    else:
+        raise Exception('this blob does not have y,x,r info, useless\n')
 
     r = r * blob_extention_ratio + blob_extention_radius
     image = flat2image(flat_crop)
@@ -761,11 +746,9 @@ def show_rand_crops(crops, label_filter="na", num_shown=1,
                     blob_extention_ratio=1, blob_extention_radius=0, seed=None, fname=None):
     '''
     crops: the blob crops
-    label_filter: 0, 1, 5; "na" means no filter
+    label_filter: 0, 1, -1; "na" means no filter
     fname: None, plot.show(); if fname provided, saved to png
     '''
-    from blob_utils import sub_sample
-
     if (label_filter != 'na'):
         filtered_idx = [str(int(x)) == str(label_filter) for x in crops[:, 3]]
         crops = crops[filtered_idx, :]
@@ -788,7 +771,7 @@ def show_rand_crops(crops, label_filter="na", num_shown=1,
 
     images, labels, rs = parse_crops(crops)
 
-    return (True)
+    return True
 
 
 def pop_label_flat_crops(crops, random=True, seed=1, skip_labels=[0, 1, 2, 3]):
@@ -798,14 +781,13 @@ def pop_label_flat_crops(crops, random=True, seed=1, skip_labels=[0, 1, 2, 3]):
     task:
         plot padded crop, let user label them
     labels:
-        no: 0, yes: 1, groupB: 2, uncertain: 3, artifacts: 4, unlabeled: 5
+        no: 0, yes: 1, groupB: 2, uncertain: 3, artifacts: 4, unlabeled: -1
         never use neg values
     skipLablels:
         crops with current labels in these will be skipped, to save time
     output:
         labeled array in the original order
     '''
-    from IPython.display import clear_output
 
     N = len(crops)
     if random:
