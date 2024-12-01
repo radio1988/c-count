@@ -54,10 +54,16 @@ def get_blob_statistics(blobs):
     """
     print("<get_blob_statistics>")
 
-    if blobs.shape[1] > 10:
+    n_cols = blobs.shape[1]
+
+    if n_cols > 10:
         print('crop width:', crop_width(crops))
+    elif n_cols >= 4:
+        print('only yxrL, no img of crops included')
+    elif n_cols == 3:
+        print('only yxr, no Labels nor img of crops included')
     else:
-        print('no img crops included')
+        raise Exception("blobs array has less than 3 columns")
 
     if blobs.shape[1] > 3:  # contains Label
         [negative, positive, maybe, artifact, unlabeled] = [
@@ -324,6 +330,7 @@ def crop_blobs(locs, image, area=0, place_holder=0, crop_width=80):
 
     @type crop_width: int
     """
+    print("\n<crop_blobs> cropping..")
     # White padding so that locs on the edge can get cropped image
     padder = max(np.max(image), 1)
     padded_img = np.pad(image, crop_width, pad_with, padder=padder)  # 1 = white padding, 0 = black padding
@@ -331,14 +338,18 @@ def crop_blobs(locs, image, area=0, place_holder=0, crop_width=80):
     num_locs = locs.shape[0]
     crop_size = crop_width * 2  # todo seems confusing
     flat_crop_size = crop_size * crop_size + 6  # 6 for y, x, r, L, area, place_holder
+    print("flat_crop_size: ", flat_crop_size)
 
     # Preallocate output array to save time
     crops = np.empty((num_locs, flat_crop_size), dtype=padded_img.dtype)
+    print("empty crops shape: ", crops.shape)
 
     for i, blob in enumerate(locs):
         y, x, r = blob[0:3]  # Counter-intuitive order, historical reasons
 
-        L = blob[3] if locs.shape[1] > 3 else -1  # Unlabeled
+        L = blob[3] if locs.shape[1] >= 4 else -1  # Unlabeled
+        area = -1
+        place_holder = -1
         y_ = int(y + crop_width)
         x_ = int(x + crop_width)  # Adjust for padding
 
@@ -350,7 +361,7 @@ def crop_blobs(locs, image, area=0, place_holder=0, crop_width=80):
 
         # Flatten crop and concatenate metadata
         flat_crop = cropped_img.flatten()
-        crops[i] = np.concatenate(([y, x, r, L, area, place_holder], flat_crop))
+        crops[i, ] = np.concatenate(([y, x, r, L, area, place_holder], flat_crop))
 
     return crops
 
