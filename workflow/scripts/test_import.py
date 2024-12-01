@@ -126,7 +126,7 @@ from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
 from ccount.blob.io import load_blobs, save_crops
 from ccount.blob.mask_image import mask_image
-from ccount.blob.misc import get_label_statistics, parse_crops, crop_width
+from ccount.blob.misc import get_blob_statistics, parse_crops, crop_width
 from ccount.clas.metrics import F1
 import sys, argparse, os, re, yaml, keras
 import numpy as np
@@ -137,15 +137,15 @@ from tensorflow.keras.optimizers import Adam
 from keras.utils import to_categorical 
 # from tensorflow.python.client import device_lib
 from ccount.blob.io import load_blobs, save_crops
-from ccount.blob.misc import get_label_statistics
+from ccount.blob.misc import get_blob_statistics
 import sys, argparse, os, re, yaml
 from pathlib import Path
 from ccount.blob.io import load_blobs, save_crops
-from ccount.blob.misc import get_label_statistics
+from ccount.blob.misc import get_blob_statistics
 import sys, argparse, os, re, yaml
 from pathlib import Path
 from ccount.blob.io import load_blobs, save_crops
-from ccount.blob.misc import get_label_statistics
+from ccount.blob.misc import get_blob_statistics
 from pathlib import Path
 import numpy as np
 import sys, argparse, os, re, yaml
@@ -171,7 +171,7 @@ from ccount.img.auto_contrast import float_image_auto_contrast
 from ccount.img.transform import down_scale
 from ccount.blob.io import load_blobs, save_crops
 from ccount.blob.mask_image import mask_image
-from ccount.blob.misc import get_label_statistics, parse_crops, crop_width
+from ccount.blob.misc import get_blob_statistics, parse_crops, crop_width
 from ccount.clas.split_data import split_data
 from ccount.clas.balance_data import balance_by_duplication
 from ccount.clas.augment_images import augment_images

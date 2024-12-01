@@ -2,6 +2,8 @@ import gzip, os, sys, subprocess
 import warnings
 import numpy as np
 from math import sqrt
+from pathlib import Path
+
 
 
 def sub_sample(A, n, seed=1):
@@ -35,14 +37,21 @@ def sub_sample(A, n, seed=1):
     return A[idx]
 
 
-def get_label_statistics(blobs):
+def get_blob_statistics(blobs):
     """
     Input: blobs, can be locs (yxr) labeled_locs (yxrL) or crops (yxrL + flattened_crop_img)
     Output: a dictionary of count for each type of labels
 
     previously called 'crop_stats'
     """
-    if blobs.shape[1] > 3: # contains Label
+    print("<get_blob_statistics>")
+
+    if blobs.shape[1] > 10:
+        print('crop width:', crop_width(crops))
+    else:
+        print('no img crops included')
+
+    if blobs.shape[1] > 3:  # contains Label
         [negative, positive, maybe, artifact, unlabeled] = [
             sum(blobs[:, 3] == 0),
             sum(blobs[:, 3] == 1),
@@ -54,7 +63,7 @@ def get_label_statistics(blobs):
             negative, positive, maybe, artifact, unlabeled
         ))
     else:
-        raise Exception("this blobs array does not contain a label column\n")
+        warnings.warn("this blobs array does not contain a label column\n")
 
     return {'positive': positive,
             "negative": negative,
@@ -143,35 +152,29 @@ def load_blobs(fname):
         raise Exception("blob file format not recognized, suffix not npy nor npy.gz")
 
     if array.shape[1] > 3:  # with label
-        get_label_statistics(array)
+        get_blob_statistics(array)
     if array.shape[1] > 4:  # is crop, not only loc
         print("n-crop: {}, crop width: {}\n".format(len(array), crop_width(array)))
     return array
 
 
-
-def load_blobs(in_db_name):
-    '''
-    alias for load_blobs
-    '''
-    crops = load_blobs(in_db_name)
-    return crops
-
-
 def save_locs(crops, fname):
     """
-    Input: np.array of crops or locs
-    Output: npy file (not npy.gz)
+    Input: np.array of blobs (crops, locs)
+    Output: npy.gz file
 
     Note:
-    - if input are crops, trim to xyrL formatted locs (to save space)
-    - if input are yxr formatted locs, padding to yxrL format with 5(unlabeled) labels
-    - even if fname is x.npy.gz will save into x.npy (locs file not big anyway)
+    - if inputs are crops, trim to xyrL formatted locs (to save space)
+    - if inputs are yxr formatted locs, padding to yxrL format with 5(unlabeled) as labels
     """
-    from .misc import get_label_statistics, crop_width
-    from pathlib import Path
 
     print('<save_locs>')
+
+    if not fname.endswith('.npy.gz'):
+        raise Exception("file format for <save_locs> not npy.gz:{}\n".format(fname))
+
+    if crops.shape[0] < 1:
+        raise Exception("n_crops equal to zero\n")
 
     # Trim crops to locs
     w = crops.shape[1]
@@ -193,23 +196,19 @@ def save_locs(crops, fname):
     print('num of blob locs: {}'.format(locs.shape[0]))
 
     Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
-
     tempName = fname.replace(".npy.gz", ".npy")
     np.save(tempName, locs)
     subprocess.run('gzip -f ' + tempName, shell=True, check=True)
-
     print(fname, 'saved\n')
-
 
 def save_crops(crops, fname):
     """
     Input: crops
     Output: npy.gz or npy files
     """
-    from .misc import get_label_statistics, crop_width
-    from pathlib import Path
+    print("<save_crops>")
     Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
-    print('dim:', crops.shape)
+    get_blob_statistics(crops)
     if crops.shape[1] > 4:
         print('width:', crop_width(crops))
         print("Saving crops:", fname)
@@ -224,6 +223,7 @@ def save_crops(crops, fname):
         np.save(fname, crops)
     else:
         raise Exception('crop output suffix not .npy nor .npy.gz')
+
 
 def find_blob(image_neg, scaling_factor=4,
               max_sigma=12, min_sigma=3, num_sigma=20, threshold=0.1, overlap=.2):
@@ -294,6 +294,7 @@ def find_blob(image_neg, scaling_factor=4,
     print("{} blobs detected\n".format(blobs.shape[0]))
     return blobs
 
+
 def pad_with(vector, pad_width, iaxis, kwargs):
     '''
     to make np.pad in crop_blobs work
@@ -302,6 +303,7 @@ def pad_with(vector, pad_width, iaxis, kwargs):
     vector[:pad_width[0]] = pad_value
     vector[-pad_width[1]:] = pad_value
     return vector
+
 
 def crop_blobs(locs, image, area=0, place_holder=0, crop_width=80):
     '''
@@ -333,8 +335,8 @@ def crop_blobs(locs, image, area=0, place_holder=0, crop_width=80):
         x_ = int(x + crop_width)  # adj for padding
 
         cropped_img = padded[
-            y_ - crop_width: y_ + crop_width,
-            x_ - crop_width: x_ + crop_width]  # x coordinates use columns to locate, vise versa
+                      y_ - crop_width: y_ + crop_width,
+                      x_ - crop_width: x_ + crop_width]  # x coordinates use columns to locate, vise versa
 
         flat_crop = np.insert(
             cropped_img.flatten(), [0, 0, 0, 0, 0, 0],
@@ -386,7 +388,7 @@ def setdiff_blobs(blobs1, blobs2):
     return (blobsout)
 
 
-def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
+def mask_image(image, r=10, blob_extention_ratio=1, blob_extention_radius=0):
     '''
     input: one image [100, 100], and radius of the blob
     return: hard-masked image of [0,1] scale
@@ -398,7 +400,7 @@ def mask_image(image, r = 10, blob_extention_ratio=1, blob_extention_radius=0):
     image = float_image_auto_contrast(image)
 
     r_ = r * blob_extention_ratio + blob_extention_radius
-    w = int(image.shape[0]/2)
+    w = int(image.shape[0] / 2)
 
     # hard mask creating training data
     mask = np.zeros((2 * w, 2 * w))  # zeros are masked to be black
@@ -478,6 +480,8 @@ def area_calculations(crops,
     print("labels (top 5):", [str(int(x)) for x in labels][0:min(5, len(labels))])
     print('areas (top 5):', areas[0:min(5, len(labels))])
     return (areas)
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 from ..blob.misc import parse_crops
@@ -494,7 +498,7 @@ def flat2image(flat_crop):
 
 
 def visualize_blobs_on_img(image, blob_locs,
-        blob_extention_ratio=1.4, blob_extention_radius=10, fname=None):
+                           blob_extention_ratio=1.4, blob_extention_radius=10, fname=None):
     '''
     image: image where blobs were detected from
     blob_locs: blob info array n x 4 [x, y, r, label], crops also works, only first 3 columns used

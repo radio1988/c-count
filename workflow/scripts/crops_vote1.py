@@ -2,7 +2,7 @@ import sys, gc
 import numpy as np
 import pandas as pd
 from ccount.blob.io import load_blobs, save_crops
-from ccount.blob.misc import get_label_statistics
+from ccount.blob.misc import get_blob_statistics
 from ccount.blob.intersect import intersect_blobs
 from ccount.clas.metrics import F1_calculation
 
@@ -66,7 +66,7 @@ def main():
 
     IN3[:, 3] = L_FINAL
     print("\noutput crops stats:")
-    get_label_statistics(IN3)
+    get_blob_statistics(IN3)
     save_crops(IN3, sys.argv[1])
 
 # Run the main function

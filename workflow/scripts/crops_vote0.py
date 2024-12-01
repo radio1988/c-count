@@ -3,7 +3,7 @@ import pandas as pd
 import sys
 
 from ccount.blob.io import load_blobs, save_crops
-from ccount.blob.misc import get_label_statistics
+from ccount.blob.misc import get_blob_statistics
 from ccount.clas.metrics import F1_calculation
 from ccount.blob.intersect import intersect_blobs
 

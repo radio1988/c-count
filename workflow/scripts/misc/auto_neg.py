@@ -9,7 +9,7 @@ sys.path.append(home+'/ccount/ccount/workflow/scripts/ccount/')
 from os.path import exists
 
 from ccount.blob.io import load_blobs, save_crops, load_blobs
-from ccount.blob.misc import get_label_statistics
+from ccount.blob.misc import get_blob_statistics
 from ccount.clas.pca_tsne import pca_tsne
 
 from ccount.img.read_czi import read_czi, parse_image_obj

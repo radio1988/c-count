@@ -45,7 +45,7 @@ Colony count for colony formation assays.
 - czi2img: read raw czi image, perform blob detection, save jpg image with detected blobs in gray circles
 - crops_filtering.py: filter blob crops based on the labeling
 - crops_merging.py: merge blob crop files
-- get_label_statisticss.py: show statistics on crop files, especially the labels
+- get_blob_statisticss.py: show statistics on crop files, especially the labels
 - crops_viewing.py: view random samples from crop files
 
 ## Notations:

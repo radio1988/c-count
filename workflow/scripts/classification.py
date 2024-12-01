@@ -5,7 +5,7 @@ from ccount.img.transform import down_scale
 
 from ccount.blob.io import load_blobs, load_blobs, save_crops, save_locs
 from ccount.blob.mask_image import mask_image
-from ccount.blob.misc import get_label_statistics, parse_crops, crop_width
+from ccount.blob.misc import get_blob_statistics, parse_crops, crop_width
 
 from ccount.clas.metrics import F1
 
@@ -104,7 +104,7 @@ positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 # Save 
 print("Saving classifications..")
 crops[:, 3] = classifications
-get_label_statistics(crops)
+get_blob_statistics(crops)
 
 save_locs(crops, args.output.replace('crops','locs'))  #todo: fix potential name bug in non-workflow situations
 save_crops(crops, args.output)

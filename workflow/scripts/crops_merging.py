@@ -1,5 +1,5 @@
 from ccount.blob.io import load_blobs, save_crops
-from ccount.blob.misc import get_label_statistics
+from ccount.blob.misc import get_blob_statistics
 from pathlib import Path
 import numpy as np
 import sys, argparse, os, re, yaml
@@ -32,6 +32,6 @@ for i, crop_name in enumerate(args.crops):
     else:
         print("Merging...")
         output_crops = np.vstack((output_crops, crops))
-        get_label_statistics(output_crops)
+        get_blob_statistics(output_crops)
 
 save_crops(output_crops, args.output)

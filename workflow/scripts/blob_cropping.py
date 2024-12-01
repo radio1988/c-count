@@ -8,7 +8,7 @@ from ccount.img.auto_contrast import uint16_image_auto_contrast
 
 from ccount.blob.crop_blobs import crop_blobs
 from ccount.blob.io import save_crops, load_blobs
-from ccount.blob.misc import get_label_statistics
+from ccount.blob.misc import get_blob_statistics
 
 
 from pathlib import Path
@@ -64,6 +64,6 @@ blob_locs = load_blobs(args.locs)
 
 print('\ncropping from image and locs:')
 crops = crop_blobs(blob_locs, image, crop_width=config['crop_width'])
-get_label_statistics(crops)
+get_blob_statistics(crops)
 
 save_crops(crops, args.o)

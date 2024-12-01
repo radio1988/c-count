@@ -1,5 +1,5 @@
 import numpy as np
-from ..blob.misc import get_label_statistics, parse_crops
+from ..blob.misc import get_blob_statistics, parse_crops
 from ..clas.augment_images import augment_images
 
 
@@ -9,7 +9,7 @@ def balance_by_removal(blobs):
     :return: balanced blobs (with less samples)
     '''
     print('Before balancing:')
-    get_label_statistics(blobs)
+    get_blob_statistics(blobs)
 
     idx_yes = np.arange(0, blobs.shape[0])[blobs[:, 3] == 1]
     idx_no = np.arange(0, blobs.shape[0])[blobs[:, 3] == 0]
@@ -26,7 +26,7 @@ def balance_by_removal(blobs):
         blobs = blobs[idx_choice,]
 
     print("After balancing by removing neg samples")
-    get_label_statistics(blobs)
+    get_blob_statistics(blobs)
 
     return blobs
 
@@ -41,7 +41,7 @@ def balance_by_duplication(blobs, maxN=160000):
     :return: balanced blobs (with less samples)
     '''
     print('Before balancing:')
-    get_label_statistics(blobs)
+    get_blob_statistics(blobs)
 
     idx_yes = np.arange(0, blobs.shape[0])[blobs[:, 3] == 1]
     idx_no = np.arange(0, blobs.shape[0])[blobs[:, 3] == 0]
@@ -66,6 +66,6 @@ def balance_by_duplication(blobs, maxN=160000):
     blobs = blobs[idx_choice, ]
 
     print("After balancing by adding positive samples")
-    get_label_statistics(blobs)
+    get_blob_statistics(blobs)
 
     return blobs

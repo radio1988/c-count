@@ -4,7 +4,7 @@ from ccount.img.transform import down_scale
 
 from ccount.blob.io import load_blobs, save_crops
 from ccount.blob.mask_image import mask_image
-from ccount.blob.misc import get_label_statistics, parse_crops, crop_width
+from ccount.blob.misc import get_blob_statistics, parse_crops, crop_width
 
 from ccount.clas.split_data import split_data
 from ccount.clas.balance_data import balance_by_duplication
@@ -77,20 +77,20 @@ def cleanup_crops(crops):
     unlabeled_idx = crops[:, 3] == 5
     print('num unlabeled crops: {}'.format(sum(unlabeled_idx)))
     crops = crops[~unlabeled_idx, :]
-    get_label_statistics(crops)
+    get_blob_statistics(crops)
 
     print("Removing uncertain crops (labelled as 3)")
     uncertain_idx = crops[:, 3] == 3  # uncertain
     print('num uncertain crops: {}'.format(sum(uncertain_idx)))
     crops = crops[~uncertain_idx, :]
-    get_label_statistics(crops)
+    get_blob_statistics(crops)
 
     if config['numClasses'] == 2:
         print("Set artifacts (labelled as 4) as NEG")
         artifacts_idx = crops[:, 3] == 4
         print('num artifacts: {}'.format(sum(artifacts_idx)))
         crops[artifacts_idx, 3] = 0  # artifacts, see ccount.blob.readme.txt
-        get_label_statistics(crops)
+        get_blob_statistics(crops)
 
     return crops
 
@@ -105,9 +105,9 @@ train_crops = cleanup_crops(train_crops)
 val_crops = cleanup_crops(val_crops)
 
 print("Training Crops:")
-get_label_statistics(train_crops)
+get_blob_statistics(train_crops)
 print("Val Crops:", flush=True)
-get_label_statistics(val_crops)
+get_blob_statistics(val_crops)
 
 # balancing
 if config['balancing']:

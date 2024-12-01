@@ -1,5 +1,5 @@
 from ccount.blob.io import load_blobs, save_crops
-from ccount.blob.misc import get_label_statistics
+from ccount.blob.misc import get_blob_statistics
 import sys, argparse, os, re, yaml
 from pathlib import Path
 
@@ -29,5 +29,5 @@ args = parse_cmd_and_prep()
 crops = load_blobs(args.crops)
 print(">>> changing all labels to:", args.label)
 crops[:,3] = [args.label] * crops.shape[0]
-get_label_statistics(crops)
+get_blob_statistics(crops)
 save_crops(crops, args.output)
