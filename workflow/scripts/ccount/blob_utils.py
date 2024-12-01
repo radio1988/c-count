@@ -9,7 +9,7 @@ from scipy import ndimage
 from skimage import filters  # io skipped todo check
 from skimage.feature import blob_log  # blob_doh, blob_dog
 from skimage.draw import disk
-from img_utils import down_scale, equalize, float_image_auto_contrast
+from ccount.img_utils import down_scale, equalize, float_image_auto_contrast
 from IPython.display import clear_output
 
 

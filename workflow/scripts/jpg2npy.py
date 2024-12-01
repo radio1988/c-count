@@ -1,7 +1,7 @@
 import argparse
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = None  # disables the warning for large Image
-from ccount.blob.io import load_blobs, save_locs
+from ccount.blob_utils import load_blobs, save_locs
 
 
 

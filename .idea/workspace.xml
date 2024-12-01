@@ -4,19 +4,14 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="get_blob_statistics includes blob_width now">
-      <change afterPath="$PROJECT_DIR$/workflow/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/workflow/scripts/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/workflow/scripts/ccount/img_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ccount.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ccount.iml" afterDir="false" />
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="blob_utils first round clean up">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/.ipynb_checkpoints/test_import-checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/.ipynb_checkpoints/test_import-checkpoint.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_detection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_detection.singleScene.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_detection.singleScene.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/blob_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount/blob_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/img/equalize.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount/img/equalize.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/test_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/test_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/trash/blob_detection.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/trash/blob_detection.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/img/auto_contrast.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount/img/auto_contrast.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/img/read_czi.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount/img/read_czi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/img/transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount/img/transform.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/img_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount/img_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,13 +90,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00019" summary="change Snakefile names">
-      <created>1719868950994</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1719868950994</updated>
     </task>
     <task id="LOCAL-00020" summary="load_crops/load_locs, save_locs/save_crops merged">
       <created>1719888650139</created>
@@ -439,7 +427,14 @@
       <option name="project" value="LOCAL" />
       <updated>1733033452389</updated>
     </task>
-    <option name="localTasksCounter" value="68" />
+    <task id="LOCAL-00068" summary="blob_utils first round clean up">
+      <created>1733036816622</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1733036816622</updated>
+    </task>
+    <option name="localTasksCounter" value="69" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -464,7 +459,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="vote0" />
     <MESSAGE value="classification.py: updated" />
     <MESSAGE value="blob_locs flag to res" />
     <MESSAGE value="mac.yaml verified on mac again" />
@@ -489,6 +483,7 @@
     <MESSAGE value="label/ draft folder removed" />
     <MESSAGE value="load_locs and load_crops becomes load_locs" />
     <MESSAGE value="get_blob_statistics includes blob_width now" />
-    <option name="LAST_COMMIT_MESSAGE" value="get_blob_statistics includes blob_width now" />
+    <MESSAGE value="blob_utils first round clean up" />
+    <option name="LAST_COMMIT_MESSAGE" value="blob_utils first round clean up" />
   </component>
 </project>
