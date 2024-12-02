@@ -157,7 +157,7 @@ rule locs2crops:
 
 rule aggr_label_based_count:
     input:
-        expand('res/label_crops/log/{scene}.label.npy.gz.log', scene = SCENES)
+        expand('res/label_locs/{scene}.label.npy.gz', scene = SCENES)
     output:
         "res/count.label.csv"
     log:
@@ -165,12 +165,12 @@ rule aggr_label_based_count:
     threads:
         1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1000
+        mem_mb=lambda wildcards, attempt: attempt * 4000
     priority:
         100
     shell:
         """
-        python workflow/scripts/aggr_label_count.py {input} {output} &> {log}
+        python workflow/scripts/count_labeled_blobs.py -input {input} -output {output} &> {log}
         """
 
 

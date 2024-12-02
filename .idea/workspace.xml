@@ -4,10 +4,9 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="jpg2npy.py 9 pixel works">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="fixed bugs introduced in the module re-organization">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_cropping.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_cropping.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/blob_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount/blob_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,13 +85,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00022" summary="reformatted">
-      <created>1719894799526</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1719894799526</updated>
     </task>
     <task id="LOCAL-00023" summary="y,x,r,L: [y, x, r, label, area, place_holder, flattened cropped_blob_img (crop_width^2)]">
       <created>1719956539051</created>
@@ -430,7 +422,14 @@
       <option name="project" value="LOCAL" />
       <updated>1733042280854</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary="fixed bugs introduced in the module re-organization">
+      <created>1733084728434</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1733084728434</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -455,7 +454,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="mac.yaml verified on mac again" />
     <MESSAGE value="better print format for info" />
     <MESSAGE value="label.npy.gz filename formatted, rule reset added, rule dag added" />
     <MESSAGE value="jpg2npy.Snakefile: label_crops works" />
@@ -480,6 +478,7 @@
     <MESSAGE value="blob_utils first round clean up" />
     <MESSAGE value="img_utils" />
     <MESSAGE value="jpg2npy.py 9 pixel works" />
-    <option name="LAST_COMMIT_MESSAGE" value="jpg2npy.py 9 pixel works" />
+    <MESSAGE value="fixed bugs introduced in the module re-organization" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed bugs introduced in the module re-organization" />
   </component>
 </project>
