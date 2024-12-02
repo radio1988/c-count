@@ -4,9 +4,20 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="fixed bugs introduced in the module re-organization">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="works, now on jpg2npy again">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/blob_utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/clas_utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/img_utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/snake/get_samples.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount/snake/input_names.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount_utils/clas.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount_utils/clas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount_utils/img.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount_utils/img.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount_utils/snake.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount_utils/snake.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,13 +96,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00023" summary="y,x,r,L: [y, x, r, label, area, place_holder, flattened cropped_blob_img (crop_width^2)]">
-      <created>1719956539051</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1719956539051</updated>
     </task>
     <task id="LOCAL-00024" summary="close plots after done">
       <created>1720034846221</created>
@@ -429,7 +433,14 @@
       <option name="project" value="LOCAL" />
       <updated>1733084728434</updated>
     </task>
-    <option name="localTasksCounter" value="72" />
+    <task id="LOCAL-00072" summary="works, now on jpg2npy again">
+      <created>1733139537100</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1733139537100</updated>
+    </task>
+    <option name="localTasksCounter" value="73" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -454,7 +465,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="better print format for info" />
     <MESSAGE value="label.npy.gz filename formatted, rule reset added, rule dag added" />
     <MESSAGE value="jpg2npy.Snakefile: label_crops works" />
     <MESSAGE value="blob_detection.py: documentation added" />
@@ -479,6 +489,7 @@
     <MESSAGE value="img_utils" />
     <MESSAGE value="jpg2npy.py 9 pixel works" />
     <MESSAGE value="fixed bugs introduced in the module re-organization" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed bugs introduced in the module re-organization" />
+    <MESSAGE value="works, now on jpg2npy again" />
+    <option name="LAST_COMMIT_MESSAGE" value="works, now on jpg2npy again" />
   </component>
 </project>

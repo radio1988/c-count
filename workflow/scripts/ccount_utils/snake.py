@@ -1,3 +1,7 @@
+import os
+import re
+
+
 def get_samples(DATA_DIR):
     """
     input: 'data/' or 'data', the path of czi files
@@ -37,16 +41,17 @@ def get_samples(DATA_DIR):
      'E2f4_CFUe_WT3_3-Stitching-20',
      'E2f4_CFUe_WT3_3_Top-Stitching-21']
     """
-    import os
-    import re
-    SAMPLES=os.listdir(DATA_DIR)
-    SAMPLES=list(filter(lambda x: x.endswith("czi"), SAMPLES))
-    SAMPLES=[re.sub(".czi", "", x) for x in SAMPLES]
+    SAMPLES = os.listdir(DATA_DIR)
+    SAMPLES = list(filter(lambda x: x.endswith("czi"), SAMPLES))
+    SAMPLES = [re.sub(".czi", "", x) for x in SAMPLES]
     return SAMPLES
 
 
-def input_names(SAMPLES, words = ["Top", "Left", "Right", "Bottom"],
-    prefix = "res/blobs/view/", suffix = '.html', NUMS=[0,1,2,3]):
+def input_names(
+        SAMPLES, words=["Top", "Left", "Right", "Bottom"],
+        prefix="res/blobs/view/", suffix='.html',
+        NUMS=[0, 1, 2, 3]
+):
     """
     If any word in words found in sample_name (s),
         only one output [0]
@@ -65,5 +70,5 @@ def input_names(SAMPLES, words = ["Top", "Left", "Right", "Bottom"],
             lst.append(res)
         else:
             res = map(lambda i: prefix + s + '.' + str(i) + suffix, NUMS)  # all four nums
-            lst=lst+list(res)
+            lst = lst + list(res)
     return lst

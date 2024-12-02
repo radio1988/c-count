@@ -1,5 +1,5 @@
 import os
-from scripts.ccount.snake.input_names import input_names
+from scripts.ccount_utils.snake import input_names
 
 
 """
@@ -118,9 +118,10 @@ rule blob_detection:
         """
 
 
-rule labelImg2locs:
+rule jpg2locs:
     """
-    900M RAM usage on Mac
+    Assume input jpg has labels in it (orange dots in positive blob circles)
+
     """
     input:
         jpg='data/label_img/{sample}.{sceneIndex}' + IMG_SUFFIX + '.jpg',
@@ -131,10 +132,14 @@ rule labelImg2locs:
         view='res/label_locs/{sample}.{sceneIndex}.label.jpg',
     log:
         'res/label_locs/log/{sample}.{sceneIndex}.label.npy.gz.log'
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 2000  # 900M RAM usage on Mac 24/04
     shell:
         """
-        python workflow/scripts/jpg2npy.py {input.jpg} {input.czi} {input.blob_locs} \
-        {wildcards.sceneIndex} {output.label_locs} &> {log}
+        python workflow/scripts/jpg2npy.py -jpg {input.jpg} -czi {input.czi} -locs {input.blob_locs} \
+        -sceneIndex {wildcards.sceneIndex} -output {output.label_locs} &> {log}
         """
 
 
