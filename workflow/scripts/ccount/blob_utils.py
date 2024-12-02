@@ -61,7 +61,7 @@ def get_blob_statistics(blobs):
     elif n_cols >= 4:
         print('only yxrL, no img of crops included')
     elif n_cols == 3:
-        print('only yxr, no Labels nor img of crops included')
+        raise Exception('only yxr, no Labels nor img of crops included')
     else:
         raise Exception("blobs array has less than 3 columns")
 
@@ -74,8 +74,7 @@ def get_blob_statistics(blobs):
             sum(blobs[:, 3] == -1)
         ]
         print("Negatives: {}, Positives: {}, Maybes: {}, Artifacts: {}, Unlabeled: {}\n".format(
-            negative, positive, maybe, artifact, unlabeled
-        ))
+            negative, positive, maybe, artifact, unlabeled))
     else:
         warnings.warn("this blobs array does not contain a label column\n")
 
@@ -175,7 +174,7 @@ def load_blobs(fname):
 def save_locs(crops, fname):
     """
     Input: np.array of blobs (crops, locs)
-    Output: npy.gz file
+    Output: locs.npy.gz file ( 4 columns only, yxrL)
 
     Note:
     - if inputs are crops, trim to xyrL formatted locs (to save space)
@@ -208,6 +207,7 @@ def save_locs(crops, fname):
         sys.exit("locs/crops format error")
 
     print('num of blob locs: {}'.format(locs.shape[0]))
+    print('blob locs head:', locs[0:4,])
 
     Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
     tempName = fname.replace(".npy.gz", ".npy")
