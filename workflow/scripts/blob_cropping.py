@@ -3,8 +3,8 @@ reads czi, locs.npy.gz, config.yaml
 outputs crops.npy.gz
 """
 
-from ccount.img_utils import read_czi, parse_image_obj, uint16_image_auto_contrast
-from ccount.blob_utils import save_crops, load_blobs, crop_blobs, get_blob_statistics
+from ccount_utils.img import read_czi, parse_image_obj, uint16_image_auto_contrast
+from ccount_utils.blob import save_crops, load_blobs, crop_blobs, get_blob_statistics
 
 from pathlib import Path
 import argparse, os, re, matplotlib, subprocess, yaml, sys

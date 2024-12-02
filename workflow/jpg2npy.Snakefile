@@ -202,8 +202,8 @@ rule reset:
         1
     shell:
         """
-        rm -f dag.pdf rulegraph.pdf dag.log
-        rm -f res/count.label.csv count.label.csv.log
+        rm -f dag.pdf rulegraph.pdf dag.log report.html
+        rm -f res/count.label.csv res/count.label.csv.log
         rm -rf res/label_locs res/label_crops
         rm -rf .snakemake
         """

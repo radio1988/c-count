@@ -1,6 +1,6 @@
 import argparse, sys, os
 import pandas as pd
-from ccount.blob_utils import load_blobs, get_blob_statistics
+from ccount_utils.blob import load_blobs, get_blob_statistics
 
 """
 Input: labeled locs files (also accept any labeled blob files)

@@ -32,6 +32,14 @@ Process:
 '''
 
 
+def validate_npy_gz(file_path):
+    """Validate that the file ends with .npy.gz."""
+    if not file_path.endswith(".npy.gz"):
+        raise argparse.ArgumentTypeError(f"The file '{file_path}' must end with .npy.gz")
+    if not os.path.isfile(file_path):
+        raise argparse.ArgumentTypeError(f"The file '{file_path}' does not exist")
+    return file_path
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description='''
@@ -49,7 +57,7 @@ def parse_args():
         help="Path to the input JPG file (with orange dots in positive blob circles)"
     )
     parser.add_argument(
-        '-locs', type=str, required=True,
+        '-locs', type=validate_npy_gz, required=True,
         help="Path to the input blob locations in .npy.gz format, \
         [y,x,r] expected, other columns will be ignored"
     )
@@ -258,18 +266,10 @@ def is_pixel_orange(rgb_color):
         # ashley: color_inside: (210, 86, 16)
         # logan: color_inside: (243, 151, 14)
         # john: color_inside: (248, 151, 12)
+        # mac preview orange (255, ~140, 0)
         return True
     else:
         return False
-
-
-def find_orange_dot_in_blob(crop):
-    """
-    Input a single crop and see if it has orange dot in it
-    @param crop:
-    @return:
-    """
-    return True
 
 
 def main():
@@ -293,7 +293,7 @@ def main():
     print("scale from czi to jpg is {}".format(round(scale, 3)))
     jpg_locs = czi_locs * scale
     print("example czi locs:\n", czi_locs[0:3, ])
-    print("example jpg locs:\n", jpg_locs[0:3, ], "\n")
+    print("example jpg locs:\n", jpg_locs[0:3, ])
 
     jpg_labels = get_labels(jpg_img, jpg_locs, blob_extention_ratio, blob_extention_radius)
     jpg_labels = np.array(jpg_labels).reshape(-1, 1)
