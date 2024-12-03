@@ -1,6 +1,6 @@
 import argparse, textwrap
 from ccount.clas.split_data import split_data
-from ccount.blob.io import load_blobs, save_crops
+from ccount_utils.blob import load_blobs, save_crops
 
 
 def parse_cmd_and_prep ():

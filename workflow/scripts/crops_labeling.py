@@ -1,5 +1,5 @@
-from ccount.blob.io import load_blobs, save_crops
-from ccount.blob.misc import get_blob_statistics
+from ccount_utils.blob import load_blobs, save_crops
+from ccount_utils.blob import get_blob_statistics
 import sys, argparse, os, re, yaml
 from pathlib import Path
 

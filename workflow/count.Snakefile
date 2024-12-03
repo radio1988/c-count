@@ -1,10 +1,27 @@
 """
 COUNT
+
+Input:
+- czi: microscopic image for the plate including all scenes
+- weight: trained ccount weight
+- config: config.yaml used when weight was trained for neural network parameters
+
+Steps:
+- detect blobs in czi files
+- classify blobs into positives and negatives
+- count positives in each plate-scene
+- aggregate all counts into a csv file
+
+Output:
+- res/COUNT.csv
+-
+
 """
 
 import os
-from scripts.ccount.snake.input_names import input_names
-from scripts.ccount.snake.get_samples import get_samples
+from scripts.ccount_utils.snake import input_names
+from scripts.ccount_utils.snake import get_samples
+
 
 configfile: "config.yaml"
 DATA_DIR = config["DATA_DIR"]
@@ -75,7 +92,7 @@ rule classification:
         "log/classification1/{s}.{i}.benchmark"
     shell:
         """
-        python workflow/scripts/classification.py  \
+        python workflow/scripts/blob_classification.py  \
         -crops {input.blob_crops} -weight {input.weight} \
         -config config.yaml -output {output.crops} &> {log}
         """
@@ -181,50 +198,50 @@ rule area_aggregation:
         python workflow/scripts/aggr_area_info.py res/classification1/pos/area/ res/areas.csv &> {log}
         """
 
-rule view0:
-    input:
-        "res/blobs/{s}.done"
-    output:
-        html="res/blobs/view/{s}.{i}.html"
-    params:
-        html="../res/blobs/view/{s}.{i}.html"
-    log:
-        "log/blobs/view/{s}.{i}.html.log"
-    benchmark:
-        "log/blobs/view/{s}.{i}.html.benchmark"
-    threads:
-        1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 8000
-    shell:
-        """
-        fname="res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" dir={WKDIR} \
-        jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
-        --output {params.html} &> {log}
-        """
-
-rule view1:
-    input:
-        "res/classification1/{s}.{i}.clas.npy.gz"  # some will not exist, but just ignore warnings
-    output:
-        html="res/classification1/view/{s}.{i}.html"
-    params:
-        html="../res/classification1/view/{s}.{i}.html"
-    log:
-        "log/classification1/view/{s}.{i}.html.log"
-    benchmark:
-        "log/classification1/view/{s}.{i}.html.benchmark"
-    threads:
-        1
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 8000
-    shell:
-        """
-        mkdir -p res res/classification1 res/classification1/view
-        fname={input} dir={WKDIR} \
-        jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
-        --output {params.html} &> {log}
-        """
+# rule view0:
+#     input:
+#         "res/blobs/{s}.done"
+#     output:
+#         html="res/blobs/view/{s}.{i}.html"
+#     params:
+#         html="../res/blobs/view/{s}.{i}.html"
+#     log:
+#         "log/blobs/view/{s}.{i}.html.log"
+#     benchmark:
+#         "log/blobs/view/{s}.{i}.html.benchmark"
+#     threads:
+#         1
+#     resources:
+#         mem_mb=lambda wildcards, attempt: attempt * 8000
+#     shell:
+#         """
+#         fname="res/blobs/{wildcards.s}.{wildcards.i}.npy.gz" dir={WKDIR} \
+#         jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
+#         --output {params.html} &> {log}
+#         """
+#
+# rule view1:
+#     input:
+#         "res/classification1/{s}.{i}.clas.npy.gz"  # some will not exist, but just ignore warnings
+#     output:
+#         html="res/classification1/view/{s}.{i}.html"
+#     params:
+#         html="../res/classification1/view/{s}.{i}.html"
+#     log:
+#         "log/classification1/view/{s}.{i}.html.log"
+#     benchmark:
+#         "log/classification1/view/{s}.{i}.html.benchmark"
+#     threads:
+#         1
+#     resources:
+#         mem_mb=lambda wildcards, attempt: attempt * 8000
+#     shell:
+#         """
+#         mkdir -p res res/classification1 res/classification1/view
+#         fname={input} dir={WKDIR} \
+#         jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
+#         --output {params.html} &> {log}
+#         """
 
 rule Create_DAG:
     resources:

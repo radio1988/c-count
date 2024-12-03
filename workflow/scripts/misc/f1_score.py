@@ -1,4 +1,4 @@
-from ccount.blob.io import load_blobs
+from ccount_utils.blob import load_blobs
 import numpy as np
 import pandas as pd
 from sklearn.metrics import f1_score

@@ -16,5 +16,5 @@ files=(`ls ../2_blob_detection_edge_removed/blobs/*npy.gz`)
 f=${files[$i]}
 f="test.rui_yes.npy"
 
-echo python classification.py -db $f -l 1 -w $weight
-python classification.py -db $f -l 1 -w $weight # > $f.classification.log 2>&1
+echo python blob_classification.py -db $f -l 1 -w $weight
+python blob_classification.py -db $f -l 1 -w $weight # > $f.classification.log 2>&1

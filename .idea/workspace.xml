@@ -4,13 +4,45 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="jpg2npy 9pixel works">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="jpg2npy.Snakefile verified to work">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_cropping.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_cropping.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/count_labeled_blobs.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/count_labeled_blobs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/develop.log" beforeDir="false" afterPath="$PROJECT_DIR$/develop.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/weights/FL1/FL.t.old.hd5.txt" beforeDir="false" afterPath="$PROJECT_DIR$/resources/weights/FL1/FL.t.old.hd5.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/count.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/count.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/mac.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/env/mac.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/edge_detector_dev.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/edge_detector_dev.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/filter_merge.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/filter_merge.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/labeling.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/labeling.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/tracking.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/tracking.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/visualize_area_calculation.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/visualize_area_calculation.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/rules/jpg2locs.smk" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/.ipynb_checkpoints/test_import-checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/.ipynb_checkpoints/test_import-checkpoint.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/area_calculation.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/area_calculation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_detection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_detection.singleScene.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_detection.singleScene.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccountCNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccountCNN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_classification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_filtering.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_filtering.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_labeling.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_labeling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_merging.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_merging.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_sampling.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_sampling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_split.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_split.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_stats.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_stats.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_viewing.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_viewing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_vote0.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_vote0.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_vote1.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_vote1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/czi2img.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/czi2img.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/eval_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/eval_classification.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/test/jpg2npy/config.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/misc/f1_score.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/misc/f1_score.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/test_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/test_import.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/train.2024.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/train.2024.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/train.old.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/train.old.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/visualize_locs_on_czi.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/visualize_locs_on_czi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/trash/classification.bsub" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/trash/classification.bsub" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/trash/workflow.bash" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/trash/workflow.bash" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,13 +121,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00025" summary="crops_viewing formatted">
-      <created>1720034956438</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1720034956439</updated>
     </task>
     <task id="LOCAL-00026" summary="cleaner crops_stat">
       <created>1720035105999</created>
@@ -433,7 +458,14 @@
       <option name="project" value="LOCAL" />
       <updated>1733145037572</updated>
     </task>
-    <option name="localTasksCounter" value="74" />
+    <task id="LOCAL-00074" summary="jpg2npy.Snakefile verified to work">
+      <created>1733163456191</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1733163456191</updated>
+    </task>
+    <option name="localTasksCounter" value="75" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -458,7 +490,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="jpg2npy.Snakefile: label_crops works" />
     <MESSAGE value="blob_detection.py: documentation added" />
     <MESSAGE value="save_locs documentation updated" />
     <MESSAGE value="blob_detection.singleScene.py: documentation updated" />
@@ -483,6 +514,7 @@
     <MESSAGE value="fixed bugs introduced in the module re-organization" />
     <MESSAGE value="works, now on jpg2npy again" />
     <MESSAGE value="jpg2npy 9pixel works" />
-    <option name="LAST_COMMIT_MESSAGE" value="jpg2npy 9pixel works" />
+    <MESSAGE value="jpg2npy.Snakefile verified to work" />
+    <option name="LAST_COMMIT_MESSAGE" value="jpg2npy.Snakefile verified to work" />
   </component>
 </project>

@@ -31,6 +31,8 @@ Process:
 - save results in locs file (y,x,r,L)
 '''
 
+#todo: unlabeled blob visualization based jpg only have one line of title, labeled has two, can cause alignment problems
+
 
 def validate_npy_gz(file_path):
     """Validate that the file ends with .npy.gz."""
@@ -262,11 +264,12 @@ def is_pixel_orange(rgb_color):
     """
     # Define orange color range (adjust as needed)
     red, green, blue = rgb_color
-    if red > 200 and 160 > green > 70 and blue < 20 and red > green * 1.4:
+    if red > 200 and 160 > green > 70 and blue < 70 and red > green * 1.4:
         # ashley: color_inside: (210, 86, 16)
         # logan: color_inside: (243, 151, 14)
         # john: color_inside: (248, 151, 12)
         # mac preview orange (255, ~140, 0)
+        # ashley FL-A 240, 154, 50
         return True
     else:
         return False

@@ -1,2 +1,2 @@
 /home/socolovsky_lab/ccount/labeling_Apr2020/training/FL/train_old_code_30epoch_9_fixed/FL.t.old.hd5
-nohup python classification.py -db ../data/FL.t.npy.gz  -odir output -s 1 -w  FL.t.old.hd5 1> train.log 2> train.err &
+nohup python blob_classification.py -db ../data/FL.t.npy.gz  -odir output -s 1 -w  FL.t.old.hd5 1> train.log 2> train.err &

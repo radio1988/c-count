@@ -2,6 +2,8 @@ name: ccount
 # run `conda-env create -f mac.yaml` for installation of the env
 # run `pip install aicspylibczi` after that
 # `pip install --upgrade yte plac`
+# conda install conda-forge::keras\n
+# pip install tensorflow
 
 channels:
   - defaults

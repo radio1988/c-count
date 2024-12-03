@@ -53,7 +53,7 @@ cd ..
 mkdir -p 2_classification_rui_daniel1
 cd 2_classification_rui_daniel1
 cp ../classification.bsub .
-cp ../classification.py .
+cp ../blob_classification.py .
 ln -s ../ccount.py
 ln -s ../pyimagesearch
 cp ../viewing_blobs.ipynb .
@@ -62,14 +62,14 @@ for f in ../1_blob_detection/blobs/*npy.gz
 do
 # round1: pred_rui_net
 weight=../../run1_good_ram_problem/2_first_round_training/output/Z_CFUe_1-Stitching-74.hdf5
-echo python classification.py -db $f -l 1 -w $weight
-python classification.py -db $f -l 1 -w $weight #> $f.classification.log 2>&1
+echo python blob_classification.py -db $f -l 1 -w $weight
+python blob_classification.py -db $f -l 1 -w $weight #> $f.classification.log 2>&1
 # round2: pred_daniel_net
 weight=../../run1_good_ram_problem/5_second_round_training/danielAug19.hdf5
 f=$(basename $f .npy.gz)
 f=${f}.yes.npy.gz
-echo python classification.py -db $f -l 1 -w $weight
-python classification.py -db $f -l 1 -w $weight > $f.pred2.log 2>&1
+echo python blob_classification.py -db $f -l 1 -w $weight
+python blob_classification.py -db $f -l 1 -w $weight > $f.pred2.log 2>&1
 done
 
 mkdir -p step1_all

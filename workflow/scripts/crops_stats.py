@@ -1,6 +1,6 @@
 import argparse, textwrap
-from ccount.blob.io import load_blobs
-from ccount.blob.misc import get_blob_statistics
+from ccount_utils.blob import load_blobs
+from ccount_utils.blob import get_blob_statistics
 
 
 def parse_cmd_and_prep():

@@ -1,23 +1,5 @@
-import matplotlib
-
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-from ccount.img.equalize import block_equalize
-from ccount.img.read_czi import read_czi, parse_image_obj
-from ccount.img.auto_contrast import uint16_image_auto_contrast
-
-from ccount.blob.find_blobs import find_blobs
-from ccount.blob.crop_blobs import crop_blobs
-from ccount.blob.io import save_locs
-from ccount.blob.plot import visualize_blobs_on_img
-
-from pathlib import Path
-
-import argparse, os, re, yaml
-import numpy as np
-
 """
-Input: czi
+Input: czi image
 Output: locs.gz or crops.gz for all scenes available in the czi (4 or less)
 
 params:
@@ -29,16 +11,27 @@ example usage:
 python workflow/scripts/blob_detection.py -i data/IL17A_POINT1_EPO_1.czi -c config.yaml -odir res/blob_locs/
 """
 
+import matplotlib
+import matplotlib.pyplot as plt
+from ccount_utils.img import read_czi, parse_image_obj
+from ccount_utils.img import block_equalize
+from ccount_utils.img import uint16_image_auto_contrast
+from ccount_utils.blob import crop_blobs, save_locs, visualize_blobs_on_img, find_blobs
+from pathlib import Path
+import argparse, os, re, yaml
+import numpy as np
+matplotlib.use('Agg')
+
 
 def parse_cmd_and_prep():
     parser = argparse.ArgumentParser(
         description='Read czi, output blobs')
-    parser.add_argument('-i', type=str,
-                        help='input file name: path/xxx.czi')
-    parser.add_argument('-c', type=str, default="config.yaml",
-                        help='path to config.yaml file')
-    parser.add_argument('-odir', type=str, default="blobs",
-                        help='output dir: default blobs')
+    parser.add_argument('-i', type=str, required=True,
+                        help='input czi file name: path/xxx.czi')
+    parser.add_argument('-c', type=str, default="config.yaml", required=True,
+                        help='path to config.yaml file, need this for blob detection params')
+    parser.add_argument('-odir', type=str, default="res/blob_locs", required=True,
+                        help='output dir: default res/blob_locs')
 
     args = parser.parse_args()
     print('input fname:', args.i)
@@ -65,7 +58,7 @@ image_obj = read_czi(args.i, Format=config['FORMAT'])
 
 for i in range(len(image_obj.scenes)):
     i = str(i)
-    out_blob_fname = os.path.join(args.odir, corename + "." + i + ".locs.npy")
+    out_blob_fname = os.path.join(args.odir, corename + "." + i + ".locs.npy.gz")
     print("Searching blobs for area", i, "; output:", out_blob_fname)
 
     image_obj = read_czi(args.i, Format=config['FORMAT'])
@@ -102,10 +95,10 @@ for i in range(len(image_obj.scenes)):
     out_img_fname = os.path.join(args.odir, "vis_blob_detection", corename + "." + i + ".jpg")
     print("output_img_fname:", out_img_fname)
     visualize_blobs_on_img(image, blob_locs,
-                             blob_extention_ratio=config['blob_extention_ratio'],
-                             blob_extention_radius=config['blob_extention_radius'],
-                             fname=out_img_fname
-                             )
+                           blob_extention_ratio=config['blob_extention_ratio'],
+                           blob_extention_radius=config['blob_extention_radius'],
+                           fname=out_img_fname
+                           )
 
 # test: skipped edge filter (we have neg plates now), 08/23/21
 # good_flats = remove_edge_crops(crops)

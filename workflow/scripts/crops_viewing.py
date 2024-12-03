@@ -1,8 +1,8 @@
 # %matplotlib inline
 import sys, os
 from os import path
-from ccount.blob.io import load_blobs
-from ccount.blob.plot import show_rand_crops
+from ccount_utils.blob import load_blobs
+from ccount_utils.blob import show_rand_crops
 
 if len(sys.argv) == 6:
     print("> work_dir:", os.getcwd())

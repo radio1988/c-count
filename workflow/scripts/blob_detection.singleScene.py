@@ -2,14 +2,14 @@ import matplotlib
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from ccount.img.equalize import block_equalize
-from ccount.img.read_czi import read_czi, parse_image_obj
-from ccount.img.auto_contrast import uint16_image_auto_contrast
+from ccount_utils.img import block_equalize
+from ccount_utils.img import read_czi, parse_image_obj
+from ccount_utils.img import uint16_image_auto_contrast
 
-from ccount.blob.find_blobs import find_blobs
-from ccount.blob.crop_blobs import crop_blobs
-from ccount.blob.io import save_locs
-from ccount.blob.plot import visualize_blobs_on_img
+from ccount_utils.blob import find_blobs
+from ccount_utils.blob import crop_blobs
+from ccount_utils.blob import save_locs
+from ccount_utils.blob import visualize_blobs_on_img
 
 from pathlib import Path
 

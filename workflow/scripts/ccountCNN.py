@@ -9,7 +9,7 @@ import time
 import tracemalloc
 import gc
 
-from ccount.img.transform import down_scale
+from ccount_utils.img import down_scale
 
 
 

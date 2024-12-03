@@ -83,7 +83,7 @@ rule classification:
         mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
-        python workflow/scripts/classification.py \
+        python workflow/scripts/blob_classification.py \
         -crops {input.data_val} \
         -config {CCOUNT_CONFIG} \
         -weight {input.weight} \
@@ -109,7 +109,7 @@ rule evaluation:
         100
     shell:
         """
-        python workflow/scripts/eval_classification.py \
+        python workflow/scripts/eval_blob_classification.py \
         {input.clas} \
         {input.data_val} \
         1>{output} \
