@@ -1,6 +1,11 @@
+"""
+Read jpg2npy.arc.py outputs and aggregate counts,
+replaced by aggr_count.py which takes npy.gz files
+"""
+
 import sys
-import pandas as pd
 import os
+import pandas as pd
 
 def aggr_count_info(inputs, label = int(1)):
     names = []

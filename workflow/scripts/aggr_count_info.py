@@ -1,3 +1,11 @@
+"""
+Read jpg2npy.arc.py outputs and aggregate counts
+replaced by count_labeled_blobs.py in jpg2npy.Snakemake which takes npy.gz files
+Still used in count.Snakemake, as it's faster
+"""
+
+
+
 import sys
 import pandas as pd
 import os
@@ -34,4 +42,4 @@ print(">>> output", output, ":\n", count_df)
 count_df.to_csv(output)
 
 
-# 
+#

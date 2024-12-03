@@ -6,6 +6,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+from scipy.ndimage import label
 
 Image.MAX_IMAGE_PIXELS = None  # disables the warning for large Image
 from ccount_utils.blob import load_blobs, save_locs, crop_blobs, get_blob_statistics
@@ -26,8 +27,9 @@ Process:
 - Read czi, get scene for the index
 - Read jpg, scale back coordinates with czi.scene
 - Find circles with y,x,r from locs file, in the jpg-img
-- Look for color inside the circles (has orange dot or not, one pixel is good enough)
-- if orange pixels detected (>9), mark positive, else, negative, in L column
+- Look for orange pixels inside the circles
+- Form orange-marks with connected pixels 
+- The size of the largest orange-mark >15, the blob is positive, else, negative, in L column
 - save results in locs file (y,x,r,L)
 '''
 
@@ -139,13 +141,14 @@ def get_labels(
         blob_extention_ratio=1.4, blob_extention_radius=10
 ):
     """
-    If >9 orange pixels are found in the corresponding circle, mark positive, otherwise negative
+    If >15 connected orange pixels are found in the corresponding circle, mark positive, otherwise negative
     @param jpg_img:
     @param jpg_locs:
     @return: jpg_labeled_locs [yxrL] with labels
     """
     labels = []
-    for i in range(len(jpg_locs)):
+    blob_orange_pixel_counts = []
+    for i in range(len(jpg_locs)):  # for each blob in the jpg
         y = int(jpg_locs[i][0])  # max y: 8628
         x = int(jpg_locs[i][1])  # max x: 10616
         r = int((jpg_locs[i][2] * blob_extention_ratio + blob_extention_radius) + 1)  # expanded as usual x1.4 and +10
@@ -157,19 +160,29 @@ def get_labels(
 
         # look at the color of the dot IN the circle
         count = count_orange_pixels_in_circle(jpg_img, x, y, r)
+        blob_orange_pixel_counts.append(count)
         # colors_inside = find_unique_colors_in_circle(jpg_img, x, y, r)
 
-        if count > 9:
+        if count > 15:
             labels.append(int(1))
         else:
             labels.append(int(0))
+
+    # test
+    plt.hist(blob_orange_pixel_counts, bins=40)
+    plt.yscale('log')  # Set y-axis to logarithmic scale
+    plt.title("Histogram of Counts for orange Pixels")
+    plt.savefig("hist.connected_orange_pixel_count.pdf", dpi=300)
 
     return labels
 
 
 def count_orange_pixels_in_circle(image, x, y, r):
     """
-    Count num of orange pixels within a circle in a PIL image.
+    Count the number of orange pixels within a circular region in a PIL image.
+    Only connected orange pixels are considered, forming “orange-marks”
+    The function identifies and counts pixels in the largest connected blob of orange pixels within the circle \
+    and reports the size of this largest orange-marks.
 
     Args:
         image: A PIL Image object representing the image.
@@ -182,17 +195,50 @@ def count_orange_pixels_in_circle(image, x, y, r):
     """
     count = 0
     width, height = image.size
-    # Iterate through pixels within the circle's bounding box
-    for i in range(max(0, x - r), min(width - 1, x + r) + 1):
-        for j in range(max(0, y - r), min(height - 1, y + r) + 1):
-            # Check if the pixel lies within the circle
+    orange_locations = set()
+
+    box_min_x = max(0, x - r)
+    box_max_x = min(width - 1, x + r) + 1
+    box_min_y = max(0, y - r)
+    box_max_y = min(height - 1, y + r) + 1
+    for i in range(box_min_x, box_max_x):  # bounding box
+        for j in range(box_min_y, box_max_y):
             if ((i - x) ** 2 + (j - y) ** 2) <= r ** 2:
-                # Get the pixel's RGB color
                 pixel_color = image.getpixel((i, j))
                 if is_pixel_orange(pixel_color):
                     count += 1
+                    orange_locations.add((i, j))
+
+    mask = np.zeros((box_max_x - box_min_x, box_max_y - box_min_y), dtype=int)
+    for x, y in orange_locations:
+        mask[x-box_min_x, y - box_min_y] = 1
+
+    max_cluster_pixel_count = find_largest_cluster(mask)
     # print('count: {}, x: {}, y: {}, r{}'.format(count, x, y, r))
-    return count
+    return max_cluster_pixel_count
+
+def find_largest_cluster(mask):
+    """
+    Finds clusters in a binary mask and returns the pixel count of the largest cluster.
+
+    Args:
+        mask (numpy.ndarray): Binary mask (2D array) where clusters are represented by 1s.
+
+    Returns:
+        int: Pixel count of the largest cluster.
+    """
+    # Label connected components
+    structure = np.ones((3, 3), dtype=int)  # 8-connectivity
+    labeled_array, num_features = label(mask, structure=structure)
+
+    if num_features == 0:
+        return 0  # No clusters found
+
+    # Calculate the size of each cluster
+    cluster_sizes = np.bincount(labeled_array.ravel())[1:]  # Exclude background (label 0)
+
+    # Return the size of the largest cluster
+    return cluster_sizes.max()
 
 
 # def find_unique_colors_at_circle(image, x, y, r):
