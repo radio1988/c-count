@@ -24,6 +24,7 @@ def sub_sample(A, n, seed=1):
         - if n is an integer between 1 and nrow(A), n rows will be sampled
         - if n is a float between 0 and 1, nrow(A) * n will be sampled
     """
+    print("\n<sub_sample>")
     n_rows = A.shape[0]
 
     if n <= 0:
@@ -51,7 +52,7 @@ def get_blob_statistics(blobs):
 
     previously called 'crop_stats'
     """
-    print("<get_blob_statistics>")
+    print("\n<get_blob_statistics>")
 
     n_cols = blobs.shape[1]
 
@@ -113,13 +114,13 @@ def parse_crops(crops):
 #     """
 #     import cv2
 #     from .plot import flat2image
-#     from .mask_image import mask_image
+#     from .mask_blob_img import mask_blob_img
 #     good_flats = []
 #     bad_flats = []
 #     for i in range(0, flat_blobs.shape[0]):
 #         flat = flat_blobs[i,]
 #         crop = flat2image(flat)
-#         crop = mask_image(crop, r=flat[2])
+#         crop = mask_blob_img(crop, r=flat[2])
 #         crop = crop * 255
 #         crop = crop.astype(np.uint8)
 #
@@ -148,7 +149,7 @@ def load_blobs(fname):
 
     gives statistics if Label is present
     """
-
+    print("\n<load_blobs>")
     if not os.path.isfile(fname):
         raise Exception('input file', fname, 'not found')
 
@@ -160,10 +161,7 @@ def load_blobs(fname):
     else:
         raise Exception("blob file format not recognized, suffix not npy nor npy.gz")
 
-    if array.shape[1] > 3:  # with label
-        get_blob_statistics(array)
-    if array.shape[1] > 4:  # is crop, not only loc
-        print("n-crop: {}, crop width: {}\n".format(len(array), crop_width(array)))
+    get_blob_statistics(array)
     return array
 
 
@@ -177,7 +175,7 @@ def save_locs(crops, fname):
     - if inputs are yxr formatted locs, padding to yxrL format with -1(unlabeled) as labels
     """
 
-    print('<save_locs>')
+    print('\n<save_locs>')
 
     if not fname.endswith('.npy.gz'):
         raise Exception("file format for <save_locs> not npy.gz:{}\n".format(fname))
@@ -217,7 +215,7 @@ def save_crops(crops, fname):
     Input: crops
     Output: npy.gz or npy files
     """
-    print("<save_crops>")
+    print("\n<save_crops>")
 
     get_blob_statistics(crops)
 
@@ -277,7 +275,7 @@ def find_blobs(image_neg, scaling_factor=4,
     blob_extention_radius: 10 # for vis in jpg
     crop_width: 80  # padding width, which is cropped img width/2 (50), in blob_cropping.py
     """
-    print("<find_blobs>")
+    print("\n<find_blobs>")
 
     tic = time.time()
     print('image size:', image_neg.shape)
@@ -367,6 +365,7 @@ def sort_blobs(blobs):
     blobs: yxrL
     sorted by r, x, y
     """
+    print("\n<sort_blobs>")
     blobs = blobs[blobs[:, 2].argsort()]
     blobs = blobs[blobs[:, 1].argsort(kind='mergesort')]
     blobs = blobs[blobs[:, 0].argsort(kind='mergesort')]
@@ -405,11 +404,12 @@ def setdiff_blobs(blobs1, blobs2):
     return (blobsout)
 
 
-def mask_image(image, r=10, blob_extention_ratio=1, blob_extention_radius=0):
+def mask_blob_img(image, r=10, blob_extention_ratio=1, blob_extention_radius=0):
     '''
     input: one image [100, 100], and radius of the blob
     return: hard-masked image of [0,1] scale
     '''
+    print("\n<mask_blob_img>")
 
     image = float_image_auto_contrast(image)
 

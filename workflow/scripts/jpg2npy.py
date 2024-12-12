@@ -1,39 +1,42 @@
-import argparse
-import os, re, sys
-import math
-import cv2
-import time
-import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image
-from scipy.ndimage import label
-
-Image.MAX_IMAGE_PIXELS = None  # disables the warning for large Image
-from ccount_utils.blob import load_blobs, save_locs, crop_blobs, get_blob_statistics
-from ccount_utils.img import read_czi, parse_image_obj
-from ccount_utils.blob import visualize_blobs_on_img, visualize_blob_compare
-
-blob_extention_ratio = 1.4  # todo: load yaml
-blob_extention_radius = 10
-
-'''
-This script takes a user labeled {jpg} file, and an unlabeled blobs' <locs> file. 
+"""
+This script takes a user labeled {jpg} file, and an unlabeled blobs' <locs> file.
 Look for orange dots in positive blobs.
 And outputs <label_locs> file in npy.gz format.
 
 It needs czi file and sceneIndex to scale jpg back to czi yxr coordinates
 
-Process: 
+Process:
 - Read czi, get scene for the index
 - Read jpg, scale back coordinates with czi.scene
 - Find circles with y,x,r from locs file, in the jpg-img
 - Look for orange pixels inside the circles
-- Form orange-marks with connected pixels 
+- Form orange-marks with connected pixels
 - The size of the largest orange-mark >15, the blob is positive, else, negative, in L column
 - save results in locs file (y,x,r,L)
-'''
+"""
 
-#todo: unlabeled blob visualization based jpg only have one line of title, labeled has two, can cause alignment problems
+import argparse
+import math
+import os
+import sys
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image
+from scipy.ndimage import label
+
+Image.MAX_IMAGE_PIXELS = None  # disables the warning for large Image
+from ccount_utils.blob import load_blobs, save_locs, get_blob_statistics
+from ccount_utils.img import read_czi, parse_image_obj
+from ccount_utils.blob import visualize_blobs_on_img
+
+blob_extention_ratio = 1.4  # todo: load yaml
+blob_extention_radius = 10
+
+
+# todo: unlabeled blob visualization based jpg only have one line of title, \
+#  labeled has two, can cause alignment problems
 
 
 def validate_npy_gz(file_path):
@@ -43,6 +46,7 @@ def validate_npy_gz(file_path):
     if not os.path.isfile(file_path):
         raise argparse.ArgumentTypeError(f"The file '{file_path}' does not exist")
     return file_path
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -75,7 +79,7 @@ def parse_args():
         e.g. res/label_loc/plate.sceneIndex.npy.gz"
     )
     args = parser.parse_args()
-    print("\nCommand typed: ", " ".join(sys.argv))
+    print("\nCommand typed: ", " ".join(sys.argv), "\n")
     return args
 
 
@@ -211,11 +215,12 @@ def count_orange_pixels_in_circle(image, x, y, r):
 
     mask = np.zeros((box_max_x - box_min_x, box_max_y - box_min_y), dtype=int)
     for x, y in orange_locations:
-        mask[x-box_min_x, y - box_min_y] = 1
+        mask[x - box_min_x, y - box_min_y] = 1
 
     max_cluster_pixel_count = find_largest_cluster(mask)
     # print('count: {}, x: {}, y: {}, r{}'.format(count, x, y, r))
     return max_cluster_pixel_count
+
 
 def find_largest_cluster(mask):
     """
@@ -325,12 +330,14 @@ def main():
     args = parse_args()
 
     czi_obj = read_czi(args.czi)
-    czi_img = parse_image_obj(czi_obj,
-                              args.sceneIndex)  # czi_img.shape (8635, 10620) (h,w); 10620/8635 1.229878401852924
+    czi_img = parse_image_obj(
+        czi_obj,
+        args.sceneIndex)  # czi_img.shape (8635, 10620) (h,w); w/h=1.22
 
     czi_locs = load_blobs(args.locs)  # czi coordinates are larger than jpg_locs
     if czi_locs.shape[1] > 3:
         czi_locs = czi_locs[:, 0:4]
+    get_blob_statistics(czi_locs)
 
     jpg_img = read_colored_jpg(args.jpg)
     print('input jpg size', jpg_img.size)
@@ -340,9 +347,10 @@ def main():
     scale = math.sqrt(jpg_img.size[0] ** 2 + jpg_img.size[1] ** 2) / \
             math.sqrt(czi_img.shape[1] ** 2 + czi_img.shape[0] ** 2)  # based on diagonal length
     print("scale from czi to jpg is {}".format(round(scale, 3)))
-    jpg_locs = czi_locs * scale
-    print("example czi locs:\n", czi_locs[0:3, ])
-    print("example jpg locs:\n", jpg_locs[0:3, ])
+    jpg_locs = czi_locs
+    jpg_locs[:, 0:3] = czi_locs[:, 0:3] * scale
+    print("example czi locs:\n", czi_locs[0:3, :])
+    print("example jpg locs:\n", jpg_locs[0:3, :])
 
     jpg_labels = get_labels(jpg_img, jpg_locs, blob_extention_ratio, blob_extention_radius)
     jpg_labels = np.array(jpg_labels).reshape(-1, 1)

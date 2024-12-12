@@ -18,7 +18,7 @@ from ccount_utils.img import equalize
 from ccount_utils.img import float_image_auto_contrast
 from ccount_utils.img import down_scale
 from ccount_utils.blob import load_blobs, load_blobs, save_crops, save_locs
-from ccount_utils.blob import mask_image
+from ccount_utils.blob import mask_blob_img
 from ccount_utils.blob import get_blob_statistics, parse_crops, crop_width
 from ccount_utils.clas import F1
 from pyimagesearch.cnn.networks.lenet import LeNet
@@ -76,7 +76,7 @@ print("Auto contrasting images...")
 images = np.array([float_image_auto_contrast(image) for image in images])
 
 print("Masking images...")
-images = np.array([mask_image(image, r=rs[ind]) for ind, image in enumerate(images)])
+images = np.array([mask_blob_img(image, r=rs[ind]) for ind, image in enumerate(images)])
 
 images = images.reshape((images.shape[0], 2 * w, 2 * w, 1))
 print("max pixel value: ", np.max(images))

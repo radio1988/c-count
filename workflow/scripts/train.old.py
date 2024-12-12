@@ -3,7 +3,7 @@ from ccount_utils.img import float_image_auto_contrast
 from ccount_utils.img import down_scale
 
 from ccount_utils.blob import load_blobs, save_crops
-from ccount_utils.blob import mask_image
+from ccount_utils.blob import mask_blob_img
 from ccount_utils.blob import get_blob_statistics, parse_crops, crop_width
 
 from ccount.clas.split_data import split_data
@@ -149,9 +149,9 @@ trainimages = np.array([float_image_auto_contrast(image) for image in trainimage
 valimages = np.array([float_image_auto_contrast(image) for image in valimages])
 
 print("Masking images...")
-trainimages = np.array([mask_image(image, r=trainrs[ind])
+trainimages = np.array([mask_blob_img(image, r=trainrs[ind])
                         for ind, image in enumerate(trainimages)])
-valimages = np.array([mask_image(image, r=valrs[ind])
+valimages = np.array([mask_blob_img(image, r=valrs[ind])
                       for ind, image in enumerate(valimages)])
 
 # Reshape for model

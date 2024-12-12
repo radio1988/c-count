@@ -4,12 +4,16 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="fix imports in count.Snakefile">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="get_blob_statistics logic simplified">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/aggr_count.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/aggr_count.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/aggr_count_info.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/aggr_count_info.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccountCNN.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/.ipynb_checkpoints/test_import-checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/.ipynb_checkpoints/test_import-checkpoint.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_classification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/test_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/test_import.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/train.2024.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/train.2024.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/train.old.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/train.old.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,20 +92,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00027" summary="create DAG">
-      <created>1720061309840</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1720061309840</updated>
-    </task>
-    <task id="LOCAL-00028" summary="count.Snakefile takes data/czi or anything specified in config.yaml DATA_DIR">
-      <created>1720204520164</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1720204520164</updated>
     </task>
     <task id="LOCAL-00029" summary="crops_vote.py">
       <created>1722515875266</created>
@@ -432,7 +422,21 @@
       <option name="project" value="LOCAL" />
       <updated>1733201176184</updated>
     </task>
-    <option name="localTasksCounter" value="76" />
+    <task id="LOCAL-00076" summary="jpg2npy validated">
+      <created>1733208947991</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1733208947991</updated>
+    </task>
+    <task id="LOCAL-00077" summary="get_blob_statistics logic simplified">
+      <created>1734003117875</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1734003117875</updated>
+    </task>
+    <option name="localTasksCounter" value="78" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -457,8 +461,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="save_locs documentation updated" />
-    <MESSAGE value="blob_detection.singleScene.py: documentation updated" />
     <MESSAGE value="rule blob_detection updated" />
     <MESSAGE value="more explicit log, documented" />
     <MESSAGE value="documented" />
@@ -482,6 +484,8 @@
     <MESSAGE value="jpg2npy 9pixel works" />
     <MESSAGE value="jpg2npy.Snakefile verified to work" />
     <MESSAGE value="fix imports in count.Snakefile" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix imports in count.Snakefile" />
+    <MESSAGE value="jpg2npy validated" />
+    <MESSAGE value="get_blob_statistics logic simplified" />
+    <option name="LAST_COMMIT_MESSAGE" value="get_blob_statistics logic simplified" />
   </component>
 </project>

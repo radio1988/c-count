@@ -121,7 +121,6 @@ rule blob_detection:
 rule jpg2locs:
     """
     Assume input jpg has labels in it (orange dots in positive blob circles)
-
     """
     input:
         jpg='data/label_img/{sample}.{sceneIndex}' + IMG_SUFFIX + '.jpg',
