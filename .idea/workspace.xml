@@ -4,13 +4,9 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="ccount_utils.clas import split_data">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="ccount_utils.clas">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/.ipynb_checkpoints/test_import-checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/.ipynb_checkpoints/test_import-checkpoint.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/test_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/test_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/train.2024.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/train.2024.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/train.old.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/train.old.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,13 +85,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00032" summary="skip sorting">
-      <created>1722516882496</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1722516882496</updated>
     </task>
     <task id="LOCAL-00033" summary="re-define balancing to maxN//2 for Yes and No; maxN default = 160000">
       <created>1722524238381</created>
@@ -433,7 +422,14 @@
       <option name="project" value="LOCAL" />
       <updated>1734008700934</updated>
     </task>
-    <option name="localTasksCounter" value="81" />
+    <task id="LOCAL-00081" summary="ccount_utils.clas">
+      <created>1734009374534</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1734009374535</updated>
+    </task>
+    <option name="localTasksCounter" value="82" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -458,7 +454,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="visualize_blob_detection: color changed" />
     <MESSAGE value="visualize_blobs_on_img: included stats of labels in title" />
     <MESSAGE value="visualize_blob_detection -&gt; visualize_blobs_on_img" />
     <MESSAGE value="blob_detection_visualization: True  removed from config.yaml" />
@@ -483,6 +478,7 @@
     <MESSAGE value="mask_blob_img renamed" />
     <MESSAGE value="blob.py &quot;&quot;&quot;" />
     <MESSAGE value="ccount_utils.clas import split_data" />
-    <option name="LAST_COMMIT_MESSAGE" value="ccount_utils.clas import split_data" />
+    <MESSAGE value="ccount_utils.clas" />
+    <option name="LAST_COMMIT_MESSAGE" value="ccount_utils.clas" />
   </component>
 </project>

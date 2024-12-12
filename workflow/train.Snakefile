@@ -109,7 +109,7 @@ rule evaluation:
         100
     shell:
         """
-        python workflow/scripts/eval_blob_classification.py \
+        python workflow/scripts/eval_classification.py \
         {input.clas} \
         {input.data_val} \
         1>{output} \
