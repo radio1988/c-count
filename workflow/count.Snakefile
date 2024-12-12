@@ -46,7 +46,8 @@ rule targets:
             suffix=".crops.clas.npy.gz.jpg"),
         blob_locs=input_names(prefix="res/classification1/", SAMPLES=SAMPLES, suffix='.locs.clas.npy.gz'),
 #        blob_locs=expand("res/classification1/{s}.{i}.locs.clas.npy.gz",s=SAMPLES,i=[0, 1, 2, 3]),
-        rulegraph="rulegraph.pdf"
+        rulegraph="rulegraph.pdf",
+        plot = "res/plots/areas.histogram.pdf"
 
 include: 'rules/czi2img.smk'
 include: 'rules/blob_detection.smk'
@@ -196,6 +197,25 @@ rule area_aggregation:
     shell:
         """
         python workflow/scripts/aggr_area_info.py res/classification1/pos/area/ res/areas.csv &> {log}
+        """
+
+
+rule area_histogram:
+    '''
+    '''
+    input:
+        "res/areas.csv"
+    output:
+        "res/plots/areas.histogram.pdf"
+    log:
+        "res/plots/areas.histogram.pdf.log"
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1000
+    shell:
+        """
+        python plot_area_histogram.py {input} {output} &> {log}
         """
 
 # rule view0:

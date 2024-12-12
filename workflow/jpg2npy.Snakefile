@@ -148,7 +148,7 @@ rule locs2crops:
         czi="data/czi/{sample}.czi",
         config='config.yaml'
     output:
-        npy='res/label_crops/{sample}.{sceneIndex}.label.npy.gz',
+        npy=protected('res/label_crops/{sample}.{sceneIndex}.label.npy.gz'),
         log='res/label_crops/log/{sample}.{sceneIndex}.label.npy.gz.log'
     log:
         'res/label_crops/log/{sample}.{sceneIndex}.label.npy.gz.err'

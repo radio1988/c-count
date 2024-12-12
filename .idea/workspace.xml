@@ -4,8 +4,12 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="ccount_utils.clas">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="eval_classification.py renamed">
+      <change afterPath="$PROJECT_DIR$/workflow/notebooks/utils/plotting.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/workflow/scripts/plot_area_histogram.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/count.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/count.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -85,13 +89,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00033" summary="re-define balancing to maxN//2 for Yes and No; maxN default = 160000">
-      <created>1722524238381</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1722524238381</updated>
     </task>
     <task id="LOCAL-00034" summary="reformatted train.py">
       <created>1724723724026</created>
@@ -429,7 +426,14 @@
       <option name="project" value="LOCAL" />
       <updated>1734009374535</updated>
     </task>
-    <option name="localTasksCounter" value="82" />
+    <task id="LOCAL-00082" summary="eval_classification.py renamed">
+      <created>1734013514623</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1734013514623</updated>
+    </task>
+    <option name="localTasksCounter" value="83" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -454,7 +458,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="visualize_blobs_on_img: included stats of labels in title" />
     <MESSAGE value="visualize_blob_detection -&gt; visualize_blobs_on_img" />
     <MESSAGE value="blob_detection_visualization: True  removed from config.yaml" />
     <MESSAGE value="blob_detection.smk and czi2img.smk split from count.Snakefile" />
@@ -479,6 +482,7 @@
     <MESSAGE value="blob.py &quot;&quot;&quot;" />
     <MESSAGE value="ccount_utils.clas import split_data" />
     <MESSAGE value="ccount_utils.clas" />
-    <option name="LAST_COMMIT_MESSAGE" value="ccount_utils.clas" />
+    <MESSAGE value="eval_classification.py renamed" />
+    <option name="LAST_COMMIT_MESSAGE" value="eval_classification.py renamed" />
   </component>
 </project>

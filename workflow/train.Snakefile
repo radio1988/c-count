@@ -43,12 +43,12 @@ rule subsampling:
         &> {log}
         """
 
-rule training: 
+rule training:
     input:
         small_crop='res/small_data/{rate}.npy.gz',
         val_crop=DATA_VAL
     output:
-        weight='res/weights/{rate}.weights.h5'
+        weight=protected('res/weights/{rate}.weights.h5')
     log:
         'res/weights/{rate}.weights.h5.log'
     benchmark:
@@ -67,7 +67,7 @@ rule training:
         &> {log}
         """
 
-rule classification: 
+rule classification_on_val:
     input:
         weight='res/weights/{rate}.weights.h5',
         data_val=DATA_VAL
@@ -91,7 +91,7 @@ rule classification:
         &> {log}
         """
 
-rule evaluation:
+rule evaluation_on_val:
     input:
         clas='res/clas/{rate}.npy.gz',
         data_val=DATA_VAL
