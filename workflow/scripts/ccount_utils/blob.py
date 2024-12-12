@@ -13,7 +13,6 @@ from ccount_utils.img import down_scale, equalize, float_image_auto_contrast
 from IPython.display import clear_output
 
 
-
 def sub_sample(A, n, seed=1):
     """
     subsample n rows from np.array A
@@ -57,15 +56,9 @@ def get_blob_statistics(blobs):
     n_cols = blobs.shape[1]
 
     if n_cols > 10:
-        print('crop width:', crop_width(blobs))
+        print('yxrL+crops format, crop width =', crop_width(blobs))
     elif n_cols >= 4:
-        print('only yxrL, no img of crops included')
-    elif n_cols == 3:
-        raise Exception('only yxr, no Labels nor img of crops included')
-    else:
-        raise Exception("blobs array has less than 3 columns")
-
-    if blobs.shape[1] > 3:  # contains Label
+        print('yxrL format')
         [negative, positive, maybe, artifact, unlabeled] = [
             sum(blobs[:, 3] == 0),
             sum(blobs[:, 3] == 1),
@@ -75,8 +68,11 @@ def get_blob_statistics(blobs):
         ]
         print("Negatives: {}, Positives: {}, Maybes: {}, Artifacts: {}, Unlabeled: {}\n".format(
             negative, positive, maybe, artifact, unlabeled))
+    elif n_cols == 3:
+        print('yxr format, all blobs unlabeled')
+        [negative, positive, maybe, artifact, unlabeled] = [0, 0, 0, 0, blobs.shape[0]]
     else:
-        warnings.warn("this blobs array does not contain a label column\n")
+        raise Exception("blobs array format error: has less than 3 columns")
 
     return {'positive': positive,
             "negative": negative,
@@ -207,7 +203,7 @@ def save_locs(crops, fname):
         sys.exit("locs/crops format error")
 
     print('num of blob locs: {}'.format(locs.shape[0]))
-    print('blob locs head:', locs[0:4,])
+    print('blob locs head:', locs[0:4, ])
 
     Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
     tempName = fname.replace(".npy.gz", ".npy")
@@ -361,7 +357,7 @@ def crop_blobs(locs, image, area=0, place_holder=0, crop_width=80):
 
         # Flatten crop and concatenate metadata
         flat_crop = cropped_img.flatten()
-        crops[i, ] = np.concatenate(([y, x, r, L, area, place_holder], flat_crop))
+        crops[i,] = np.concatenate(([y, x, r, L, area, place_holder], flat_crop))
 
     return crops
 
