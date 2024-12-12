@@ -20,17 +20,17 @@ rule targets:
         'res/3_evaluation_on_validationSet/{rate}.{rep}.txt',
         rate=SAMSPLING_RATES,
         rep=REPS),
-        # curve = 'data_curve.pdf'
+        curve = 'res/plots/saturation_analysis.pdf'
 
 rule subsampling: 
     input:
         crop=DATA_TRAIN
     output:
-        small_crop='res/0_trainingData_subsets/{rate}.npy.gz'
+        small_crop='res/0_trainingData_subsets/{rate}.{rep}.npy.gz'
     log:
-        'res/0_trainingData_subsets/{rate}.npy.gz.log'
+        'res/0_trainingData_subsets/{rate}.{rep}.npy.gz.log'
     benchmark:
-         'res/0_trainingData_subsets/{rate}.npy.gz.benchmark'
+         'res/0_trainingData_subsets/{rate}.{rep}.npy.gz.benchmark'
     threads:
         1
     resources:
@@ -46,7 +46,7 @@ rule subsampling:
 
 rule training:
     input:
-        small_crop='res/0_trainingData_subsets/{rate}.npy.gz',
+        small_crop='res/0_trainingData_subsets/{rate}.{rep}.npy.gz',
         val_crop=DATA_VAL
     output:
         weight=protected('res/1_trained_weights/{rate}.{rep}.weights.h5')
@@ -115,4 +115,21 @@ rule evaluation_on_val:
         {input.data_val} \
         1>{output} \
         2>{log}
+        """
+
+rule saturation_plot:
+    input:
+        expand('res/3_evaluation_on_validationSet/{rate}.{rep}.txt', rate=SAMSPLING_RATES, rep=REPS)
+    output:
+        'res/plots/saturation_analysis.pdf'
+    log:
+        'res/plots/saturation_analysis.pdf.log'
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 2000
+    shell:
+        """
+        python workflow/scripts/plot_saturation.py \
+        {input} {output}  &>{log}
         """
