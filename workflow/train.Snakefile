@@ -12,24 +12,25 @@ DATA_TRAIN=config['DATA_TRAIN']
 DATA_VAL=config['DATA_VAL']
 SAMSPLING_RATES = config['sampling_rates']
 CCOUNT_CONFIG=config['CCOUNT_CONFIG']
+REPS=config['REPS']
 
 rule targets:
     input:
-        subsamples=expand('res/small_data/{rate}.npy.gz', rate=SAMSPLING_RATES), 
-        weights=expand('res/weights/{rate}.weights.h5', rate=SAMSPLING_RATES), 
-        classifications=expand('res/clas/{rate}.npy.gz', rate=SAMSPLING_RATES),
-        evaluations=expand('res/eval/{rate}.txt', rate=SAMSPLING_RATES),
+        evaluations=expand(
+        'res/3_evaluation_on_validationSet/{rate}.{rep}.txt',
+        rate=SAMSPLING_RATES,
+        rep=REPS),
         # curve = 'data_curve.pdf'
 
 rule subsampling: 
     input:
         crop=DATA_TRAIN
     output:
-        small_crop='res/small_data/{rate}.npy.gz'
+        small_crop='res/0_trainingData_subsets/{rate}.npy.gz'
     log:
-        'res/small_data/{rate}.npy.gz.log'
+        'res/0_trainingData_subsets/{rate}.npy.gz.log'
     benchmark:
-         'res/small_data/{rate}.npy.gz.benchmark'
+         'res/0_trainingData_subsets/{rate}.npy.gz.benchmark'
     threads:
         1
     resources:
@@ -45,14 +46,14 @@ rule subsampling:
 
 rule training:
     input:
-        small_crop='res/small_data/{rate}.npy.gz',
+        small_crop='res/0_trainingData_subsets/{rate}.npy.gz',
         val_crop=DATA_VAL
     output:
-        weight=protected('res/weights/{rate}.weights.h5')
+        weight=protected('res/1_trained_weights/{rate}.{rep}.weights.h5')
     log:
-        'res/weights/{rate}.weights.h5.log'
+        'res/1_trained_weights/{rate}.{rep}.weights.h5.log'
     benchmark:
-         'res/weights/{rate}.weights.h5.benchmark'
+         'res/1_trained_weights/{rate}.{rep}.weights.h5.benchmark'
     threads:
         4
     resources:
@@ -69,14 +70,14 @@ rule training:
 
 rule classification_on_val:
     input:
-        weight='res/weights/{rate}.weights.h5',
+        weight='res/1_trained_weights/{rate}.{rep}.weights.h5',
         data_val=DATA_VAL
     output:
-        clas='res/clas/{rate}.npy.gz' # test
+        clas='res/2_count_on_validationSet/{rate}.{rep}.npy.gz' #todo:  test for non-complete scenes
     log:
-        'res/clas/{rate}.npy.gz.log'
+        'res/2_count_on_validationSet/{rate}.{rep}.npy.gz.log'
     benchmark:
-        'res/clas/{rate}.npy.gz.benchmark'
+        'res/2_count_on_validationSet/{rate}.{rep}.npy.gz.benchmark'
     threads:
         2
     resources:
@@ -93,14 +94,14 @@ rule classification_on_val:
 
 rule evaluation_on_val:
     input:
-        clas='res/clas/{rate}.npy.gz',
+        clas='res/2_count_on_validationSet/{rate}.{rep}.npy.gz',
         data_val=DATA_VAL
     output:
-        eval='res/eval/{rate}.txt'
+        eval='res/3_evaluation_on_validationSet/{rate}.{rep}.txt'
     log:
-        'res/eval/{rate}.txt.log'
+        'res/3_evaluation_on_validationSet/{rate}.{rep}.txt.log'
     benchmark:
-        'res/eval/{rate}.txt.benchmark'
+        'res/3_evaluation_on_validationSet/{rate}.{rep}.txt.benchmark'
     threads:
         1
     resources:
