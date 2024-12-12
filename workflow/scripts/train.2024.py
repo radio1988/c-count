@@ -7,7 +7,7 @@ from ccount_utils.blob import mask_blob_img
 from ccount_utils.blob import get_blob_statistics, parse_crops, crop_width
 
 
-from ccount.clas.split_data import split_data
+from ccount_utils.clas import split_data
 from ccount.clas.balance_data import balance_by_duplication
 from ccount.clas.augment_images import augment_images
 from ccount_utils.clas import F1, F1_calculation

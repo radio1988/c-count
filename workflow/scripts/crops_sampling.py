@@ -1,5 +1,5 @@
 import argparse, textwrap
-from ccount.clas.split_data import split_data
+from ccount_utils.clas import split_data
 from ccount_utils.blob import load_blobs, save_crops
 
 

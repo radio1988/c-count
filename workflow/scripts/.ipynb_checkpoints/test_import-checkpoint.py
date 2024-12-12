@@ -150,7 +150,7 @@ from pathlib import Path
 import numpy as np
 import sys, argparse, os, re, yaml
 import argparse, textwrap
-from ccount.clas.split_data import split_data
+from ccount_utils.clas import split_data
 from ccount_utils.blob import load_blobs, save_crops
 from ccount_utils.img import read_czi, parse_image_obj
 from ccount_utils.img import uint16_image_auto_contrast
@@ -164,7 +164,7 @@ from ccount_utils.blob import load_blobs
 from ccount_utils.clas import F1_calculation
 from ccount_utils.blob import intersect_blobs
 import argparse, textwrap
-from ccount.clas.split_data import split_data
+from ccount_utils.clas import split_data
 from ccount_utils.blob import load_blobs, save_crops
 from ccount_utils.img import equalize
 from ccount_utils.img import float_image_auto_contrast
@@ -172,7 +172,7 @@ from ccount_utils.img import down_scale
 from ccount_utils.blob import load_blobs, save_crops
 from ccount_utils.blob import mask_blob_img
 from ccount_utils.blob import get_blob_statistics, parse_crops, crop_width
-from ccount.clas.split_data import split_data
+from ccount_utils.clas import split_data
 from ccount.clas.balance_data import balance_by_duplication
 from ccount.clas.augment_images import augment_images
 from ccount_utils.clas import F1, F1_calculation
