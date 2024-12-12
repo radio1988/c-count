@@ -11,7 +11,6 @@ from skimage.feature import blob_log  # blob_doh, blob_dog
 from skimage.draw import disk
 from ccount_utils.img import down_scale, equalize, float_image_auto_contrast
 from IPython.display import clear_output
-from clas import F1_calculation
 
 
 def sub_sample(A, n, seed=1):
@@ -56,6 +55,7 @@ def get_blob_statistics(blobs):
     print("\n<get_blob_statistics>")
 
     n_cols = blobs.shape[1]
+    n_blobs = blobs.shape[0]
 
     if n_cols > 10:
         print('yxrL+crops format, crop width =', crop_width(blobs))
@@ -71,8 +71,8 @@ def get_blob_statistics(blobs):
         print("Negatives: {}, Positives: {}, Maybes: {}, Artifacts: {}, Unlabeled: {}\n".format(
             negative, positive, maybe, artifact, unlabeled))
     elif n_cols == 3:
-        print('yxr format, all blobs unlabeled')
-        [negative, positive, maybe, artifact, unlabeled] = [0, 0, 0, 0, blobs.shape[0]]
+        print('yxr format, all {} blobs unlabeled'.format(n_blobs))
+        [negative, positive, maybe, artifact, unlabeled] = [0, 0, 0, 0, n_blobs]
     else:
         raise Exception("blobs array format error: has less than 3 columns")
 
@@ -616,6 +616,8 @@ def visualize_blob_compare(image, blob_locs, blob_locs2,
         0, 1, red
         1, 0, purple
     """
+    from ccount_utils.clas import F1_calculation
+
     print("\n<visualize_blob_compare>")
     px = 1 / plt.rcParams['figure.dpi']
 

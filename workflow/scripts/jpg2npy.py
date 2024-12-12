@@ -336,26 +336,25 @@ def main():
 
     czi_locs = load_blobs(args.locs)  # czi coordinates are larger than jpg_locs
     if czi_locs.shape[1] > 3:
-        czi_locs = czi_locs[:, 0:4]
-    get_blob_statistics(czi_locs)
+        czi_locs = czi_locs[:, 0:3]  # yxr only, no L needed
 
     jpg_img = read_colored_jpg(args.jpg)
     print('input jpg size', jpg_img.size)
     jpg_img = remove_jpg_white_canvas(jpg_img, args.jpg)
     print('jpg size after removing white canvas', jpg_img.size)
 
+    print("\nexample czi sized locs:\n", czi_locs[0:4, :])
     scale = math.sqrt(jpg_img.size[0] ** 2 + jpg_img.size[1] ** 2) / \
             math.sqrt(czi_img.shape[1] ** 2 + czi_img.shape[0] ** 2)  # based on diagonal length
     print("scale from czi to jpg is {}".format(round(scale, 3)))
-    jpg_locs = czi_locs
+    jpg_locs = czi_locs.copy()
     jpg_locs[:, 0:3] = czi_locs[:, 0:3] * scale
-    print("example czi locs:\n", czi_locs[0:3, :])
-    print("example jpg locs:\n", jpg_locs[0:3, :])
+    print("example jpg sized locs(should be scaled):\n", jpg_locs[0:4, :])
 
     jpg_labels = get_labels(jpg_img, jpg_locs, blob_extention_ratio, blob_extention_radius)
     jpg_labels = np.array(jpg_labels).reshape(-1, 1)
     czi_locs_labeled = np.hstack((czi_locs, jpg_labels))
-    print("example labeled jpg locs:\n", czi_locs_labeled[0:3, ])
+    print("example output locs(should be czi sized):\n", czi_locs_labeled[0:4, ])
     get_blob_statistics(czi_locs_labeled)
 
     if os.path.dirname(args.output):

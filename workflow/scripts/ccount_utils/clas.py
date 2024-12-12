@@ -1,12 +1,9 @@
 import copy
-
+import numpy as np
 import imgaug as ia
 from imgaug import augmenters as iaa
-import numpy as np
 from ccount_utils.img import float_image_auto_contrast
-from ccount_utils.blob import get_blob_statistics, parse_crops, crop_width
-
-
+from ccount_utils.blob import get_blob_statistics, parse_crops
 
 def augment_images(images, aug_sample_size):
     '''
@@ -104,9 +101,7 @@ def augment_crops(images, labels, Rs, aug_sample_size):
     return images, labels, Rs
 
 
-import numpy as np
-from ccount_utils.blob import get_blob_statistics, parse_crops
-from ccount_utils.clas import augment_images
+
 
 
 def balance_by_removal(blobs):

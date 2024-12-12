@@ -4,9 +4,11 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="mask_blob_img renamed">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="blob.py &quot;&quot;&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount_utils/clas.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount_utils/clas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/jpg2npy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,13 +87,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00030" summary="blobs1b">
-      <created>1722515990770</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1722515990770</updated>
     </task>
     <task id="LOCAL-00031" summary="intersect_blobs use x,y -&gt; x.y.r">
       <created>1722516454287</created>
@@ -429,7 +424,14 @@
       <option name="project" value="LOCAL" />
       <updated>1734003889293</updated>
     </task>
-    <option name="localTasksCounter" value="79" />
+    <task id="LOCAL-00079" summary="blob.py &quot;&quot;&quot;">
+      <created>1734004293931</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1734004293931</updated>
+    </task>
+    <option name="localTasksCounter" value="80" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -454,7 +456,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="more explicit log, documented" />
     <MESSAGE value="documented" />
     <MESSAGE value="visualize_blob_detection: color changed" />
     <MESSAGE value="visualize_blobs_on_img: included stats of labels in title" />
@@ -479,6 +480,7 @@
     <MESSAGE value="jpg2npy validated" />
     <MESSAGE value="get_blob_statistics logic simplified" />
     <MESSAGE value="mask_blob_img renamed" />
-    <option name="LAST_COMMIT_MESSAGE" value="mask_blob_img renamed" />
+    <MESSAGE value="blob.py &quot;&quot;&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="blob.py &quot;&quot;&quot;" />
   </component>
 </project>
