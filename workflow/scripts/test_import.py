@@ -173,8 +173,8 @@ from ccount_utils.blob import load_blobs, save_crops
 from ccount_utils.blob import mask_blob_img
 from ccount_utils.blob import get_blob_statistics, parse_crops, crop_width
 from ccount_utils.clas import split_data
-from ccount.clas.balance_data import balance_by_duplication
-from ccount.clas.augment_images import augment_images
+from ccount_utils.clas import balance_by_duplication
+from ccount_utils.clas import augment_images
 from ccount_utils.clas import F1, F1_calculation
 import sys, argparse, os, re, yaml, keras, textwrap
 import numpy as np

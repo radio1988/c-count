@@ -7,22 +7,20 @@ from ccount_utils.blob import mask_blob_img
 from ccount_utils.blob import get_blob_statistics, parse_crops, crop_width
 
 from ccount_utils.clas import split_data
-from ccount.clas.balance_data import balance_by_duplication
-from ccount.clas.augment_images import augment_crops
+from ccount_utils.clas import balance_by_duplication
+from ccount_utils.clas import augment_crops
 from ccount_utils.clas import F1, F1_calculation
 
-import sys, argparse, os, re, yaml, keras, textwrap
+import sys, os, argparse, re, yaml, keras, textwrap
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
 
 from pyimagesearch.cnn.networks.lenet import LeNet
 from sklearn.model_selection import train_test_split
-from skimage.transform import rescale, resize, downscale_local_mean
 from tensorflow.keras.optimizers import Adam
 from keras.utils import to_categorical
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from collections import Counter
 
 
 # Show CPU/GPU info
