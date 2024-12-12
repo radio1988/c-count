@@ -61,6 +61,13 @@ def get_blob_statistics(blobs):
         print('yxrL+crops format, crop width =', crop_width(blobs))
     elif n_cols >= 4:
         print('yxrL format')
+    elif n_cols == 3:
+        print('yxr format, all {} blobs unlabeled'.format(n_blobs))
+    else:
+        raise Exception("blobs array format error: has less than 3 columns")
+
+    [negative, positive, maybe, artifact, unlabeled] = [0, 0, 0, 0, n_blobs]
+    if n_cols >= 4:
         [negative, positive, maybe, artifact, unlabeled] = [
             sum(blobs[:, 3] == 0),
             sum(blobs[:, 3] == 1),
@@ -68,13 +75,8 @@ def get_blob_statistics(blobs):
             sum(blobs[:, 3] == 4),
             sum(blobs[:, 3] == -1)
         ]
-        print("Negatives: {}, Positives: {}, Maybes: {}, Artifacts: {}, Unlabeled: {}\n".format(
-            negative, positive, maybe, artifact, unlabeled))
-    elif n_cols == 3:
-        print('yxr format, all {} blobs unlabeled'.format(n_blobs))
-        [negative, positive, maybe, artifact, unlabeled] = [0, 0, 0, 0, n_blobs]
-    else:
-        raise Exception("blobs array format error: has less than 3 columns")
+    print("Negatives: {}, Positives: {}, Maybes: {}, Artifacts: {}, Unlabeled: {}\n".format(
+        negative, positive, maybe, artifact, unlabeled))
 
     return {'positive': positive,
             "negative": negative,
