@@ -11,6 +11,7 @@ from skimage.feature import blob_log  # blob_doh, blob_dog
 from skimage.draw import disk
 from ccount_utils.img import down_scale, equalize, float_image_auto_contrast
 from IPython.display import clear_output
+from clas import F1_calculation
 
 
 def sub_sample(A, n, seed=1):
@@ -405,18 +406,16 @@ def setdiff_blobs(blobs1, blobs2):
 
 
 def mask_blob_img(image, r=10, blob_extention_ratio=1, blob_extention_radius=0):
-    '''
+    """
     input: one image [100, 100], and radius of the blob
-    return: hard-masked image of [0,1] scale
-    '''
+    return: hard-masked image of [0,1] scale for training
+    """
     print("\n<mask_blob_img>")
 
     image = float_image_auto_contrast(image)
 
     r_ = r * blob_extention_ratio + blob_extention_radius
     w = int(image.shape[0] / 2)
-    # todo: 24/11 speed?
-    # hard mask creating training data
     mask = np.zeros((2 * w, 2 * w))  # zeros are masked to be black
     rr, cc = disk((w - 1, w - 1), min(r_, w - 1))
     mask[rr, cc] = 1  # 1 is white
@@ -433,8 +432,6 @@ def area_calculation(img, r,
     output area-of-pixels as int
     outname: outname for plotting, e.g. 'view_area_cal.pdf'
     """
-    # todo: 24/11 speed?
-
     # automatic thresholding method such as Otsu's (avaible in scikit-image)
     img = float_image_auto_contrast(img)
 
@@ -474,9 +471,10 @@ def area_calculation(img, r,
 def area_calculations(crops,
                       blob_extention_ratio=1.4, blob_extention_radius=10,
                       plotting=False):
-    '''
-    only calculate for blobs matching the filter'''
-
+    """
+    only calculate for blobs matching the filter
+    """
+    print("\n<area_calculations>")
     images, labels, rs = parse_crops(crops)
     areas = [area_calculation(image, r=rs[ind], plotting=plotting,
                               blob_extention_ratio=blob_extention_ratio,
@@ -484,7 +482,7 @@ def area_calculations(crops,
              for ind, image in enumerate(images)]
     print("labels (top 5):", [str(int(x)) for x in labels][0:min(5, len(labels))])
     print('areas (top 5):', areas[0:min(5, len(labels))])
-    return (areas)
+    return areas
 
 
 def flat2image(flat_crop):
@@ -496,13 +494,14 @@ def flat2image(flat_crop):
 
 def visualize_blobs_on_img(image, blob_locs,
                            blob_extention_ratio=1.4, blob_extention_radius=10, fname=None):
-    '''
+    """
     image: image where blobs were detected from
     blob_locs: blob info array n x 4 [x, y, r, label], crops also works, only first 3 columns used
     blob_locs: if labels in the fourth column provided, use that to give colors to blobs
 
     output: image with yellow circles around blobs
-    '''
+    """
+    print("\n<visualize_blobs_on_img>")
     px = 1 / plt.rcParams['figure.dpi']
 
     print("image shape:", image.shape)
@@ -605,7 +604,7 @@ def visualize_blobs_on_img(image, blob_locs,
 
 def visualize_blob_compare(image, blob_locs, blob_locs2,
                            blob_extention_ratio=1.4, blob_extention_radius=10, fname=None):
-    '''
+    """
     image: image where blobs were detected from
     blob_locs: blob info array n x 4 [x, y, r, label]
     blob_locs2: ground truth
@@ -616,8 +615,8 @@ def visualize_blob_compare(image, blob_locs, blob_locs2,
         1, 1, pink
         0, 1, red
         1, 0, purple
-    '''
-    from clas.metrics import F1_calculation
+    """
+    print("\n<visualize_blob_compare>")
     px = 1 / plt.rcParams['figure.dpi']
 
     print("image shape:", image.shape)
@@ -733,10 +732,10 @@ def plot_flat_crop(flat_crop, blob_extention_ratio=1.4, blob_extention_radius=10
 
 
 def plot_flat_crops(crops, blob_extention_ratio=1, blob_extention_radius=0, fname=None):
-    '''
+    """
     input: crops
     task: call plot_flat_crop many times
-    '''
+    """
     for i, flat_crop in enumerate(crops):
         if fname:
             plot_flat_crop(flat_crop,
@@ -751,11 +750,12 @@ def plot_flat_crops(crops, blob_extention_ratio=1, blob_extention_radius=0, fnam
 
 def show_rand_crops(crops, label_filter="na", num_shown=1,
                     blob_extention_ratio=1, blob_extention_radius=0, seed=None, fname=None):
-    '''
+    """
     crops: the blob crops
     label_filter: 0, 1, -1; "na" means no filter
     fname: None, plot.show(); if fname provided, saved to png
-    '''
+    """
+    print("\n<show_rand_crops>")
     if (label_filter != 'na'):
         filtered_idx = [str(int(x)) == str(label_filter) for x in crops[:, 3]]
         crops = crops[filtered_idx, :]
@@ -782,7 +782,7 @@ def show_rand_crops(crops, label_filter="na", num_shown=1,
 
 
 def pop_label_flat_crops(crops, random=True, seed=1, skip_labels=[0, 1, 2, 3]):
-    '''
+    """
     input:
         crops
     task:
@@ -794,7 +794,7 @@ def pop_label_flat_crops(crops, random=True, seed=1, skip_labels=[0, 1, 2, 3]):
         crops with current labels in these will be skipped, to save time
     output:
         labeled array in the original order
-    '''
+    """
 
     N = len(crops)
     if random:
