@@ -47,8 +47,9 @@ def sub_sample(A, n, seed=1):
 
 def get_blob_statistics(blobs):
     """
-    Input: blobs, can be locs (yxr) labeled_locs (yxrL) or crops (yxrL + flattened_crop_img)
+    Input: blobs, can be locs (yxr), labeled_locs (yxrL) or crops (yxrL + flattened_crop_img)
     Output: a dictionary of count for each type of labels
+    Prints: stats
 
     previously called 'crop_stats'
     """
