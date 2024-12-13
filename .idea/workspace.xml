@@ -4,10 +4,9 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="train.Snakefile: rep1,2,3,4 added for training [major]">
-      <change afterPath="$PROJECT_DIR$/workflow/scripts/plot_saturation.py" afterDir="false" />
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="train.Snakefile: plot_saturation.py added [major]">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/plot_saturation.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/plot_saturation.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,13 +85,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00036" summary="less print">
-      <created>1724741078532</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1724741078532</updated>
     </task>
     <task id="LOCAL-00037" summary="debug">
       <created>1724741386639</created>
@@ -430,7 +422,14 @@
       <option name="project" value="LOCAL" />
       <updated>1734034313789</updated>
     </task>
-    <option name="localTasksCounter" value="85" />
+    <task id="LOCAL-00085" summary="train.Snakefile: plot_saturation.py added [major]">
+      <created>1734041447533</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1734041447533</updated>
+    </task>
+    <option name="localTasksCounter" value="86" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -455,7 +454,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="blob_detection.smk and czi2img.smk split from count.Snakefile" />
     <MESSAGE value="jpg2npy.Snakefile: aggr_label_count takes correct amount of scenes" />
     <MESSAGE value="jpg2npy.Snakefile: organize log" />
     <MESSAGE value="jpg2npy.Snakefile: organize log, added view/jpg in check" />
@@ -480,6 +478,7 @@
     <MESSAGE value="eval_classification.py renamed" />
     <MESSAGE value="protected hdf in train.Snakefile and labeled_crops in jpg2npy.Snakefile" />
     <MESSAGE value="train.Snakefile: rep1,2,3,4 added for training [major]" />
-    <option name="LAST_COMMIT_MESSAGE" value="train.Snakefile: rep1,2,3,4 added for training [major]" />
+    <MESSAGE value="train.Snakefile: plot_saturation.py added [major]" />
+    <option name="LAST_COMMIT_MESSAGE" value="train.Snakefile: plot_saturation.py added [major]" />
   </component>
 </project>

@@ -121,4 +121,6 @@ print(melt.shape)
 melt
 
 saturation_plot = create_saturation_curve(melt)
+
+os.makedirs(os.path.dirname(sys.argv[-1]), exist_ok=True)
 saturation_plot.figure.savefig(sys.argv[-1])  # Save to PDF
