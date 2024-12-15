@@ -335,7 +335,7 @@ def cluster_scatterplot(df2d, labels, title):
 
 
 
-def split_data(array, training_ratio):
+def split_data(array, training_ratio, fixed_seed=True):
     """
     Split into train and valid
     seed is always 3
@@ -346,7 +346,12 @@ def split_data(array, training_ratio):
     import numpy as np
     N = array.shape[0]
     N1 = int(N * training_ratio)
-    np.random.seed(3)
+
+    if fixed_seed:
+        np.random.seed(3)
+    else:
+        np.random.seed()
+
     np.random.shuffle(array)
     np.random.seed()
     train = array[0:N1]

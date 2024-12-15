@@ -1,29 +1,39 @@
-import argparse, textwrap
+import argparse
+import textwrap
 from ccount_utils.clas import split_data
 from ccount_utils.blob import load_blobs, save_crops
 
 
-def parse_cmd_and_prep ():
+def parse_cmd_and_prep():
     # Construct the argument parser and parse the arguments
     parser = argparse.ArgumentParser(
-    	formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent('''\
-        	>>> Usage: 
-        	crops_sampling.py -crops crops.labled.npy.gz -ratio 0.1
-        	>>> Output:
-        	crops.0.1.npy.gz
-        	'''))
-    parser.add_argument("-crops", type=str,
-        help="labled blob-crops file, e.g. labeled/labeled.crops.npy.gz")
-    parser.add_argument("-ratio", type=float,
-        help="ratio of down-sampling e.g. 0.1")
-    parser.add_argument("-output", type=str,
-        help="e.g. output.npy.gz")
+        >>> Usage: 
+        crops_sampling.py -crops crops.labled.npy.gz -ratio 0.1
+        >>> Output:
+        crops.0.1.npy.gz
+        
+        Logic: the seed is randomized in sampling, so two runs will give different results
+        ''')
+    )
+    parser.add_argument(
+        "-crops", type=str,
+        help="labled blob-crops file, e.g. labeled/labeled.crops.npy.gz"
+    )
+    parser.add_argument(
+        "-ratio", type=float,
+        help="ratio of down-sampling e.g. 0.1"
+    )
+    parser.add_argument(
+        "-output", type=str,
+        help="e.g. output.npy.gz"
+    )
 
     args = parser.parse_args()
 
     if args.ratio > 1 or args.ratio < 0:
-    	raise ValueError('ratio should be between 0, 1')
+        raise ValueError('ratio should be between 0, 1')
 
     print('\n'.join(f'{k}={v}' for k, v in vars(args).items()))
 
