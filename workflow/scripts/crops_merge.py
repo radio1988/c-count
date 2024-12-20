@@ -27,16 +27,19 @@ def parse_cmd_and_prep():
 
     return args
 
+def main():
+    args = parse_cmd_and_prep()
 
-args = parse_cmd_and_prep()
+    for i, crop_name in enumerate(args.crops):
+        crops = load_blobs(crop_name)
+        if i == 0:
+            output_crops = crops
+        else:
+            print("Merging...")
+            output_crops = np.vstack((output_crops, crops))
+            get_blob_statistics(output_crops)
 
-for i, crop_name in enumerate(args.crops):
-    crops = load_blobs(crop_name)
-    if i == 0:
-        output_crops = crops
-    else:
-        print("Merging...")
-        output_crops = np.vstack((output_crops, crops))
-        get_blob_statistics(output_crops)
+    save_crops(output_crops, args.output)
 
-save_crops(output_crops, args.output)
+if __name__ == "__main__":
+    main()

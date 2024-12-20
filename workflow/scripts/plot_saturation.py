@@ -1,8 +1,24 @@
+"""
+Input: res/eval/xxx.txt  # multiple files
+Output:
+- res/plot/saturation_analysis.pdf
+- res/plot/saturation_analysis.pdf.csv
+
+Usage example:
+python workflow/scripts/plot_saturation.py \
+res/3_evaluation_on_validationSet/0.125.rep1.txt .. \
+res/3_evaluation_on_validationSet/1.0.rep9.txt \
+res/plots/saturation_analysis.pdf  \
+&>res/plots/saturation_analysis.pdf.log
+"""
+
 import os
 import sys
 import re
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+
 
 
 def read_eval_txts_into_df(files):
@@ -16,32 +32,29 @@ def read_eval_txts_into_df(files):
         # 0.5        68.33   89.13  77.36
         # 1.0        74.75   80.43  77.49
     """
-
     data = []
     pattern = r"Precision: ([\d.]+)%, Recall: ([\d.]+)%, F1: ([\d.]+)%"
-    # pattern2 = r"([\d.]+).(rep[\d.]+).txt"
     pattern2 = r"([\d.]+)\.(rep[\d]+)\.txt"
-    # Iterate over all files in the directory
-    for filename in files:
-        if filename.endswith(".txt"):  # Ensure it's a .txt file
-            filepath = filename
-            match2 = re.search(pattern2, filename)
 
-            with open(filepath, 'r') as file:
-                for line in file:
-                    match = re.search(pattern, line)
-                    if match:
-                        # Extract values
-                        precision, recall, f1 = map(float, match.groups())
-                        proportion, rep = map(str, match2.groups())
-                        data.append(
-                            {"Name": filename.replace('.txt', ''),
-                             "Proportion": proportion,
-                             "Rep": rep,
-                             "Precision": precision,
-                             "Recall": recall,
-                             "F1": f1})
-                        break  # Stop reading after finding the line
+    for filename in files:
+        filepath = filename
+        match2 = re.search(pattern2, filename)
+
+        with open(filepath, 'r') as file:
+            for line in file:
+                match = re.search(pattern, line)
+                if match:
+                    # Extract values
+                    precision, recall, f1 = map(float, match.groups())
+                    proportion, rep = map(str, match2.groups())
+                    data.append(
+                        {"Name": filename.replace('.txt', ''),
+                         "Proportion": proportion,
+                         "Rep": rep,
+                         "Precision": precision,
+                         "Recall": recall,
+                         "F1": f1})
+                    break  # Stop reading after finding the line
 
     # Create a DataFrame
     df = pd.DataFrame(data)
@@ -51,10 +64,17 @@ def read_eval_txts_into_df(files):
 
 def plot_training_saturation(df, mode='F1', out_keyword='saturation_analysis'):
     """
-    Input df from <read_eval_txts_into_df>
-    mode: F1, Precision, Recall, All
-    Plot: saturation: Metric Score change over proportion
+    Obsolete
+    Parse txt files, get metric scores, plot saturation over training subset proportions
+    Simply plot them as a scatterplot with connecting lines, not collapsing to proportion
+    This function is obsolete
+
+    @param df: output from <read_eval_txts_into_df>
+    @param mode: F1, Precision, Recall, or All (metric score types)
+    @param out_keyword: name of the saturation: selectede metric score change over proportion
+    @return: plot object
     """
+
     if mode not in ['F1', 'Precision', 'Recall', 'All']:
         raise Exception('mode not recognized')
 
@@ -63,9 +83,9 @@ def plot_training_saturation(df, mode='F1', out_keyword='saturation_analysis'):
     if mode in ['All', 'F1']:
         plt.plot(df.index, df["F1"], marker='o', label="F1", color='red')
     if mode in ['All', 'Precision']:
-        plt.plot(df.index, df["Precision"], marker='o', label="Precision", color = 'lightblue')
+        plt.plot(df.index, df["Precision"], marker='o', label="Precision", color='lightblue')
     if mode in ['All', 'Recall']:
-        plt.plot(df.index, df["Recall"], marker='o', label="Recall", color = 'lightgreen')
+        plt.plot(df.index, df["Recall"], marker='o', label="Recall", color='lightgreen')
 
     # Add labels and title
     plt.title("Saturation Analysis")
@@ -80,16 +100,29 @@ def plot_training_saturation(df, mode='F1', out_keyword='saturation_analysis'):
     plt.savefig(out_keyword + '.' + mode + '.pdf')
     plt.show()
 
+
 def create_saturation_curve(df_melted):
-    '''
-    '''
-    import seaborn as sns
+    """
+    Create saturation plot using boxplots to summarize the distribution (CI added)
+    and add jitter to show individual data points.
+
+    @param df_melted: DataFrame with columns Proportion, Rep, ScoreType, Value.
+               Proportion   Rep ScoreType  Value
+    0       0.125  rep1        F1  81.32
+    1       0.125  rep2        F1  72.54
+    2       0.125  rep3        F1  70.65
+    8        0.25  rep1        F1  75.80
+    9        0.25  rep2        F1  68.83
+    10       0.25  rep3        F1  79.78
+
+    @return: plt object
+    """
     plt.figure(figsize=(6, 5))
 
     pointplot = sns.pointplot(
         data=df_melted,
         x='Proportion', y='Value',
-        #hue='ScoreType',
+        # hue='ScoreType',
         dodge=True,
         markers='o',
         color='red',
@@ -97,30 +130,99 @@ def create_saturation_curve(df_melted):
         errorbar='ci'  # se, sd, ci, pi
     )
 
-    plt.title('Saturation Analysis with Error Bars (CI)')
+    # boxplot = sns.boxplot(
+    #     data=df_melted,
+    #     x='Proportion', y='Value',
+    #     color='lightgray',  # Neutral color for the boxplot
+    #     showfliers=False,   # Hide outliers to reduce visual clutter
+    #     width=0.5,          # Narrower boxes for better layout
+    #     linewidth=1.5       # Thicker boxplot lines
+    # )
+
+
+    stripplot = sns.stripplot(
+        data=df_melted,
+        x='Proportion', y='Value',
+        color='black',  # Adjust color for visibility
+        alpha=0.6,     # Transparency for better layering
+        jitter=True,   # Add jitter
+        dodge=True     # Align with pointplot
+    )
+
+    plt.title('Saturation Analysis with Error Bars (CI) and Jitter')
     plt.xlabel('Proportion of Training Data Used')
     plt.ylabel('F1 Score')
     plt.legend(title='F1 Score', loc='best')
 
-    return (pointplot)
+    return plt
 
 
-files = sys.argv[0:-1]
-df = read_eval_txts_into_df(files)
-print(df)
+
+def create_saturation_curve_jittered_boxplot(df_melted):
+    """
+    Create saturation plot using boxplots to summarize the distribution
+    and add jitter to show individual data points.
+
+    @param df_melted: DataFrame with columns Proportion, Rep, ScoreType, Value.
+               Proportion   Rep ScoreType  Value
+        0       0.125  rep1        F1  81.32
+        1       0.125  rep2        F1  72.54
+        2       0.125  rep3        F1  70.65
+        8        0.25  rep1        F1  75.80
+        9        0.25  rep2        F1  68.83
+        10       0.25  rep3        F1  79.78
+
+    @return: plt object
+    """
+    plt.figure(figsize=(6, 5))
+
+    # Boxplot for distribution and summary stats
+    boxplot = sns.boxplot(
+        data=df_melted,
+        x='Proportion', y='Value',
+        color='lightgray',  # Neutral color for the boxplot
+        showfliers=False,   # Hide outliers to reduce visual clutter
+        width=0.5,          # Narrower boxes for better layout
+        linewidth=1.5       # Thicker boxplot lines
+    )
+
+    # Stripplot for individual points with jitter
+    stripplot = sns.stripplot(
+        data=df_melted,
+        x='Proportion', y='Value',
+        color='blue',       # Blue for data points
+        alpha=0.6,          # Transparency for layering
+        jitter=True,        # Add jitter
+        dodge=True          # Align with boxplot
+    )
+
+    plt.title('Saturation Analysis with Boxplots and Jitter')
+    plt.xlabel('Proportion of Training Data Used')
+    plt.ylabel('F1 Score')
+    plt.xticks(rotation=45)  # Optional: Rotate x-axis labels for better readability
+    plt.tight_layout()       # Adjust layout to prevent clipping
+
+    return plt
+
+def main():
+    files = sys.argv[0:-1]
+    df = read_eval_txts_into_df(files)
+    print(df)
+    os.makedirs(os.path.dirname(sys.argv[-1]), exist_ok=True)
+    df.to_csv(sys.argv[-1] + ".csv")
+
+    melt = df.melt(
+        id_vars=['Proportion', 'Rep'],
+        # value_vars=['Precision', 'Recall', 'F1'],
+        value_vars=['F1'],
+        var_name='ScoreType', value_name='Value')
+
+    # print(melt.shape)
+    # print(melt)
+
+    saturation_plot = create_saturation_curve(melt)
+    saturation_plot.savefig(sys.argv[-1], dpi=300, bbox_inches='tight')  # Save to PDF
 
 
-melt = df.melt(
-    id_vars=['Proportion', 'Rep'],
-    # value_vars=['Precision', 'Recall', 'F1'],
-    value_vars=['F1'],
-    var_name='ScoreType', value_name='Value')
-
-print(melt.shape)
-# melt.to_csv('count_plate_level_melt.csv', index=0)
-melt
-
-saturation_plot = create_saturation_curve(melt)
-
-os.makedirs(os.path.dirname(sys.argv[-1]), exist_ok=True)
-saturation_plot.figure.savefig(sys.argv[-1])  # Save to PDF
+if __name__ == '__main__':
+    main()

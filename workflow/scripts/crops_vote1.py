@@ -42,7 +42,7 @@ def threshold_counts(COUNTS, n=1):
 
 def main():
     # Check if there are enough arguments
-    if len(sys.argv) != 6:
+    if len(sys.argv) != 6:  # todo: any num of inputs supported
         print("Usage: vote.py <output.npy.gz> <min-vote> <A.npy.gz> <B.npy.gz> <C.npy.gz>")
         sys.exit("cmd error")
     else:
