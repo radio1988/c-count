@@ -7,15 +7,20 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from functools import reduce
 
+
 def fix_count_names(df):
     """
     designed for FL-B
     @param df:
     @return:
     """
-    df['NAME'] = [x.replace(".label","") for x in df['NAME']]
-    df['NAME'] = [x.replace("res/label_locs/","") for x in df['NAME']]
+    df['NAME'] = [x.replace(".label", "") for x in df['NAME']]
+    df['NAME'] = [x.replace("res/label_locs/", "") for x in df['NAME']]
+    df['NAME'] = [x.replace(".vote2", "") for x in df['NAME']]
+    df['NAME'] = [x.replace("1U_Epo", "1unitEpo") for x in df['NAME']]
+    df['NAME'] = [x.replace("U_Epo", "unitsEpo") for x in df['NAME']]
     return df
+
 
 def get_epo_concentration(name):
     """
@@ -49,6 +54,14 @@ def get_replicate(label):
         return '3'
     elif 'Epo_4' in label:
         return '4'
+    elif 'Epo1' in label:
+        return '1'
+    elif 'Epo2' in label:
+        return '2'
+    elif 'Epo3' in label:
+        return '3'
+    elif 'Epo4' in label:
+        return '4'
 
 
 def get_sceneIndex(name):
@@ -63,14 +76,14 @@ def get_sceneIndex(name):
 
 
 def create_pairplot(df, bins=20):
-    '''
+    """
     all df columns should be counts, no NAME column
 
     print(m2.head(2))
        COUNT-A  COUNT-J  COUNT-L
     0       23       21       29
     1        6        2        4
-    '''
+    """
     global_max = df.max().max() * 1.1
     g = sns.pairplot(df, diag_kind="hist", diag_kws={"bins": bins})
 
@@ -107,14 +120,14 @@ def create_pairplot(df, bins=20):
 
 
 def create_corr_heatmap(df):
-    '''
+    """
     all df columns should be counts, no NAME column
 
     print(m2.head(2))
        COUNT-A  COUNT-J  COUNT-L
     0       23       21       29
     1        6        2        4
-    '''
+    """
     corr_matrix = df.corr(method='pearson')  # {‘pearson’, ‘kendall’, ‘spearman’}
     g = sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', cbar=True)
     plt.title('Correlation Heatmap')
@@ -122,7 +135,7 @@ def create_corr_heatmap(df):
 
 
 def create_epo_curve(df_melted):
-    '''
+    """
     df_melted example:
 
           Epo replicate Count_Type  Count
@@ -139,7 +152,7 @@ def create_epo_curve(df_melted):
     62  1.0000         4    COUNT-L    164
 
     [63 rows x 4 columns]
-    '''
+    """
     plt.figure(figsize=(6, 5))
 
     pointplot = sns.pointplot(
@@ -157,4 +170,4 @@ def create_epo_curve(df_melted):
     plt.ylabel('Count')
     plt.legend(title='Count Type', loc='best')
 
-    return (pointplot)
+    return pointplot
