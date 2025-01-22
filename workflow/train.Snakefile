@@ -103,9 +103,9 @@ rule evaluation_on_val:
     benchmark:
         'res/3_evaluation_on_validationSet/{rate}.{rep}.txt.benchmark'
     threads:
-        1
+        2
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 8000
+        mem_mb=lambda wildcards, attempt: attempt * 16000
     priority:
         100
     shell:
