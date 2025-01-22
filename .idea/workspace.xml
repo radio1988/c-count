@@ -4,12 +4,10 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="randomized sub-sets">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="get_replicate adapted to more situations">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/jpg2npy.Snakefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_merge.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_merge.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_vote1.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_vote1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/plot_saturation.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/plot_saturation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/utils/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/utils/plotting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_vote0.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_vote0.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,15 +33,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/rui/github/ccount/workflow/scripts&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "/Users/rui/github/ccount",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/workflow/scripts" />
@@ -88,20 +86,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00039" summary="labels and rs use np.concatenate">
-      <created>1724742141414</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1724742141414</updated>
-    </task>
-    <task id="LOCAL-00040" summary="priority of eval 100">
-      <created>1724766302545</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1724766302545</updated>
     </task>
     <task id="LOCAL-00041" summary="blob_locs input names updated">
       <created>1724864566804</created>
@@ -432,7 +416,21 @@
       <option name="project" value="LOCAL" />
       <updated>1734241583291</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary="polish">
+      <created>1734670394405</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1734670394406</updated>
+    </task>
+    <task id="LOCAL-00089" summary="get_replicate adapted to more situations">
+      <created>1737495838504</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1737495838505</updated>
+    </task>
+    <option name="localTasksCounter" value="90" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -457,8 +455,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="jpg2npy.Snakefile: organize log, added view/jpg in check" />
-    <MESSAGE value="take blob/io.py blob/misc.py to blob_utils.py" />
     <MESSAGE value="label/ draft folder removed" />
     <MESSAGE value="load_locs and load_crops becomes load_locs" />
     <MESSAGE value="get_blob_statistics includes blob_width now" />
@@ -482,6 +478,8 @@
     <MESSAGE value="train.Snakefile: plot_saturation.py added [major]" />
     <MESSAGE value="train.Snakefile: plot_saturation.py makedir" />
     <MESSAGE value="randomized sub-sets" />
-    <option name="LAST_COMMIT_MESSAGE" value="randomized sub-sets" />
+    <MESSAGE value="polish" />
+    <MESSAGE value="get_replicate adapted to more situations" />
+    <option name="LAST_COMMIT_MESSAGE" value="get_replicate adapted to more situations" />
   </component>
 </project>

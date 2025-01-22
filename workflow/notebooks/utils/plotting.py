@@ -46,22 +46,11 @@ def get_epo_concentration(name):
 
 
 def get_replicate(label):
-    if 'Epo_1' in label:
-        return '1'
-    elif 'Epo_2' in label:
-        return '2'
-    elif 'Epo_3' in label:
-        return '3'
-    elif 'Epo_4' in label:
-        return '4'
-    elif 'Epo1' in label:
-        return '1'
-    elif 'Epo2' in label:
-        return '2'
-    elif 'Epo3' in label:
-        return '3'
-    elif 'Epo4' in label:
-        return '4'
+    for key, value in {'Epo_1': '1', 'Epo_2': '2', 'Epo_3': '3', 'Epo_4': '4',
+                       'Epo1': '1', 'Epo2': '2', 'Epo3': '3', 'Epo4': '4'}.items():
+        if key in label:  # allow partial match
+            return value
+    return None
 
 
 def get_sceneIndex(name):

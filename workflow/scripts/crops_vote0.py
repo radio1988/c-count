@@ -39,6 +39,8 @@ def read_labels(blobs):
     return labels
 
 
+sys.exit("This is obsolete")
+
 name1 = sys.argv[1]  # label set A
 name2 = sys.argv[2]  # label set B
 outname = sys.argv[3]
