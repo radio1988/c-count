@@ -392,7 +392,7 @@ def intersect_blobs(blobs1, blobs2):
     idx2 = [x in set_overlap for x in tup2]
     blobs1b = blobs1[idx1, :]
     blobs2b = blobs2[idx2, :]
-    return (blobs1b, blobs2b)
+    return blobs1b, blobs2b
 
 
 def setdiff_blobs(blobs1, blobs2):

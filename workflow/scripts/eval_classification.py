@@ -1,6 +1,4 @@
-import numpy as np
-import pandas as pd
-import sys 
+import sys
 
 from ccount_utils.blob import load_blobs
 from ccount_utils.clas import F1_calculation
@@ -19,12 +17,13 @@ def read_labels(blobs):
 
 name1 = sys.argv[1]  # prediction
 name2 = sys.argv[2]  # truth
-#print(name1, name2)
 
 
 blobs1 = load_blobs(name1)
+locs1 = blobs1[:, :4]
 print()
 blobs2 = load_blobs(name2)
+locs2 = blobs2[:, :4]  # yxrL
 print()
 
 blobs1b, blobs2b = intersect_blobs(blobs1, blobs2)
