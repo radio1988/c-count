@@ -4,10 +4,8 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="more RAM for evaluation_on_val">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/eval_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/eval_classification.py" afterDir="false" />
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="reduce RAM in evaluation_on_val.py">
+      <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,13 +84,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00043" summary="vote0">
-      <created>1725572360142</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1725572360142</updated>
     </task>
     <task id="LOCAL-00044" summary="classification.py: updated">
       <created>1725650775303</created>
@@ -430,7 +421,14 @@
       <option name="project" value="LOCAL" />
       <updated>1737580049227</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="reduce RAM in evaluation_on_val.py">
+      <created>1737580439886</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1737580439886</updated>
+    </task>
+    <option name="localTasksCounter" value="93" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -455,7 +453,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="get_blob_statistics includes blob_width now" />
     <MESSAGE value="blob_utils first round clean up" />
     <MESSAGE value="img_utils" />
     <MESSAGE value="jpg2npy.py 9 pixel works" />
@@ -480,6 +477,7 @@
     <MESSAGE value="get_replicate adapted to more situations" />
     <MESSAGE value="polished" />
     <MESSAGE value="more RAM for evaluation_on_val" />
-    <option name="LAST_COMMIT_MESSAGE" value="more RAM for evaluation_on_val" />
+    <MESSAGE value="reduce RAM in evaluation_on_val.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="reduce RAM in evaluation_on_val.py" />
   </component>
 </project>
