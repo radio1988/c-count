@@ -215,7 +215,7 @@ rule area_histogram:
         mem_mb=lambda wildcards, attempt: attempt * 1000
     shell:
         """
-        python plot_area_histogram.py {input} {output} &> {log}
+        python workflow/scripts/plot_area_histogram.py {input} {output} &> {log}
         """
 
 # rule view0:

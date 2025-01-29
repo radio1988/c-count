@@ -10,7 +10,7 @@ from functools import reduce
 
 def fix_count_names(df):
     """
-    designed for FL-B
+    transform into FL-B format
     @param df:
     @return:
     """
@@ -20,6 +20,18 @@ def fix_count_names(df):
     df['NAME'] = [x.replace("1U_Epo", "1unitEpo") for x in df['NAME']]
     df['NAME'] = [x.replace("U_Epo", "unitsEpo") for x in df['NAME']]
     return df
+
+def fix_count_name(name):
+    """
+    transform into FL-B format
+    @param name: 1U_Epo_2-Stitching-02.1
+    @return: 1unitEpo_2-Stitching-02.1
+    """
+    name = name.replace(".label", "")
+    name = name.replace("res/label_locs/", "")
+    name = name.replace("1U_Epo", "1unitEpo")
+    name = name.replace("U_Epo", "unitsEpo")
+    return name
 
 
 def get_epo_concentration(name):
