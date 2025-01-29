@@ -7,7 +7,7 @@ rule blob_detection:
     threads:
         1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 8000  # 4.5G at 2024/11 on example
+        mem_mb=lambda wildcards, attempt: attempt * 16000  # 4.5G at 2024/11 on example
     log:
         "log/blob_locs/{s}.log"
     benchmark:
