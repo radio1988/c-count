@@ -13,7 +13,7 @@ import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
 from keras.optimizers import Adam
-from keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical
 from ccount_utils.img import equalize
 from ccount_utils.img import float_image_auto_contrast
 from ccount_utils.img import down_scale
