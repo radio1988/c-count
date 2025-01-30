@@ -1,3 +1,4 @@
+import snakemake
 from skimage import io, filters
 from skimage.draw import disk
 from scipy import ndimage
