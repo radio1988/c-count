@@ -22,7 +22,7 @@ rule targets:
         rep=REPS),
         curve = 'res/plots/saturation_analysis.pdf'
 
-rule subsampling: 
+rule subsample:
     input:
         crop=DATA_TRAIN
     output:
@@ -44,7 +44,7 @@ rule subsampling:
         &> {log}
         """
 
-rule training:
+rule train:
     input:
         small_crop='res/0_trainingData_subsets/{rate}.{rep}.npy.gz',
         val_crop=DATA_VAL
@@ -55,9 +55,9 @@ rule training:
     benchmark:
          'res/1_trained_weights/{rate}.{rep}.weights.h5.benchmark'
     threads:
-        4
+        16
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 15000
+        mem_mb=lambda wildcards, attempt: attempt * 4000
     shell:
         """
         python workflow/scripts/training.py \
@@ -68,7 +68,7 @@ rule training:
         &> {log}
         """
 
-rule classification_on_val:
+rule classification:
     input:
         weight='res/1_trained_weights/{rate}.{rep}.weights.h5',
         data_val=DATA_VAL
@@ -92,7 +92,7 @@ rule classification_on_val:
         &> {log}
         """
 
-rule evaluation_on_val:
+rule evaluation:
     input:
         clas='res/2_count_on_validationSet/{rate}.{rep}.npy.gz',
         data_val=DATA_VAL
