@@ -2,6 +2,7 @@ name: ccount-env
 # conda env create -f ccount.yaml
 # pip install aicspylibczi
 # don't change version of packages untill necessary
+# verified to install well 250129 on HPC
 
 channels:
         - anaconda
