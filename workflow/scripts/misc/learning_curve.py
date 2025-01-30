@@ -43,6 +43,8 @@ plt.xlabel("Epoch")
 plt.ylabel("Cross Entropy")
 plt.legend()
 plt.savefig(oname1)
+plt.close()
+
 
 # F1 learning curve
 plt.plot(epoch, f1_train, label = "F1_train")
@@ -51,3 +53,5 @@ plt.xlabel("Epoch")
 plt.ylabel("F1 score")
 plt.legend()
 plt.savefig(oname2)
+plt.close()
+

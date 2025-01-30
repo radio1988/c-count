@@ -463,6 +463,7 @@ def area_calculation(img, r,
         plt.imshow(masked, cmap='gray')
         if outname:
             plt.savefig(outname)
+            plt.close()
         else:
             plt.show()
 
@@ -599,6 +600,7 @@ def visualize_blobs_on_img(image, blob_locs,
 
     if fname:
         plt.savefig(fname)
+        plt.close()  # Closes the figure, preventing it from being displayed in the notebook
     else:
         plt.show()
 
@@ -681,6 +683,7 @@ def visualize_blob_compare(image, blob_locs, blob_locs2,
 
     if fname:
         plt.savefig(fname)
+        plt.close()
     else:
         plt.show()
 

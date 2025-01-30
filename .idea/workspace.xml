@@ -4,9 +4,11 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="classification1 -&gt; count">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="blob_classification.py: back to binary output, with probs(txt) added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_classification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/area_calculation.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/area_calculation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/ccount_utils/blob.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/misc/learning_curve.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/misc/learning_curve.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,13 +87,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00053" summary="rule blob_detection updated">
-      <created>1732777561476</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1732777561476</updated>
     </task>
     <task id="LOCAL-00054" summary="more explicit log, documented">
       <created>1732777613891</created>
@@ -429,7 +424,14 @@
       <option name="project" value="LOCAL" />
       <updated>1738256842568</updated>
     </task>
-    <option name="localTasksCounter" value="102" />
+    <task id="LOCAL-00102" summary="blob_classification.py: back to binary output, with probs(txt) added">
+      <created>1738260205484</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1738260205484</updated>
+    </task>
+    <option name="localTasksCounter" value="103" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -454,7 +456,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="get_blob_statistics logic simplified" />
     <MESSAGE value="mask_blob_img renamed" />
     <MESSAGE value="blob.py &quot;&quot;&quot;" />
     <MESSAGE value="ccount_utils.clas import split_data" />
@@ -479,6 +480,7 @@
     <MESSAGE value="train.Snakefile: simpler rule names, 16 threads for training" />
     <MESSAGE value="blob_classification.py: output clas.txt .prob and prob.npy" />
     <MESSAGE value="classification1 -&gt; count" />
-    <option name="LAST_COMMIT_MESSAGE" value="classification1 -&gt; count" />
+    <MESSAGE value="blob_classification.py: back to binary output, with probs(txt) added" />
+    <option name="LAST_COMMIT_MESSAGE" value="blob_classification.py: back to binary output, with probs(txt) added" />
   </component>
 </project>
