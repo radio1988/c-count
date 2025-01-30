@@ -93,16 +93,18 @@ model.compile(loss="categorical_crossentropy", optimizer=opt, metrics=[F1])
 # Classification process
 print('Making classifications...')
 probs = model.predict(images)
+
 classifications = probs.argmax(axis=1)
 positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 
 # Save 
 print("Saving classifications..")
-crops[:, 3] = classifications
+# crops[:, 3] = classifications
+crops[:, 3] = probs[:, 1]
 get_blob_statistics(crops)
 
 save_locs(crops, args.output.replace('crops', 'locs'))  # todo: fix potential name bug in non-workflow situations
 save_crops(crops, args.output)
 
 txt_name = args.output.replace('.npy.gz', '.txt')
-np.savetxt(txt_name, classifications.astype(int), fmt='%d')
+np.savetxt(txt_name, probs)  # fmt='%d')
