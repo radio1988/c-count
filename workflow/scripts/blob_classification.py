@@ -107,7 +107,7 @@ probs = model.predict(images)  # shape: (n, 2), column 0: prob of being 0, colum
 
 # Get classifications
 # classifications = probs.argmax(axis=1)  # old
-classifications = [x for x in probs[:, 1] > 0.5]  # adjustable threshold
+classifications = [x for x in probs[:, 1] > config['MIN_P']]  # adjustable threshold
 
 positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 
