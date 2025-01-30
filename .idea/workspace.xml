@@ -4,8 +4,17 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="reduce RAM in evaluation_on_val.py">
-      <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="blob_classification.py: output clas.txt .prob and prob.npy">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/count.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/count.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/labeling.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/labeling.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/tracking.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/tracking.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/viewing_blobs.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/viewing_blobs.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/notebooks/visualize_area_calculation.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/visualize_area_calculation.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/aggr_area_info.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/aggr_area_info.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.sh" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/train.old.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/train.old.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,15 +40,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "/Users/rui/github/ccount",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/rui/github/ccount&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/workflow/scripts" />
@@ -84,62 +93,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00044" summary="classification.py: updated">
-      <created>1725650775303</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1725650775303</updated>
-    </task>
-    <task id="LOCAL-00045" summary="blob_locs flag to res">
-      <created>1725659803296</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1725659803296</updated>
-    </task>
-    <task id="LOCAL-00046" summary="mac.yaml verified on mac again">
-      <created>1732650986741</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1732650986741</updated>
-    </task>
-    <task id="LOCAL-00047" summary="better print format for info">
-      <created>1732651016745</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1732651016745</updated>
-    </task>
-    <task id="LOCAL-00048" summary="label.npy.gz filename formatted, rule reset added, rule dag added">
-      <created>1732658510754</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1732658510754</updated>
-    </task>
-    <task id="LOCAL-00049" summary="jpg2npy.Snakefile: label_crops works">
-      <created>1732768439564</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1732768439564</updated>
-    </task>
-    <task id="LOCAL-00050" summary="blob_detection.py: documentation added">
-      <created>1732769660776</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1732769660776</updated>
-    </task>
-    <task id="LOCAL-00051" summary="save_locs documentation updated">
-      <created>1732772337689</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1732772337689</updated>
     </task>
     <task id="LOCAL-00052" summary="blob_detection.singleScene.py: documentation updated">
       <created>1732777522703</created>
@@ -428,7 +381,63 @@
       <option name="project" value="LOCAL" />
       <updated>1737580439886</updated>
     </task>
-    <option name="localTasksCounter" value="93" />
+    <task id="LOCAL-00093" summary="reduce RAM in evaluation_on_val rule">
+      <created>1737580806309</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1737580806309</updated>
+    </task>
+    <task id="LOCAL-00094" summary="fixed bug and new plotting functions">
+      <created>1738186791244</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1738186791244</updated>
+    </task>
+    <task id="LOCAL-00095" summary="8-&gt; 16G RAM for blob_detection">
+      <created>1738189395091</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1738189395091</updated>
+    </task>
+    <task id="LOCAL-00096" summary="from keras.utils import to_categorical (now)">
+      <created>1738242352070</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1738242352070</updated>
+    </task>
+    <task id="LOCAL-00097" summary="misc">
+      <created>1738242459584</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1738242459584</updated>
+    </task>
+    <task id="LOCAL-00098" summary="blob_classification.py: probs in npy and probs in txt">
+      <created>1738254160631</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1738254160631</updated>
+    </task>
+    <task id="LOCAL-00099" summary="train.Snakefile: simpler rule names, 16 threads for training">
+      <created>1738255046940</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1738255046940</updated>
+    </task>
+    <task id="LOCAL-00100" summary="blob_classification.py: output clas.txt .prob and prob.npy">
+      <created>1738256561887</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1738256561887</updated>
+    </task>
+    <option name="localTasksCounter" value="101" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -453,14 +462,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="blob_utils first round clean up" />
-    <MESSAGE value="img_utils" />
-    <MESSAGE value="jpg2npy.py 9 pixel works" />
-    <MESSAGE value="fixed bugs introduced in the module re-organization" />
-    <MESSAGE value="works, now on jpg2npy again" />
-    <MESSAGE value="jpg2npy 9pixel works" />
-    <MESSAGE value="jpg2npy.Snakefile verified to work" />
-    <MESSAGE value="fix imports in count.Snakefile" />
     <MESSAGE value="jpg2npy validated" />
     <MESSAGE value="get_blob_statistics logic simplified" />
     <MESSAGE value="mask_blob_img renamed" />
@@ -478,6 +479,14 @@
     <MESSAGE value="polished" />
     <MESSAGE value="more RAM for evaluation_on_val" />
     <MESSAGE value="reduce RAM in evaluation_on_val.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="reduce RAM in evaluation_on_val.py" />
+    <MESSAGE value="reduce RAM in evaluation_on_val rule" />
+    <MESSAGE value="fixed bug and new plotting functions" />
+    <MESSAGE value="8-&gt; 16G RAM for blob_detection" />
+    <MESSAGE value="from keras.utils import to_categorical (now)" />
+    <MESSAGE value="misc" />
+    <MESSAGE value="blob_classification.py: probs in npy and probs in txt" />
+    <MESSAGE value="train.Snakefile: simpler rule names, 16 threads for training" />
+    <MESSAGE value="blob_classification.py: output clas.txt .prob and prob.npy" />
+    <option name="LAST_COMMIT_MESSAGE" value="blob_classification.py: output clas.txt .prob and prob.npy" />
   </component>
 </project>

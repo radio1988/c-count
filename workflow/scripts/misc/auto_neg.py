@@ -1,5 +1,5 @@
 # this is a simple code for ad-hoc use
-# for f in res/classification1/pos/*gz;do python auto_neg.py $f >> auto_neg/auto_neg.log;done
+# for f in res/count/pos/*gz;do python auto_neg.py $f >> auto_neg/auto_neg.log;done
 
 import sys, re, os
 from pathlib import Path
@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 # S0A1_FIRST_SCAN-Stitching-24.0.locs.npy.gz   S0A3_FIRST_SCAN-Stitching-20.0.locs.npy.gz   S0B2_FIRST_SCAN-Stitching-16.0.locs.npy.gz
 # S0A1_FIRST_SCAN-Stitching-24.1.locs.npy.gz   S0A3_FIRST_SCAN-Stitching-20.1.locs.npy.gz   S0B2_FIRST_SCAN-Stitching-16.1.locs.npy.gz
 # 
-# res/classification1/pos/
+# res/count/pos/
 # S0A1_FIRST_SCAN-Stitching-24.0.crops.clas.npy.gz   S0A3_FIRST_SCAN-Stitching-20.0.crops.clas.npy.gz   S0B2_FIRST_SCAN-Stitching-16.0.crops.clas.npy.gz
 # S0A1_FIRST_SCAN-Stitching-24.1.crops.clas.npy.gz   S0A3_FIRST_SCAN-Stitching-20.1.crops.clas.npy.gz   S0B2_FIRST_SCAN-Stitching-16.1.crops.clas.npy.gz
 
@@ -56,7 +56,7 @@ czi_name = plate_name + '.czi'
 czi_file = './data/' + czi_name
 print('czi_file:', czi_file, exists(czi_file))
 
-pos_loc_file = './res/classification1/pos/' + name + '.crops.clas.npy.gz'  # for labeling
+pos_loc_file = './res/count/pos/' + name + '.crops.clas.npy.gz'  # for labeling
 print('pos_loc_file:', pos_loc_file, exists(pos_loc_file))
 
 out_name = './auto_neg/' + name + '.labeled.npy.gz'

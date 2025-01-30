@@ -1,7 +1,7 @@
 import sys
 import pandas as pd
 
-def get_areaDF_from_area_txts(path="classification1/area/"):
+def get_areaDF_from_area_txts(path="count/area/"):
     '''
     input: path storing xxx.area.txt files
     output: data frame of #pixels for each scanned area (or any npy.gz output from blob detection)
@@ -18,9 +18,9 @@ def get_areaDF_from_area_txts(path="classification1/area/"):
     #  'E2f4_CFUe_KO_1-Stitching-01.2']
 
     area_fnames = [path + x for x in area_fnames]
-    # ['classification1/area/E2f4_CFUe_KO_1-Stitching-01.0.area.txt',
-    #  'classification1/area/E2f4_CFUe_KO_1-Stitching-01.1.area.txt',
-    #  'classification1/area/E2f4_CFUe_KO_1-Stitching-01.2.area.txt']
+    # ['count/area/E2f4_CFUe_KO_1-Stitching-01.0.area.txt',
+    #  'count/area/E2f4_CFUe_KO_1-Stitching-01.1.area.txt',
+    #  'count/area/E2f4_CFUe_KO_1-Stitching-01.2.area.txt']
     
     areaLSF = []
     labels = []
@@ -56,7 +56,7 @@ def get_areaDF_from_area_txts(path="classification1/area/"):
 
 
 print("usage: get_areas.py path_to_area_files output_csv_fname")
-print('example: python workflow/get_areas.py res/classification1/area/ res/areas.csv')
+print('example: python workflow/get_areas.py res/count/area/ res/areas.csv')
 if len(sys.argv) < 3:
     sys.exit("cmd error")
 areaDF = get_areaDF_from_area_txts(sys.argv[1])

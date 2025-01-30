@@ -36,16 +36,16 @@ rule targets:
         # czi2img=expand("log/img/{s}.done", s=SAMPLES), # skipped, clas vis more helpful
         # blob_cropping=input_names(prefix="res/blob_crops/", SAMPLES=SAMPLES,
         #                          suffix='.crops.npy.gz'),
-        # classification=input_names(prefix='res/classification1/', SAMPLES=SAMPLES,
+        # classification=input_names(prefix='res/count/', SAMPLES=SAMPLES,
         #                            suffix=".crops.clas.txt"),
-        # filter_crops=input_names(prefix='res/classification1/pos/', SAMPLES=SAMPLES,
+        # filter_crops=input_names(prefix='res/count/pos/', SAMPLES=SAMPLES,
         #                          suffix=".crops.clas.npy.gz"),
         count_file='res/COUNT.csv',
         area1_agg="res/areas.csv",
-        view_clas_on_image=input_names(prefix="res/classification1/",SAMPLES=SAMPLES,
+        view_clas_on_image=input_names(prefix="res/count/",SAMPLES=SAMPLES,
             suffix=".crops.clas.npy.gz.jpg"),
-        blob_locs=input_names(prefix="res/classification1/", SAMPLES=SAMPLES, suffix='.locs.clas.npy.gz'),
-#        blob_locs=expand("res/classification1/{s}.{i}.locs.clas.npy.gz",s=SAMPLES,i=[0, 1, 2, 3]),
+        blob_locs=input_names(prefix="res/count/", SAMPLES=SAMPLES, suffix='.locs.clas.npy.gz'),
+#        blob_locs=expand("res/count/{s}.{i}.locs.clas.npy.gz",s=SAMPLES,i=[0, 1, 2, 3]),
         rulegraph="rulegraph.pdf",
         plot = "res/plots/areas.histogram.pdf"
 
@@ -57,13 +57,13 @@ rule blob_cropping:
     input:
         czi=os.path.join(config['DATA_DIR'], "{s}.czi"),
         blob_locs_flag="res/blob_locs/{s}.done",
-    #blob_locs="res/blob_locs/{s}.{i}.crops.npy.gz"
+        #blob_locs="res/blob_locs/{s}.{i}.crops.npy.gz"
     output:
         temp('res/blob_crops/{s}.{i}.crops.npy.gz')
     threads:
         1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 16000  # todo: how much
+        mem_mb=lambda wildcards, attempt: attempt * 16000
     log:
         'log/blob_crops/{s}.{i}.crops.npy.gz.log'
     benchmark:
@@ -80,17 +80,17 @@ rule classification:
         blob_crops='res/blob_crops/{s}.{i}.crops.npy.gz',
         weight=WEIGHT
     output:
-        crops=temp("res/classification1/{s}.{i}.crops.clas.npy.gz"),
-        locs="res/classification1/{s}.{i}.locs.clas.npy.gz",
-        txt="res/classification1/{s}.{i}.crops.clas.txt"
+        crops=temp("res/count/{s}.{i}.crops.clas.npy.gz"),
+        locs="res/count/{s}.{i}.locs.clas.npy.gz",
+        txt="res/count/{s}.{i}.crops.clas.txt"
     threads:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 8000
     log:
-        "log/classification1/{s}.{i}.log"  # todo: log deleted if job fail
+        "log/count/{s}.{i}.log"  # todo: log deleted if job fail
     benchmark:
-        "log/classification1/{s}.{i}.benchmark"
+        "log/count/{s}.{i}.benchmark"
     shell:
         """
         python workflow/scripts/blob_classification.py  \
@@ -101,7 +101,7 @@ rule classification:
 
 rule aggr_count:
     input:
-        input_names(SAMPLES=SAMPLES,prefix="res/classification1/",suffix=".crops.clas.txt")
+        input_names(SAMPLES=SAMPLES,prefix="res/count/",suffix=".crops.clas.txt")
     output:
         "res/COUNT.csv"
     threads:
@@ -119,17 +119,17 @@ rule aggr_count:
 
 rule filter_crops:
     input:
-        "res/classification1/{s}.{i}.crops.clas.npy.gz"
+        "res/count/{s}.{i}.crops.clas.npy.gz"
     output:
-        "res/classification1/pos/{s}.{i}.crops.clas.npy.gz"
+        "res/count/pos/{s}.{i}.crops.clas.npy.gz"
     threads:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 8000
     log:
-        "log/classification1/pos/{s}.{i}.crops.clas.npy.gz.log"
+        "log/count/pos/{s}.{i}.crops.clas.npy.gz.log"
     benchmark:
-        "log/classification1/pos/{s}.{i}.crops.clas.npy.gz.benchmark"
+        "log/count/pos/{s}.{i}.crops.clas.npy.gz.benchmark"
     shell:
         """
         python workflow/scripts/crops_filtering.py -crops {input} \
@@ -138,18 +138,18 @@ rule filter_crops:
 
 rule view_clas_on_image:
     input:
-        crop="res/classification1/{s}.{i}.crops.clas.npy.gz",
+        crop="res/count/{s}.{i}.crops.clas.npy.gz",
         czi=os.path.join(config['DATA_DIR'], "{s}.czi")
     output:
-        "res/classification1/{s}.{i}.crops.clas.npy.gz.jpg"
+        "res/count/{s}.{i}.crops.clas.npy.gz.jpg"
     threads:
         1
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 16000
     log:
-        "log/classification1/{s}.{i}.crops.clas.npy.gz.jpg.log"
+        "log/count/{s}.{i}.crops.clas.npy.gz.jpg.log"
     benchmark:
-        "log/classification1/{s}.{i}.crops.clas.npy.gz.jpg.benchmark"
+        "log/count/{s}.{i}.crops.clas.npy.gz.jpg.benchmark"
     shell:
         """
         python workflow/scripts/visualize_locs_on_czi.py \
@@ -162,14 +162,14 @@ rule view_clas_on_image:
 
 rule area_calculation:
     input:
-        'res/classification1/pos/{s}.{i}.crops.clas.npy.gz'
+        'res/count/pos/{s}.{i}.crops.clas.npy.gz'
     output:
-        txt='res/classification1/pos/area/{s}.{i}.area.txt',
-        npy='res/classification1/pos/area/{s}.{i}.area.npy.gz'
+        txt='res/count/pos/area/{s}.{i}.area.txt',
+        npy='res/count/pos/area/{s}.{i}.area.npy.gz'
     log:
-        "res/classification1/pos/area/{s}.{i}.area.log"
+        "res/count/pos/area/{s}.{i}.area.log"
     benchmark:
-        "res/classification1/pos/area/{s}.{i}.area.benchmark"
+        "res/count/pos/area/{s}.{i}.area.benchmark"
     threads:
         1
     resources:
@@ -181,11 +181,11 @@ rule area_calculation:
 
 rule area_aggregation:
     '''
-    Will aggreated all files under res/classification1/area, regardless of config.yaml
+    Will aggreated all files under res/count/area, regardless of config.yaml
     '''
     input:
         input_names(SAMPLES=SAMPLES,
-            prefix="res/classification1/pos/area/",suffix=".area.txt")
+            prefix="res/count/pos/area/",suffix=".area.txt")
     output:
         "res/areas.csv"
     log:
@@ -196,7 +196,7 @@ rule area_aggregation:
         mem_mb=lambda wildcards, attempt: attempt * 1000
     shell:
         """
-        python workflow/scripts/aggr_area_info.py res/classification1/pos/area/ res/areas.csv &> {log}
+        python workflow/scripts/aggr_area_info.py res/count/pos/area/ res/areas.csv &> {log}
         """
 
 
@@ -242,22 +242,22 @@ rule area_histogram:
 #
 # rule view1:
 #     input:
-#         "res/classification1/{s}.{i}.clas.npy.gz"  # some will not exist, but just ignore warnings
+#         "res/count/{s}.{i}.clas.npy.gz"  # some will not exist, but just ignore warnings
 #     output:
-#         html="res/classification1/view/{s}.{i}.html"
+#         html="res/count/view/{s}.{i}.html"
 #     params:
-#         html="../res/classification1/view/{s}.{i}.html"
+#         html="../res/count/view/{s}.{i}.html"
 #     log:
-#         "log/classification1/view/{s}.{i}.html.log"
+#         "log/count/view/{s}.{i}.html.log"
 #     benchmark:
-#         "log/classification1/view/{s}.{i}.html.benchmark"
+#         "log/count/view/{s}.{i}.html.benchmark"
 #     threads:
 #         1
 #     resources:
 #         mem_mb=lambda wildcards, attempt: attempt * 8000
 #     shell:
 #         """
-#         mkdir -p res res/classification1 res/classification1/view
+#         mkdir -p res res/count res/count/view
 #         fname={input} dir={WKDIR} \
 #         jupyter nbconvert --to html --execute workflow/notebooks/viewing_blobs.ipynb \
 #         --output {params.html} &> {log}

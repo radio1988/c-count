@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 from pyimagesearch.cnn.networks.lenet import LeNet
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import Adam
-from keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 
