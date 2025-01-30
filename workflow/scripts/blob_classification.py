@@ -106,18 +106,18 @@ print('Making predictions...')
 probs = model.predict(images)  # shape: (n, 2), column 0: prob of being 0, column 1: prob of being 1 (use this)
 
 # Get classifications
-# classifications = probs.argmax(axis=1)
-classifications = [x for x in probs[:, 1] > 0.5]
+# classifications = probs.argmax(axis=1)  # old
+classifications = [x for x in probs[:, 1] > 0.5]  # adjustable threshold
 
 positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 
 # Save 
 print("Saving classifications..")
-# crops[:, 3] = classifications
-crops[:, 3] = probs[:, 1]
+crops[:, 3] = classifications  # int16 in npy, so probs not useful
+# crops[:, 3] = probs[:, 1]
 get_blob_statistics(crops)
 
-save_locs(crops, args.output.replace('crops', 'locs'))  # todo: fix potential name bug in non-workflow situations
+save_locs(crops, args.output.replace('crops', 'locs'))  # int16, todo: fix potential name bug in non-workflow situations
 save_crops(crops, args.output)
 
 txt_name = args.output.replace('.npy.gz', '.txt')

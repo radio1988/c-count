@@ -4,17 +4,9 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="blob_classification.py: output clas.txt .prob and prob.npy">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="classification1 -&gt; count">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/count.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/count.Snakefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/notebooks/labeling.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/labeling.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/notebooks/tracking.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/tracking.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/notebooks/viewing_blobs.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/viewing_blobs.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/notebooks/visualize_area_calculation.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/notebooks/visualize_area_calculation.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/aggr_area_info.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/aggr_area_info.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.sh" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/misc/auto_neg.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/train.old.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/train.old.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_classification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,13 +85,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00052" summary="blob_detection.singleScene.py: documentation updated">
-      <created>1732777522703</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1732777522703</updated>
     </task>
     <task id="LOCAL-00053" summary="rule blob_detection updated">
       <created>1732777561476</created>
@@ -437,7 +422,14 @@
       <option name="project" value="LOCAL" />
       <updated>1738256561887</updated>
     </task>
-    <option name="localTasksCounter" value="101" />
+    <task id="LOCAL-00101" summary="classification1 -&gt; count">
+      <created>1738256842568</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1738256842568</updated>
+    </task>
+    <option name="localTasksCounter" value="102" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -462,7 +454,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="jpg2npy validated" />
     <MESSAGE value="get_blob_statistics logic simplified" />
     <MESSAGE value="mask_blob_img renamed" />
     <MESSAGE value="blob.py &quot;&quot;&quot;" />
@@ -487,6 +478,7 @@
     <MESSAGE value="blob_classification.py: probs in npy and probs in txt" />
     <MESSAGE value="train.Snakefile: simpler rule names, 16 threads for training" />
     <MESSAGE value="blob_classification.py: output clas.txt .prob and prob.npy" />
-    <option name="LAST_COMMIT_MESSAGE" value="blob_classification.py: output clas.txt .prob and prob.npy" />
+    <MESSAGE value="classification1 -&gt; count" />
+    <option name="LAST_COMMIT_MESSAGE" value="classification1 -&gt; count" />
   </component>
 </project>
