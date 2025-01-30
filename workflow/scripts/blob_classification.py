@@ -8,12 +8,16 @@ Output:
     - crops.clas.npy.gz  # crop file with labels
 """
 
-import sys, argparse, os, re, yaml, keras
+import sys
+import os
+import re
+import argparse
+import keras
+import yaml
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
 from keras.optimizers import Adam
-from tensorflow.keras.utils import to_categorical
 from ccount_utils.img import equalize
 from ccount_utils.img import float_image_auto_contrast
 from ccount_utils.img import down_scale
@@ -85,16 +89,26 @@ print("min pixel value: ", np.min(images))
 # Initialize the optimizer and model
 # todo: feature normalization (optional)
 print("Compiling model...")
+
 opt = Adam(learning_rate=config['learning_rate'])
-model = LeNet.build(numChannels=1, imgRows=2 * w, imgCols=2 * w, numClasses=config['numClasses'],
+
+model = LeNet.build(numChannels=1,
+                    imgRows=2 * w,
+                    imgCols=2 * w,
+                    numClasses=config['numClasses'],
                     weightsPath=args.weight)
-model.compile(loss="categorical_crossentropy", optimizer=opt, metrics=[F1])
 
-# Classification process
-print('Making classifications...')
-probs = model.predict(images)
+model.compile(loss="categorical_crossentropy",
+              optimizer=opt,
+              metrics=[F1])
 
-classifications = probs.argmax(axis=1)
+print('Making predictions...')
+probs = model.predict(images)  # shape: (n, 2), column 0: prob of being 0, column 1: prob of being 1 (use this)
+
+# Get classifications
+# classifications = probs.argmax(axis=1)
+classifications = [x for x in probs[:, 1] > 0.5]
+
 positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 
 # Save 
@@ -107,4 +121,6 @@ save_locs(crops, args.output.replace('crops', 'locs'))  # todo: fix potential na
 save_crops(crops, args.output)
 
 txt_name = args.output.replace('.npy.gz', '.txt')
-np.savetxt(txt_name, probs)  # fmt='%d')
+np.savetxt(txt_name, classifications, fmt='%d')
+np.savetxt(txt_name.replace('txt', 'probs'), probs, fmt='%f')
+
