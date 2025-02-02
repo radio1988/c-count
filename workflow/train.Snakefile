@@ -133,3 +133,13 @@ rule saturation_plot:
         python workflow/scripts/plot_saturation.py \
         {input} {output}  &>{log}
         """
+
+rule reset:
+    shell:
+        """
+        echo 'deleting files..'
+        rm -rf res/ lsf.log  log/ train.log
+
+        echo 'unlocking dir..'
+        snakemake -j 1 --unlock
+        """

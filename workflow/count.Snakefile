@@ -276,3 +276,15 @@ rule Create_DAG:
     shell:
         "snakemake -s workflow/count.Snakefile --dag targets |dot -Tpdf > {output.dag} 2> {log};"
         "snakemake -s workflow/count.Snakefile  --rulegraph targets | dot -Tpdf > {output.rulegraph} 2>> {log}"
+
+
+
+rule reset:
+    shell:
+        """
+        echo 'deleting files..'
+        rm -rf res/ lsf.log  log/ train.log workflow.pdf rulegraph.pdf
+
+        echo 'unlocking dir..'
+        snakemake -j 1 --unlock
+        """
