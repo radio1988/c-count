@@ -12,4 +12,4 @@ snakemake \
 --ri --restart-times 1 \
 --cluster 'bsub -q long -o lsf.log -R "rusage[mem={resources.mem_mb}]" -n {threads} -R span[hosts=1] -W 144:00' > train.log 2>&1
 
-snakemake -j 1 --report report.html >> train.log  2>&1
+snakemake -j 1 --report report.html -s workflow/train.Snakefile  >> train.log  2>&1
