@@ -6,6 +6,7 @@ Train
 import os
 
 configfile: "config.train.yaml"
+singularity: "workflow/ccount.sif"
 
 WKDIR=os.getcwd()
 DATA_TRAIN=config['DATA_TRAIN']

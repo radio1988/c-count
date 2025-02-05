@@ -4,10 +4,9 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="plt.close()">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="basic reset added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/scripts/blob_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/blob_classification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +38,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/rui/github/ccount&quot;,
     &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -86,27 +85,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00055" summary="documented">
-      <created>1732777650091</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1732777650091</updated>
-    </task>
-    <task id="LOCAL-00056" summary="visualize_blob_detection: color changed">
-      <created>1732779530880</created>
-      <option name="number" value="00056" />
-      <option name="presentableId" value="LOCAL-00056" />
-      <option name="project" value="LOCAL" />
-      <updated>1732779530880</updated>
-    </task>
-    <task id="LOCAL-00057" summary="visualize_blobs_on_img: included stats of labels in title">
-      <created>1732780356614</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1732780356614</updated>
     </task>
     <task id="LOCAL-00058" summary="visualize_blob_detection -&gt; visualize_blobs_on_img">
       <created>1732780412967</created>
@@ -430,7 +408,28 @@
       <option name="project" value="LOCAL" />
       <updated>1738262452404</updated>
     </task>
-    <option name="localTasksCounter" value="104" />
+    <task id="LOCAL-00104" summary="blob_classification.py: MIN_P takes config.yaml">
+      <created>1738263914873</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1738263914873</updated>
+    </task>
+    <task id="LOCAL-00105" summary="blob_classification.py: from tensorflow.keras.optimizers import Adam">
+      <created>1738354476555</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1738354476555</updated>
+    </task>
+    <task id="LOCAL-00106" summary="basic reset added">
+      <created>1738465376929</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1738465376929</updated>
+    </task>
+    <option name="localTasksCounter" value="107" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -455,9 +454,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="blob.py &quot;&quot;&quot;" />
-    <MESSAGE value="ccount_utils.clas import split_data" />
-    <MESSAGE value="ccount_utils.clas" />
     <MESSAGE value="eval_classification.py renamed" />
     <MESSAGE value="protected hdf in train.Snakefile and labeled_crops in jpg2npy.Snakefile" />
     <MESSAGE value="train.Snakefile: rep1,2,3,4 added for training [major]" />
@@ -480,6 +476,9 @@
     <MESSAGE value="classification1 -&gt; count" />
     <MESSAGE value="blob_classification.py: back to binary output, with probs(txt) added" />
     <MESSAGE value="plt.close()" />
-    <option name="LAST_COMMIT_MESSAGE" value="plt.close()" />
+    <MESSAGE value="blob_classification.py: MIN_P takes config.yaml" />
+    <MESSAGE value="blob_classification.py: from tensorflow.keras.optimizers import Adam" />
+    <MESSAGE value="basic reset added" />
+    <option name="LAST_COMMIT_MESSAGE" value="basic reset added" />
   </component>
 </project>
