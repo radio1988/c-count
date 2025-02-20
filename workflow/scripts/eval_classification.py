@@ -31,4 +31,11 @@ blobs1b, blobs2b = intersect_blobs(blobs1, blobs2)
 labels1b = read_labels(blobs1b)
 labels2b = read_labels(blobs2b)
 
-precision, recall, F1 = F1_calculation(labels1b, labels2b)
+y_true = labels2b
+y_pred = labels1b
+
+precision, recall, F1 = F1_calculation(y_pred, y_true)
+
+from sklearn.metrics import average_precision_score
+auc_pr = average_precision_score(y_true, y_pred)  # average_precision_score computes the precision-recall AUC, which is equivalent to AUC-PR.
+print(f"AUC-PR: {auc_pr:.4f}")
