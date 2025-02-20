@@ -21,6 +21,7 @@ Output:
 import os
 from scripts.ccount_utils.snake import input_names
 from scripts.ccount_utils.snake import get_samples
+singularity: "workflow/ccount.sif"
 
 
 configfile: "config.yaml"
