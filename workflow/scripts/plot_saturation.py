@@ -213,8 +213,8 @@ def main():
 
     melt = df.melt(
         id_vars=['Proportion', 'Rep'],
-        # value_vars=['Precision', 'Recall', 'F1'],
-        value_vars=['F1'],
+        value_vars=['Precision', 'Recall', 'F1'],
+        #value_vars=['F1'],
         var_name='ScoreType', value_name='Value')
 
     # print(melt.shape)
