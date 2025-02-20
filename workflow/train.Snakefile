@@ -4,6 +4,7 @@ Train
 
 
 import os
+import numpy as np
 
 configfile: "config.train.yaml"
 singularity: "workflow/ccount.sif"
