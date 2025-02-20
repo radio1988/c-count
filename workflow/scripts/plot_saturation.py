@@ -20,7 +20,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-
 def read_eval_txts_into_df(files):
     """
     Read all txt files in directory, default 'res/eval' from train.Snakefile workflow
@@ -139,14 +138,13 @@ def create_saturation_curve(df_melted):
     #     linewidth=1.5       # Thicker boxplot lines
     # )
 
-
     stripplot = sns.stripplot(
         data=df_melted,
         x='Proportion', y='Value',
         color='black',  # Adjust color for visibility
-        alpha=0.6,     # Transparency for better layering
-        jitter=True,   # Add jitter
-        dodge=True     # Align with pointplot
+        alpha=0.6,  # Transparency for better layering
+        jitter=True,  # Add jitter
+        dodge=True  # Align with pointplot
     )
 
     plt.title('Saturation Analysis with Error Bars (CI) and Jitter')
@@ -155,7 +153,6 @@ def create_saturation_curve(df_melted):
     plt.legend(title='F1 Score', loc='best')
 
     return plt
-
 
 
 def create_saturation_curve_jittered_boxplot(df_melted):
@@ -181,28 +178,30 @@ def create_saturation_curve_jittered_boxplot(df_melted):
         data=df_melted,
         x='Proportion', y='Value',
         color='lightgray',  # Neutral color for the boxplot
-        showfliers=False,   # Hide outliers to reduce visual clutter
-        width=0.5,          # Narrower boxes for better layout
-        linewidth=1.5       # Thicker boxplot lines
+        showfliers=False,  # Hide outliers to reduce visual clutter
+        width=0.5,  # Narrower boxes for better layout
+        linewidth=1.5  # Thicker boxplot lines
     )
 
     # Stripplot for individual points with jitter
     stripplot = sns.stripplot(
         data=df_melted,
         x='Proportion', y='Value',
-        color='blue',       # Blue for data points
-        alpha=0.6,          # Transparency for layering
-        jitter=True,        # Add jitter
-        dodge=True          # Align with boxplot
+        hue='ScoreType',
+        color='blue',  # Blue for data points
+        alpha=0.6,  # Transparency for layering
+        jitter=True,  # Add jitter
+        dodge=True  # Align with boxplot
     )
 
     plt.title('Saturation Analysis with Boxplots and Jitter')
     plt.xlabel('Proportion of Training Data Used')
     plt.ylabel('F1 Score')
     plt.xticks(rotation=45)  # Optional: Rotate x-axis labels for better readability
-    plt.tight_layout()       # Adjust layout to prevent clipping
+    plt.tight_layout()  # Adjust layout to prevent clipping
 
     return plt
+
 
 def main():
     files = sys.argv[0:-1]
@@ -214,7 +213,7 @@ def main():
     melt = df.melt(
         id_vars=['Proportion', 'Rep'],
         value_vars=['Precision', 'Recall', 'F1'],
-        #value_vars=['F1'],
+        # value_vars=['F1'],
         var_name='ScoreType', value_name='Value')
 
     # print(melt.shape)
