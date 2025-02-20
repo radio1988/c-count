@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 
 from ccount_utils.blob import load_blobs
 from ccount_utils.clas import F1_calculation
