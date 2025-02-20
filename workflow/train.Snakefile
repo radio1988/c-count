@@ -106,7 +106,7 @@ rule evaluation:
     threads:
         2
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 8000
+        mem_mb=lambda wildcards, attempt: attempt * 16000
     priority:
         100
     shell:
