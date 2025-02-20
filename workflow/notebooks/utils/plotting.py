@@ -135,7 +135,7 @@ def create_corr_heatmap(df):
     return (g)
 
 
-def create_epo_curve(df_melted):
+def create_epo_curve(df_melted, custom_palette):
     """
     df_melted example:
 
@@ -153,20 +153,29 @@ def create_epo_curve(df_melted):
     62  1.0000         4    COUNT-L    164
 
     [63 rows x 4 columns]
+
+    custom_palette = {
+        'i-count-A': '#666666',  # Gray1
+        'i-count-J': '#999999',  # Gray2
+        'i-count-L': '#BBBBBB',  # Gray3
+        'm-count': '#0072B2',   # Colorblind-friendly blue for c-count
+        'c-count-AF1-P0.1': '#D55E00',  # Colorblind-friendly red
+    }
+
     """
     plt.figure(figsize=(6, 5))
 
     pointplot = sns.pointplot(
         data=df_melted,
         x='Epo', y='Count',
-        hue='Count_Type',
+        hue='Count_Type', palette=custom_palette,
         dodge=True,
         markers='o',
-        linestyles='--',  # -  --  :  -.
-        errorbar='ci'  # se, sd, ci, pi
+        linestyles='--', # -  --  :  -.
+        errorbar='se'  # se, sd, ci, pi
     )
 
-    plt.title('Epo Concentration Curve with Error Bars (CI)')
+    plt.title('Epo Concentration Curve with Error Bars (SE)')
     plt.xlabel('Epo Concentration')
     plt.ylabel('Count')
     plt.legend(title='Count Type', loc='best')
