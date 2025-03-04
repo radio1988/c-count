@@ -86,7 +86,7 @@ def create_pairplot(df, bins=20):
     1        6        2        4
     """
     global_max = df.max().max() * 1.1
-    g = sns.pairplot(df, diag_kind="hist", diag_kws={"bins": bins})
+    g = sns.pairplot(df, diag_kind="hist", diag_kws={"bins": bins}, corner=True)
 
     # Set x-axis limits for all subplots
     for ax in g.axes.flat:  # Iterate through all axes
@@ -97,7 +97,7 @@ def create_pairplot(df, bins=20):
     # Add correlation coefficients to the upper triangle
     for i, row in enumerate(df.columns):
         for j, col in enumerate(df.columns):
-            if i < j:  # Upper triangle
+            if i > j:  # lower triangle
                 # Calculate correlation
                 corr = df[row].corr(df[col])
 
@@ -131,11 +131,14 @@ def create_corr_heatmap(df):
     """
     corr_matrix = df.corr(method='pearson')  # {‘pearson’, ‘kendall’, ‘spearman’}
     g = sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', cbar=True)
-    plt.title('Correlation Heatmap')
+    plt.title('Pearson Correlation Heatmap')
     return (g)
 
 
-def create_epo_curve(df_melted, custom_palette):
+def create_epo_curve(df_melted,
+                     custom_palette={'i-count-A': '#666666'},
+                     linestyle_dict={'i-count-A': ':'}
+                     ):
     """
     df_melted example:
 
@@ -162,6 +165,15 @@ def create_epo_curve(df_melted, custom_palette):
         'c-count-AF1-P0.1': '#D55E00',  # Colorblind-friendly red
     }
 
+
+    linestyle_dict = {
+    'i-count-A': ':',
+    'i-count-J': ':',
+    'i-count-L': ':',
+    'm-count': '--',
+    'c-count-AF1-P0.1': '-.',
+    }
+
     """
     plt.figure(figsize=(6, 5))
 
@@ -175,9 +187,19 @@ def create_epo_curve(df_melted, custom_palette):
         errorbar='se'  # se, sd, ci, pi
     )
 
+    # Apply different linestyles by modifying the lines manually
+    for line, (_, count_type) in zip(pointplot.lines[1::3], enumerate(df_melted['Count_Type'].unique())):
+        lineStyle = linestyle_dict.get(count_type, '-')
+        print(count_type)
+        print(lineStyle)
+        line.set_linestyle(lineStyle)
+
+
     plt.title('Epo Concentration Curve with Error Bars (SE)')
     plt.xlabel('Epo Concentration')
     plt.ylabel('Count')
     plt.legend(title='Count Type', loc='best')
+
+    plt.show()
 
     return pointplot
