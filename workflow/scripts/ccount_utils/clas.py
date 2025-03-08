@@ -367,7 +367,7 @@ def calculate_AUC_PR(y_true, y_pred):
     """
     from sklearn.metrics import average_precision_score
     auc_pr = average_precision_score(y_true, y_pred)  # average_precision_score computes the precision-recall AUC, which is equivalent to AUC-PR.
-    print(f"AUC-PR: {auc_pr:.4f}")
+    #print(f"AUC-PR: {auc_pr:.4f}")
     return auc_pr
 
 
@@ -383,5 +383,5 @@ def calculate_MCC_Max(y_true, y_pred):
     thresholds = np.unique(y_pred)
     mcc_scores = [matthews_corrcoef(y_true, y_pred >= t) for t in thresholds]
     mcc_max = max(mcc_scores)
-    print(f"MCC-max: {mcc_max:.4f}")
+    #print(f"MCC-max: {mcc_max:.4f}")
     return mcc_max

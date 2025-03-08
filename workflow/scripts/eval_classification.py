@@ -43,4 +43,4 @@ auc_pr = calculate_AUC_PR(y_true, y_pred)  # average_precision_score computes th
 print(f"AUC-PR: {auc_pr:.4f}")
 
 mcc_min = calculate_MCC_Max(y_true, y_pred)
-print(f"MCC-min: {mcc_min:.4f}")
+print(f"MCC-MAX: {mcc_min:.4f}")
