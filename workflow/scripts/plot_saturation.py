@@ -33,12 +33,13 @@ def read_eval_txts_into_df(files):
     """
     data = []
     pattern = r"Precision: ([\d.]+)%, Recall: ([\d.]+)%, F1: ([\d.]+)%"
-    pattern2 = r"([\d.]+)\.(rep[\d]+)\.txt"
+    pattern2 = r"([\d.]+)\.(rep[\d]+)\.txt"   # 0.125.rep1.txt
     p_auc_pr = r"AUC-PR: ([\d.]+)"
     p_mcc_max = r"MCC-MAX: ([\d.]+)"
 
     for filename in files:
         basename = os.path.basename(filename)
+        print(basename)
         match2 = re.search(pattern2, basename)
         if match2:
             proportion, rep = map(str, match2.groups())
