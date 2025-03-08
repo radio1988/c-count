@@ -40,7 +40,10 @@ def read_eval_txts_into_df(files):
     for filename in files:
         filepath = filename
         match2 = re.search(pattern2, filename)
-        proportion, rep = map(str, match2.groups())
+        if match2:
+            proportion, rep = map(str, match2.groups())
+        else:
+            sys.exit("Error: filename does not match pattern")
 
         with open(filepath, 'r') as file:
             for line in file:
