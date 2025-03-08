@@ -218,7 +218,7 @@ def create_saturation_curve_jittered_boxplot(df_melted):
 
 
 def main():
-    files = sys.argv[0:-1]
+    files = sys.argv[1:-1]
     df = read_eval_txts_into_df(files)
     print(df)
     os.makedirs(os.path.dirname(sys.argv[-1]), exist_ok=True)
