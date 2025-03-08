@@ -34,26 +34,36 @@ def read_eval_txts_into_df(files):
     data = []
     pattern = r"Precision: ([\d.]+)%, Recall: ([\d.]+)%, F1: ([\d.]+)%"
     pattern2 = r"([\d.]+)\.(rep[\d]+)\.txt"
+    p_auc_pr = r"AUC-PR: ([\d.]+)"
+    p_mcc_max = r"MCC-MAX: ([\d.]+)"
 
     for filename in files:
         filepath = filename
         match2 = re.search(pattern2, filename)
+        proportion, rep = map(str, match2.groups())
 
         with open(filepath, 'r') as file:
             for line in file:
                 match = re.search(pattern, line)
                 if match:
-                    # Extract values
                     precision, recall, f1 = map(float, match.groups())
-                    proportion, rep = map(str, match2.groups())
-                    data.append(
-                        {"Name": filename.replace('.txt', ''),
-                         "Proportion": proportion,
-                         "Rep": rep,
-                         "Precision": precision,
-                         "Recall": recall,
-                         "F1": f1})
-                    break  # Stop reading after finding the line
+                match3 = re.search(p_auc_pr, line)
+                if match3:
+                    auc_pr = float(match3.group(1))
+                match4 = re.search(p_mcc_max, line)
+                if match4:
+                    mcc_max = float(match4.group(1))
+
+            data.append(
+                {"Name": filename.replace('.txt', ''),
+                 "Proportion": proportion,
+                 "Rep": rep,
+                 "Precision": precision,
+                 "Recall": recall,
+                 "F1": f1,
+                 "AUC-PR": auc_pr,
+                 "MCC-MAX": mcc_max
+                 })
 
     # Create a DataFrame
     df = pd.DataFrame(data)
