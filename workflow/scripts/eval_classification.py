@@ -38,7 +38,7 @@ y_pred = labels1b
 precision, recall, F1 = F1_calculation(y_pred, y_true)
 
 
-from ccount_utils.clas import calculate_AUC_PR, calculate_MCC
+from ccount_utils.clas import calculate_AUC_PR, calculate_MCC_Max
 auc_pr = calculate_AUC_PR(y_true, y_pred)  # average_precision_score computes the precision-recall AUC, which is equivalent to AUC-PR.
 print(f"AUC-PR: {auc_pr:.4f}")
 
