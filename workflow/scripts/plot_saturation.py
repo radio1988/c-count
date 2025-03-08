@@ -38,14 +38,14 @@ def read_eval_txts_into_df(files):
     p_mcc_max = r"MCC-MAX: ([\d.]+)"
 
     for filename in files:
-        filepath = filename
-        match2 = re.search(pattern2, filename)
+        basename = os.path.basename(filename)
+        match2 = re.search(pattern2, basename)
         if match2:
             proportion, rep = map(str, match2.groups())
         else:
             sys.exit("Error: filename does not match pattern")
 
-        with open(filepath, 'r') as file:
+        with open(filename, 'r') as file:
             for line in file:
                 match = re.search(pattern, line)
                 if match:
