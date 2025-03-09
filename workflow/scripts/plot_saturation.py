@@ -227,11 +227,14 @@ def main():
     melt = df.melt(
         id_vars=['Proportion', 'Rep'],
         # value_vars=['Precision', 'Recall', 'F1'],
-        value_vars=['F1'],
+        value_vars=['MCC-MAX'],
         var_name='ScoreType', value_name='Value')
+    #            Proportion   Rep ScoreType  Value
+    # 0       0.125  rep1        F1  81.32
+    # 1       0.125  rep2        F1  72.54
 
-    # print(melt.shape)
-    # print(melt)
+    print(melt.shape)
+    print(melt)
 
     saturation_plot = create_saturation_curve(melt)
     saturation_plot.savefig(sys.argv[-1], dpi=300, bbox_inches='tight')  # Save to PDF
