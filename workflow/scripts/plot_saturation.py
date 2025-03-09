@@ -130,6 +130,7 @@ def create_saturation_curve(df_melted):
     """
     plt.figure(figsize=(6, 5))
 
+    # gray jitter
     pointplot = sns.pointplot(
         data=df_melted,
         x='Proportion', y='Value',
@@ -141,6 +142,7 @@ def create_saturation_curve(df_melted):
         errorbar='se'  # se, sd, ci, pi
     )
 
+    # red curve
     stripplot = sns.stripplot(
         data=df_melted,
         x='Proportion', y='Value',
@@ -151,6 +153,7 @@ def create_saturation_curve(df_melted):
     )
 
     score_type = df_melted['ScoreType'].unique()[0] + ' Score'
+    print("score_type": score_type)
     plt.title('Saturation Analysis with Error Bars (SE) and Jitter')
     plt.xlabel('Proportion of Training Data Used')
     plt.ylabel(score_type)
@@ -168,7 +171,7 @@ def main():
     melt = df.melt(
         id_vars=['Proportion', 'Rep'],
         # value_vars=['Precision', 'Recall', 'F1'],
-        value_vars=['MCC-MAX'],
+        value_vars=['AUC-PR'],
         var_name='ScoreType', value_name='Value')
     #            Proportion   Rep ScoreType  Value
     # 0       0.125  rep1        F1  81.32
