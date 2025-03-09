@@ -74,7 +74,6 @@ def read_eval_txts_into_df(files):
     df = df.sort_values(by="Name").set_index("Name")
     return df
 
-
 def plot_training_saturation(df, mode='F1', out_keyword='saturation_analysis'):
     """
     Obsolete
@@ -113,10 +112,9 @@ def plot_training_saturation(df, mode='F1', out_keyword='saturation_analysis'):
     plt.savefig(out_keyword + '.' + mode + '.pdf')
     plt.show()
 
-
 def create_saturation_curve(df_melted):
     """
-    Create saturation plot using boxplots to summarize the distribution (CI added)
+    Create saturation plot using boxplots to summarize the distribution (SE added)
     and add jitter to show individual data points.
 
     @param df_melted: DataFrame with columns Proportion, Rep, ScoreType, Value.
@@ -140,17 +138,8 @@ def create_saturation_curve(df_melted):
         markers='o',
         color='red',
         linestyles='--',  # -  --  :  -.
-        errorbar='ci'  # se, sd, ci, pi
+        errorbar='se'  # se, sd, ci, pi
     )
-
-    # boxplot = sns.boxplot(
-    #     data=df_melted,
-    #     x='Proportion', y='Value',
-    #     color='lightgray',  # Neutral color for the boxplot
-    #     showfliers=False,   # Hide outliers to reduce visual clutter
-    #     width=0.5,          # Narrower boxes for better layout
-    #     linewidth=1.5       # Thicker boxplot lines
-    # )
 
     stripplot = sns.stripplot(
         data=df_melted,
@@ -161,61 +150,13 @@ def create_saturation_curve(df_melted):
         dodge=True  # Align with pointplot
     )
 
-    plt.title('Saturation Analysis with Error Bars (CI) and Jitter')
+    score_type = df_melted['ScoreType'].unique()[0] + ' Score'
+    plt.title('Saturation Analysis with Error Bars (SE) and Jitter')
     plt.xlabel('Proportion of Training Data Used')
-    plt.ylabel('F1 Score')
-    plt.legend(title='F1 Score', loc='best')
+    plt.ylabel(score_type)
+    plt.legend(title=score_type, loc='best')
 
     return plt
-
-
-def create_saturation_curve_jittered_boxplot(df_melted):
-    """
-    Create saturation plot using boxplots to summarize the distribution
-    and add jitter to show individual data points.
-
-    @param df_melted: DataFrame with columns Proportion, Rep, ScoreType, Value.
-               Proportion   Rep ScoreType  Value
-        0       0.125  rep1        F1  81.32
-        1       0.125  rep2        F1  72.54
-        2       0.125  rep3        F1  70.65
-        8        0.25  rep1        F1  75.80
-        9        0.25  rep2        F1  68.83
-        10       0.25  rep3        F1  79.78
-
-    @return: plt object
-    """
-    plt.figure(figsize=(6, 5))
-
-    # Boxplot for distribution and summary stats
-    boxplot = sns.boxplot(
-        data=df_melted,
-        x='Proportion', y='Value',
-        color='lightgray',  # Neutral color for the boxplot
-        showfliers=False,  # Hide outliers to reduce visual clutter
-        width=0.5,  # Narrower boxes for better layout
-        linewidth=1.5  # Thicker boxplot lines
-    )
-
-    # Stripplot for individual points with jitter
-    stripplot = sns.stripplot(
-        data=df_melted,
-        x='Proportion', y='Value',
-        hue='ScoreType',
-        color='blue',  # Blue for data points
-        alpha=0.6,  # Transparency for layering
-        jitter=True,  # Add jitter
-        dodge=True  # Align with boxplot
-    )
-
-    plt.title('Saturation Analysis with Boxplots and Jitter')
-    plt.xlabel('Proportion of Training Data Used')
-    plt.ylabel('F1 Score')
-    plt.xticks(rotation=45)  # Optional: Rotate x-axis labels for better readability
-    plt.tight_layout()  # Adjust layout to prevent clipping
-
-    return plt
-
 
 def main():
     files = sys.argv[1:-1]
