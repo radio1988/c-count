@@ -108,8 +108,8 @@ probs = model.predict(images)  # shape: (n, 2), column 0: prob of being 0, colum
 
 # Get classifications
 # classifications = probs.argmax(axis=1)  # old
+print("threshold: ", config['MIN_P'])
 classifications = [x for x in probs[:, 1] > config['MIN_P']]  # adjustable threshold
-
 positive_idx = [i for i, x in enumerate(classifications) if x == 1]
 
 # Save 
@@ -123,5 +123,5 @@ save_crops(crops, args.output)
 
 txt_name = args.output.replace('.npy.gz', '.txt')
 np.savetxt(txt_name, classifications, fmt='%d')
-np.savetxt(txt_name.replace('txt', 'probs'), probs, fmt='%f')
+np.savetxt(txt_name.replace('.txt', '.probs.txt'), probs, fmt='%f', header="p_no,p_yes", comments="")
 
