@@ -153,7 +153,7 @@ def create_saturation_curve(df_melted):
     )
 
     score_type = df_melted['ScoreType'].unique()[0] + ' Score'
-    print("score_type": score_type)
+    print("score_type:", score_type)
     plt.title('Saturation Analysis with Error Bars (SE) and Jitter')
     plt.xlabel('Proportion of Training Data Used')
     plt.ylabel(score_type)
