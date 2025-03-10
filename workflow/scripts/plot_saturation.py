@@ -171,7 +171,7 @@ def main():
     melt = df.melt(
         id_vars=['Proportion', 'Rep'],
         # value_vars=['Precision', 'Recall', 'F1'],
-        value_vars=['AUC-PR'],
+        value_vars=['MCC-MAX'],
         var_name='ScoreType', value_name='Value')
     #            Proportion   Rep ScoreType  Value
     # 0       0.125  rep1        F1  81.32
