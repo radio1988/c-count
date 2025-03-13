@@ -44,3 +44,23 @@ print(f"AUC-PR: {auc_pr:.4f}")
 
 mcc_min = calculate_MCC_Max(y_true, y_pred)
 print(f"MCC-MAX: {mcc_min:.4f}")
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import precision_recall_curve, auc
+
+# Compute precision-recall curve
+precision, recall, _ = precision_recall_curve(y_true, y_pred)
+
+# Compute AUC-PR
+auc_pr = auc(recall, precision)
+
+# Plot Precision-Recall curve
+plt.figure(figsize=(6, 6))
+plt.plot(recall, precision, marker='.', label=f'AUC-PR = {auc_pr:.2f}')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve')
+plt.legend()
+plt.grid()
+plt.savefig('precision_recall_curve.pdf')
