@@ -76,7 +76,7 @@ def get_sceneIndex(name):
         return '3'
 
 
-def create_pairplot(df, bins=20):
+def create_lower_pairplot(df):
     """
     all df columns should be counts, no NAME column
 
@@ -84,14 +84,21 @@ def create_pairplot(df, bins=20):
        COUNT-A  COUNT-J  COUNT-L
     0       23       21       29
     1        6        2        4
+
+    df: scene level
+    df2: plate level
+
+    density plot is plate level
     """
     global_max = df.max().max() * 1.1
-    g = sns.pairplot(df, diag_kind="hist", diag_kws={"bins": bins}, corner=True)
+    g = sns.pairplot(df, diag_kind="kde", corner=True, height=2,
+                     plot_kws={"color": "darkblue", "alpha": 0.5})
+    #sns.set_context("talk", font_scale=1.2)
 
     # Set x-axis limits for all subplots
     for ax in g.axes.flat:  # Iterate through all axes
         if ax is not None:  # Avoid empty subplots
-            ax.set_xlim(right=global_max)
+            ax.set_xlim(left=0, right=global_max)
             ax.set_ylim(top=global_max)
 
     # Add correlation coefficients to the upper triangle
@@ -103,21 +110,76 @@ def create_pairplot(df, bins=20):
 
                 # Add text annotation to the pairplot
                 ax = g.axes[i, j]
-                ax.annotate('corr: ' + f'{corr:.2f}',
-                            xy=(0.2, 0.9),
+                ax.annotate(f'{corr:.2f}',
+                            xy=(0.8, 0.1),
                             xycoords='axes fraction',
-                            ha='center', va='center', fontsize=10, color='red')
+                            ha='center', va='center', fontsize=15, color='brown')
             if i == j:  # diagnal
                 # Calculate correlation
                 total = sum(df[row])
 
                 # Add text annotation to the pairplot
                 ax = g.axes[i, j]
-                ax.annotate("total count: " + f'{total}',
-                            xy=(0.3, 0.9),
+                ax.annotate(f'{total}',
+                            xy=(0.4, 0.1),
                             xycoords='axes fraction',
-                            ha='center', va='center', fontsize=10, color='black')
-    return (g)
+                            ha='center', va='center', fontsize=15, color='black')
+
+    #g.fig.tight_layout()
+    return g
+
+def create_upper_pairplot(df):
+    """
+    all df columns should be counts, no NAME column
+
+    print(m2.head(2))
+       COUNT-A  COUNT-J  COUNT-L
+    0       23       21       29
+    1        6        2        4
+
+    df: scene level
+    df2: plate level
+
+    density plot is plate level
+    """
+    global_max = df.max().max() * 1.1
+    g = sns.pairplot(df, diag_kind="kde", corner=False, height=2,
+                      plot_kws={"color": "blue", "alpha": 0.7})
+    #sns.set_context("talk", font_scale=1.2)
+
+    # Set x-axis limits for all subplots
+    for ax in g.axes.flat:  # Iterate through all axes
+        if ax is not None:  # Avoid empty subplots
+            ax.set_xlim(left=0, right=global_max)
+            ax.set_ylim(top=global_max)
+
+    # Add correlation coefficients to the upper triangle
+    for i, row in enumerate(df.columns):
+        for j, col in enumerate(df.columns):
+            if i < j:  # upper triangle
+                # Calculate correlation
+                corr = df[row].corr(df[col])
+
+                # Add text annotation to the pairplot
+                ax = g.axes[i, j]
+                ax.annotate(f'{corr:.2f}',
+                            xy=(0.8, 0.1),
+                            xycoords='axes fraction',
+                            ha='center', va='center', fontsize=15, color='red')
+            if i == j:  # diagnal
+                # Calculate correlation
+                total = sum(df[row])
+
+                # Add text annotation to the pairplot
+                ax = g.axes[i, j]
+                ax.annotate(f'{total}',
+                            xy=(0.4, 0.1),
+                            xycoords='axes fraction',
+                            ha='center', va='center', fontsize=15, color='black')
+
+    #g.fig.tight_layout()
+    return g
+
 
 
 def create_corr_heatmap(df):
@@ -135,10 +197,7 @@ def create_corr_heatmap(df):
     return (g)
 
 
-def create_epo_curve(df_melted,
-                     custom_palette={'i-count-A': '#666666'},
-                     linestyle_dict={'i-count-A': ':'}
-                     ):
+def create_epo_curve(df_melted):
     """
     df_melted example:
 
@@ -146,59 +205,27 @@ def create_epo_curve(df_melted,
     0   0.0000         3    COUNT-A      0
     1   0.0625         1    COUNT-A     45
     2   0.0625         2    COUNT-A     48
-    3   0.0625         3    COUNT-A     42
-    4   0.0625         4    COUNT-A     73
-    ..     ...       ...        ...    ...
-    58  0.5000         4    COUNT-L    132
-    59  1.0000         1    COUNT-L    211
-    60  1.0000         2    COUNT-L    131
     61  1.0000         3    COUNT-L    143
     62  1.0000         4    COUNT-L    164
 
-    [63 rows x 4 columns]
-
-    custom_palette = {
-        'i-count-A': '#666666',  # Gray1
-        'i-count-J': '#999999',  # Gray2
-        'i-count-L': '#BBBBBB',  # Gray3
-        'm-count': '#0072B2',   # Colorblind-friendly blue for c-count
-        'c-count-AF1-P0.1': '#D55E00',  # Colorblind-friendly red
-    }
-
-
-    linestyle_dict = {
-    'i-count-A': ':',
-    'i-count-J': ':',
-    'i-count-L': ':',
-    'm-count': '--',
-    'c-count-AF1-P0.1': '-.',
-    }
-
     """
     plt.figure(figsize=(6, 5))
-
-    pointplot = sns.pointplot(
+    sns.despine()
+    sns.set_context("talk")
+    print(marker_dict)
+    pointplot = sns.lineplot(
         data=df_melted,
         x='Epo', y='Count',
-        hue='Count_Type', palette=custom_palette,
-        dodge=True,
-        markers='o',
-        linestyles='--', # -  --  :  -.
-        errorbar='se'  # se, sd, ci, pi
+        hue='Count_Type',  # palette=custom_palette,
+        style="Count_Type",  # style_order = style_order,
+        markers='o', markersize=10,
+        err_style='bars', errorbar='se'  # se, sd, ci, pi
     )
-
-    # Apply different linestyles by modifying the lines manually
-    for line, (_, count_type) in zip(pointplot.lines[1::3], enumerate(df_melted['Count_Type'].unique())):
-        lineStyle = linestyle_dict.get(count_type, '-')
-        print(count_type)
-        print(lineStyle)
-        line.set_linestyle(lineStyle)
-
 
     plt.title('Epo Concentration Curve with Error Bars (SE)')
     plt.xlabel('Epo Concentration')
     plt.ylabel('Count')
-    plt.legend(title='Count Type', loc='best')
+    plt.legend(title='Count Type', loc='best', bbox_to_anchor=(1.05, 1), borderaxespad=0.0)
 
     plt.show()
 
