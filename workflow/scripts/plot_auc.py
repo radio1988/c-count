@@ -2,6 +2,12 @@
 This script computes and plots the Precision-Recall curve for a binary classification problem.
 
 python plot_auc.py -prediction res/2_count_on_validationSet/1.0.rep5.probs.txt -groundtruth data/AF.val.npy.gz
+
+prob.txt:
+p_no p_yes
+0.999999 0.000001
+0.999999 0.000001
+0.999998 0.000002
 """
 
 
@@ -27,7 +33,8 @@ def main():
     args = parse_args()
 
     y_true = load_blobs(args.groundtruth)
-    y_scores = pd.read_csv(args.prediction,  delimiter=' ', header=1).iloc[:, 1].values
+    y_scores = pd.read_csv(args.prediction,  delimiter=' ', header=0).iloc[:, 1].values  # second column
+
     print(y_scores[0:10])
     print(y_scores[-10:-1])
 
