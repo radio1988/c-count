@@ -11,14 +11,15 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import precision_recall_curve, auc
 import argparse
 import sys
+import os
 from ccount_utils.blob import load_blobs
 
 
-# Function to parse command line arguments
 def parse_args():
     parser = argparse.ArgumentParser(description="Plot Precision-Recall curve")
-    parser.add_argument('-prediction', type=str, required=True, help='Path to predicted probabilities file')
-    parser.add_argument('-groundtruth', type=str, required=True, help='Path to ground truth file')
+    parser.add_argument('-prediction', type=str, required=True, help='probs.txt')
+    parser.add_argument('-groundtruth', type=str, required=True, help='val.npy.gz')
+    parser.add_argument('-output', type=str, default='precision_recall_curve.pdf', help='Output PDF file for the plot')
     return parser.parse_args()
 
 
@@ -26,7 +27,7 @@ def main():
     args = parse_args()
 
     y_true = load_blobs(args.groundtruth)
-    y_scores = pd.read_csv(fname,  delimiter=' ', header=1).iloc[:, 1].values
+    y_scores = pd.read_csv(args.prediction,  delimiter=' ', header=1).iloc[:, 1].values
 
     if y_scores.shape[0] != y_true.shape[0]:
         sys.exit("Error: The number of predictions and ground truth labels must match.")
@@ -49,11 +50,10 @@ def main():
     plt.legend()
     plt.grid()
 
-    # Save plot to PDF
-    plt.savefig("precision_recall_curve.pdf", format="pdf", bbox_inches="tight")
-
-    # Show the plot (optional)
-    plt.show()
+    output_dir = os.path.dirname(args.output)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    plt.savefig(args.output, format="pdf", bbox_inches="tight")
 
 if __name__ == "__main__":
     main()
