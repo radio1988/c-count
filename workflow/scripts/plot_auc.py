@@ -29,6 +29,7 @@ def main():
     y_true = load_blobs(args.groundtruth)
     y_scores = pd.read_csv(args.prediction,  delimiter=' ', header=1).iloc[:, 1].values
 
+    print(f"Ground truth shape: {y_true.shape}, Predictions shape: {y_scores.shape}")
     if y_scores.shape[0] != y_true.shape[0]:
         sys.exit("Error: The number of predictions and ground truth labels must match.")
 
