@@ -123,5 +123,5 @@ save_crops(crops, args.output)
 
 txt_name = args.output.replace('.npy.gz', '.txt')
 np.savetxt(txt_name, classifications, fmt='%d')
-np.savetxt(txt_name.replace('.txt', '.probs.txt'), probs, fmt='%f', header="p_no,p_yes", comments="")
+np.savetxt(txt_name.replace('.txt', '.probs.txt'), probs, fmt='%f', header="p_no p_yes", comments="")
 
