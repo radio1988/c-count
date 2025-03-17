@@ -19,6 +19,7 @@ import argparse
 import sys
 import os
 from ccount_utils.blob import load_blobs
+import seaborn as sns
 
 
 def parse_args():
@@ -32,17 +33,16 @@ def parse_args():
 def main():
     args = parse_args()
 
-    y_true = load_blobs(args.groundtruth)
+    blobs = load_blobs(args.groundtruth)
+    y_true = blobs[:, 3]
     y_scores = pd.read_csv(args.prediction,  delimiter=' ', header=0).iloc[:, 1].values  # second column
 
-    print(y_scores[0:10])
-    print(y_scores[-10:-1])
-
-    print(f"Ground truth shape: {y_true.shape}, Predictions shape: {y_scores.shape}")
     if y_scores.shape[0] != y_true.shape[0]:
+        print(f"Ground truth shape: {y_true.shape}, Predictions shape: {y_scores.shape}")
         sys.exit("Error: The number of predictions and ground truth labels must match.")
 
     if not np.all(np.isin(y_true, [0, 1])):
+        print(f"Ground truth labels: {np.unique(y_true)}")
         sys.exit("Error: Ground truth labels must be binary (0 or 1).")
 
     # Compute precision-recall curve
@@ -56,14 +56,28 @@ def main():
     plt.plot(recall, precision, marker='.', label=f'AUC-PR = {auc_pr:.2f}')
     plt.xlabel('Recall')
     plt.ylabel('Precision')
-    plt.title('Precision-Recall Curve')
+    plt.title(f'Precision-Recall Curve')
     plt.legend()
-    plt.grid()
+
+    outname = 'output/test.pdf'
+    output_dir = os.path.dirname(outname)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    plt.savefig(outname, format="pdf", bbox_inches="tight")
 
     output_dir = os.path.dirname(args.output)
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir)
     plt.savefig(args.output, format="pdf", bbox_inches="tight")
+
+    plt.figure(figsize=(12, 6))  # Set figure size
+    sns.histplot(y_scores, bins=50, log_scale=(True, False))
+    plt.ylim(1, 500)  # Example: from 1 to 1000, adjust based on your data
+    plt.xlabel("P-value (log scale)")
+    plt.ylabel("Count (log scale)")
+    plt.title("Histogram of P-values (Log-Log Scale)")
+    plt.savefig(outname.replace("pdf", "hist.pdf"), format="pdf", bbox_inches="tight")
+
 
 if __name__ == "__main__":
     main()
