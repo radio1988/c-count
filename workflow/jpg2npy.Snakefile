@@ -135,7 +135,7 @@ rule jpg2locs:
     threads:
         1
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 8000  # 900M RAM usage on Mac 24/04
+        mem_mb=lambda wildcards, attempt: attempt * 16000  # 900M RAM usage on Mac 24/04
     shell:
         """
         python workflow/scripts/jpg2npy.py -jpg {input.jpg} -czi {input.czi} -locs {input.blob_locs} \
