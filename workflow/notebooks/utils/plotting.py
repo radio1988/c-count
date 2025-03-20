@@ -113,7 +113,7 @@ def create_lower_pairplot(df):
                 ax.annotate(f'{corr:.2f}',
                             xy=(0.8, 0.1),
                             xycoords='axes fraction',
-                            ha='center', va='center', fontsize=15, color='brown')
+                            ha='center', va='center', fontsize=15, color='black')
             if i == j:  # diagnal
                 # Calculate correlation
                 total = sum(df[row])
@@ -144,7 +144,7 @@ def create_upper_pairplot(df):
     """
     global_max = df.max().max() * 1.1
     g = sns.pairplot(df, diag_kind="kde", corner=False, height=2,
-                      plot_kws={"color": "blue", "alpha": 0.7})
+                      plot_kws={"color": "darkred", "alpha": 0.5})
     #sns.set_context("talk", font_scale=1.2)
 
     # Set x-axis limits for all subplots
@@ -165,7 +165,7 @@ def create_upper_pairplot(df):
                 ax.annotate(f'{corr:.2f}',
                             xy=(0.8, 0.1),
                             xycoords='axes fraction',
-                            ha='center', va='center', fontsize=15, color='red')
+                            ha='center', va='center', fontsize=15, color='black')
             if i == j:  # diagnal
                 # Calculate correlation
                 total = sum(df[row])
@@ -197,7 +197,11 @@ def create_corr_heatmap(df):
     return (g)
 
 
-def create_epo_curve(df_melted):
+def create_epo_curve(df_melted,
+                     custom_palette={'i-count-A': '0.5'},
+                     style_order = ['A', 'B'],
+                     jitter = 0.005
+                     ):
     """
     df_melted example:
 
@@ -209,16 +213,23 @@ def create_epo_curve(df_melted):
     62  1.0000         4    COUNT-L    164
 
     """
-    plt.figure(figsize=(6, 5))
+    plt.figure(figsize=(5.5, 5))
     sns.despine()
     sns.set_context("talk")
-    print(marker_dict)
+
+    df = df_melted.copy()
+
+    unique_types = df['Count_Type'].unique()
+    jitter_values = {ct: i * jitter for i, ct in enumerate(unique_types)}
+    df['Epo_jittered'] = df.apply(lambda row: row['Epo'] + jitter_values[row['Count_Type']], axis=1)
+
     pointplot = sns.lineplot(
-        data=df_melted,
-        x='Epo', y='Count',
-        hue='Count_Type',  # palette=custom_palette,
-        style="Count_Type",  # style_order = style_order,
-        markers='o', markersize=10,
+        data=df,
+        x='Epo_jittered', y='Count',
+        hue='Count_Type', palette=custom_palette,
+        style="Count_Type", style_order = style_order,
+        markers='o',
+        markersize=10,
         err_style='bars', errorbar='se'  # se, sd, ci, pi
     )
 
@@ -226,7 +237,5 @@ def create_epo_curve(df_melted):
     plt.xlabel('Epo Concentration')
     plt.ylabel('Count')
     plt.legend(title='Count Type', loc='best', bbox_to_anchor=(1.05, 1), borderaxespad=0.0)
-
-    plt.show()
 
     return pointplot
