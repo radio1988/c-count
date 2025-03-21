@@ -3,10 +3,25 @@
   <component name="AnalysisUIOptions">
     <option name="SCOPE_TYPE" value="3" />
   </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="basic reset added">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="Instructions">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/instructions/create_conda_env.md" beforeDir="false" afterPath="$PROJECT_DIR$/instructions/create_conda_env.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/ccount.exported.1.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/ccount.hpc.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/ccount.old.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/ccount.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/hpc.mamba.conda-list.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/mac.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/note.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/oak.install.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/spec-file.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/test_gpu.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,6 +41,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2eLCXCw9rAJXxDExfd0OJut1Nsr" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -36,9 +54,22 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;singularity&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/rui/github/ccount&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;Python&quot;
+    ]
   }
 }</component>
   <component name="RecentsManager">
@@ -62,6 +93,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$USER_HOME$/Documents/Family Share/GIS/test/test.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -77,6 +109,14 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-PY-243.24978.54" />
+        <option value="bundled-python-sdk-91e3b7efe1d4-466328ff949b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.24978.54" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -85,160 +125,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711674509003</updated>
-    </task>
-    <task id="LOCAL-00058" summary="visualize_blob_detection -&gt; visualize_blobs_on_img">
-      <created>1732780412967</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
-      <option name="project" value="LOCAL" />
-      <updated>1732780412967</updated>
-    </task>
-    <task id="LOCAL-00059" summary="blob_detection_visualization: True  removed from config.yaml">
-      <created>1732780710151</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1732780710151</updated>
-    </task>
-    <task id="LOCAL-00060" summary="blob_detection.smk and czi2img.smk split from count.Snakefile">
-      <created>1732780787417</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
-      <option name="project" value="LOCAL" />
-      <updated>1732780787418</updated>
-    </task>
-    <task id="LOCAL-00061" summary="jpg2npy.Snakefile: aggr_label_count takes correct amount of scenes">
-      <created>1732781095665</created>
-      <option name="number" value="00061" />
-      <option name="presentableId" value="LOCAL-00061" />
-      <option name="project" value="LOCAL" />
-      <updated>1732781095665</updated>
-    </task>
-    <task id="LOCAL-00062" summary="jpg2npy.Snakefile: organize log">
-      <created>1732781879635</created>
-      <option name="number" value="00062" />
-      <option name="presentableId" value="LOCAL-00062" />
-      <option name="project" value="LOCAL" />
-      <updated>1732781879635</updated>
-    </task>
-    <task id="LOCAL-00063" summary="jpg2npy.Snakefile: organize log, added view/jpg in check">
-      <created>1732990177800</created>
-      <option name="number" value="00063" />
-      <option name="presentableId" value="LOCAL-00063" />
-      <option name="project" value="LOCAL" />
-      <updated>1732990177801</updated>
-    </task>
-    <task id="LOCAL-00064" summary="take blob/io.py blob/misc.py to blob_utils.py">
-      <created>1733029795494</created>
-      <option name="number" value="00064" />
-      <option name="presentableId" value="LOCAL-00064" />
-      <option name="project" value="LOCAL" />
-      <updated>1733029795494</updated>
-    </task>
-    <task id="LOCAL-00065" summary="label/ draft folder removed">
-      <created>1733029875053</created>
-      <option name="number" value="00065" />
-      <option name="presentableId" value="LOCAL-00065" />
-      <option name="project" value="LOCAL" />
-      <updated>1733029875053</updated>
-    </task>
-    <task id="LOCAL-00066" summary="load_locs and load_crops becomes load_locs">
-      <created>1733031925141</created>
-      <option name="number" value="00066" />
-      <option name="presentableId" value="LOCAL-00066" />
-      <option name="project" value="LOCAL" />
-      <updated>1733031925141</updated>
-    </task>
-    <task id="LOCAL-00067" summary="get_blob_statistics includes blob_width now">
-      <created>1733033452389</created>
-      <option name="number" value="00067" />
-      <option name="presentableId" value="LOCAL-00067" />
-      <option name="project" value="LOCAL" />
-      <updated>1733033452389</updated>
-    </task>
-    <task id="LOCAL-00068" summary="blob_utils first round clean up">
-      <created>1733036816622</created>
-      <option name="number" value="00068" />
-      <option name="presentableId" value="LOCAL-00068" />
-      <option name="project" value="LOCAL" />
-      <updated>1733036816622</updated>
-    </task>
-    <task id="LOCAL-00069" summary="img_utils">
-      <created>1733037014629</created>
-      <option name="number" value="00069" />
-      <option name="presentableId" value="LOCAL-00069" />
-      <option name="project" value="LOCAL" />
-      <updated>1733037014629</updated>
-    </task>
-    <task id="LOCAL-00070" summary="jpg2npy.py 9 pixel works">
-      <created>1733042280854</created>
-      <option name="number" value="00070" />
-      <option name="presentableId" value="LOCAL-00070" />
-      <option name="project" value="LOCAL" />
-      <updated>1733042280854</updated>
-    </task>
-    <task id="LOCAL-00071" summary="fixed bugs introduced in the module re-organization">
-      <created>1733084728434</created>
-      <option name="number" value="00071" />
-      <option name="presentableId" value="LOCAL-00071" />
-      <option name="project" value="LOCAL" />
-      <updated>1733084728434</updated>
-    </task>
-    <task id="LOCAL-00072" summary="works, now on jpg2npy again">
-      <created>1733139537100</created>
-      <option name="number" value="00072" />
-      <option name="presentableId" value="LOCAL-00072" />
-      <option name="project" value="LOCAL" />
-      <updated>1733139537100</updated>
-    </task>
-    <task id="LOCAL-00073" summary="jpg2npy 9pixel works">
-      <created>1733145037572</created>
-      <option name="number" value="00073" />
-      <option name="presentableId" value="LOCAL-00073" />
-      <option name="project" value="LOCAL" />
-      <updated>1733145037572</updated>
-    </task>
-    <task id="LOCAL-00074" summary="jpg2npy.Snakefile verified to work">
-      <created>1733163456191</created>
-      <option name="number" value="00074" />
-      <option name="presentableId" value="LOCAL-00074" />
-      <option name="project" value="LOCAL" />
-      <updated>1733163456191</updated>
-    </task>
-    <task id="LOCAL-00075" summary="fix imports in count.Snakefile">
-      <created>1733201176184</created>
-      <option name="number" value="00075" />
-      <option name="presentableId" value="LOCAL-00075" />
-      <option name="project" value="LOCAL" />
-      <updated>1733201176184</updated>
-    </task>
-    <task id="LOCAL-00076" summary="jpg2npy validated">
-      <created>1733208947991</created>
-      <option name="number" value="00076" />
-      <option name="presentableId" value="LOCAL-00076" />
-      <option name="project" value="LOCAL" />
-      <updated>1733208947991</updated>
-    </task>
-    <task id="LOCAL-00077" summary="get_blob_statistics logic simplified">
-      <created>1734003117875</created>
-      <option name="number" value="00077" />
-      <option name="presentableId" value="LOCAL-00077" />
-      <option name="project" value="LOCAL" />
-      <updated>1734003117875</updated>
-    </task>
-    <task id="LOCAL-00078" summary="mask_blob_img renamed">
-      <created>1734003889293</created>
-      <option name="number" value="00078" />
-      <option name="presentableId" value="LOCAL-00078" />
-      <option name="project" value="LOCAL" />
-      <updated>1734003889293</updated>
-    </task>
-    <task id="LOCAL-00079" summary="blob.py &quot;&quot;&quot;">
-      <created>1734004293931</created>
-      <option name="number" value="00079" />
-      <option name="presentableId" value="LOCAL-00079" />
-      <option name="project" value="LOCAL" />
-      <updated>1734004293931</updated>
+      <workItem from="1741109479174" duration="8541000" />
+      <workItem from="1741367012965" duration="4367000" />
+      <workItem from="1742212126836" duration="71000" />
     </task>
     <task id="LOCAL-00080" summary="ccount_utils.clas import split_data">
       <created>1734008700934</created>
@@ -429,8 +318,165 @@
       <option name="project" value="LOCAL" />
       <updated>1738465376929</updated>
     </task>
-    <option name="localTasksCounter" value="107" />
+    <task id="LOCAL-00107" summary="singularity global">
+      <created>1738775248541</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1738775248541</updated>
+    </task>
+    <task id="LOCAL-00108" summary="custom_palette">
+      <created>1740076893269</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1740076893269</updated>
+    </task>
+    <task id="LOCAL-00109" summary="auc_pr">
+      <created>1740076913719</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1740076913719</updated>
+    </task>
+    <task id="LOCAL-00110" summary="mcc_max">
+      <created>1740078473476</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1740078473476</updated>
+    </task>
+    <task id="LOCAL-00111" summary="more RAM in train.Snakefile">
+      <created>1740078529628</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1740078529628</updated>
+    </task>
+    <task id="LOCAL-00112" summary="import numpy as np">
+      <created>1740078554290</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1740078554290</updated>
+    </task>
+    <task id="LOCAL-00113" summary="import numpy as np">
+      <created>1740078642702</created>
+      <option name="number" value="00113" />
+      <option name="presentableId" value="LOCAL-00113" />
+      <option name="project" value="LOCAL" />
+      <updated>1740078642702</updated>
+    </task>
+    <task id="LOCAL-00114" summary="        value_vars=['Precision', 'Recall', 'F1'],">
+      <created>1740078988629</created>
+      <option name="number" value="00114" />
+      <option name="presentableId" value="LOCAL-00114" />
+      <option name="project" value="LOCAL" />
+      <updated>1740078988629</updated>
+    </task>
+    <task id="LOCAL-00115" summary="        hue='ScoreType',">
+      <created>1740079461223</created>
+      <option name="number" value="00115" />
+      <option name="presentableId" value="LOCAL-00115" />
+      <option name="project" value="LOCAL" />
+      <updated>1740079461223</updated>
+    </task>
+    <task id="LOCAL-00116" summary="        value_vars=['F1'],">
+      <created>1740079584522</created>
+      <option name="number" value="00116" />
+      <option name="presentableId" value="LOCAL-00116" />
+      <option name="project" value="LOCAL" />
+      <updated>1740079584522</updated>
+    </task>
+    <task id="LOCAL-00132" summary="more RAM for jpg2npy">
+      <created>1742221914247</created>
+      <option name="number" value="00132" />
+      <option name="presentableId" value="LOCAL-00132" />
+      <option name="project" value="LOCAL" />
+      <updated>1742221914247</updated>
+    </task>
+    <task id="LOCAL-00133" summary="notebook plots">
+      <created>1742242286188</created>
+      <option name="number" value="00133" />
+      <option name="presentableId" value="LOCAL-00133" />
+      <option name="project" value="LOCAL" />
+      <updated>1742242286188</updated>
+    </task>
+    <task id="LOCAL-00134" summary="prob.txt header fixed">
+      <created>1742245250645</created>
+      <option name="number" value="00134" />
+      <option name="presentableId" value="LOCAL-00134" />
+      <option name="project" value="LOCAL" />
+      <updated>1742245250645</updated>
+    </task>
+    <task id="LOCAL-00135" summary="prob.txt header fixed">
+      <created>1742245267580</created>
+      <option name="number" value="00135" />
+      <option name="presentableId" value="LOCAL-00135" />
+      <option name="project" value="LOCAL" />
+      <updated>1742245267580</updated>
+    </task>
+    <task id="LOCAL-00136" summary="plot_auc.py">
+      <created>1742245608554</created>
+      <option name="number" value="00136" />
+      <option name="presentableId" value="LOCAL-00136" />
+      <option name="project" value="LOCAL" />
+      <updated>1742245608554</updated>
+    </task>
+    <task id="LOCAL-00137" summary="plot_auc.py">
+      <created>1742245678318</created>
+      <option name="number" value="00137" />
+      <option name="presentableId" value="LOCAL-00137" />
+      <option name="project" value="LOCAL" />
+      <updated>1742245678318</updated>
+    </task>
+    <task id="LOCAL-00138" summary="plot_auc.py">
+      <created>1742245796040</created>
+      <option name="number" value="00138" />
+      <option name="presentableId" value="LOCAL-00138" />
+      <option name="project" value="LOCAL" />
+      <updated>1742245796040</updated>
+    </task>
+    <task id="LOCAL-00139" summary="plot_auc.py">
+      <created>1742245814681</created>
+      <option name="number" value="00139" />
+      <option name="presentableId" value="LOCAL-00139" />
+      <option name="project" value="LOCAL" />
+      <updated>1742245814681</updated>
+    </task>
+    <task id="LOCAL-00140" summary="plot_auc.py">
+      <created>1742246025446</created>
+      <option name="number" value="00140" />
+      <option name="presentableId" value="LOCAL-00140" />
+      <option name="project" value="LOCAL" />
+      <updated>1742246025446</updated>
+    </task>
+    <task id="LOCAL-00141" summary="plot_auc.py">
+      <created>1742248692260</created>
+      <option name="number" value="00141" />
+      <option name="presentableId" value="LOCAL-00141" />
+      <option name="project" value="LOCAL" />
+      <updated>1742248692260</updated>
+    </task>
+    <task id="LOCAL-00142" summary="updated paper's plots">
+      <created>1742490789739</created>
+      <option name="number" value="00142" />
+      <option name="presentableId" value="LOCAL-00142" />
+      <option name="project" value="LOCAL" />
+      <updated>1742490789739</updated>
+    </task>
+    <task id="LOCAL-00143" summary="Instructions">
+      <created>1742579761053</created>
+      <option name="number" value="00143" />
+      <option name="presentableId" value="LOCAL-00143" />
+      <option name="project" value="LOCAL" />
+      <updated>1742579761053</updated>
+    </task>
+    <option name="localTasksCounter" value="144" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.History.Properties">
     <option name="COLUMN_ID_ORDER">
@@ -454,31 +500,31 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="eval_classification.py renamed" />
-    <MESSAGE value="protected hdf in train.Snakefile and labeled_crops in jpg2npy.Snakefile" />
-    <MESSAGE value="train.Snakefile: rep1,2,3,4 added for training [major]" />
-    <MESSAGE value="train.Snakefile: plot_saturation.py added [major]" />
-    <MESSAGE value="train.Snakefile: plot_saturation.py makedir" />
-    <MESSAGE value="randomized sub-sets" />
-    <MESSAGE value="polish" />
-    <MESSAGE value="get_replicate adapted to more situations" />
-    <MESSAGE value="polished" />
-    <MESSAGE value="more RAM for evaluation_on_val" />
-    <MESSAGE value="reduce RAM in evaluation_on_val.py" />
-    <MESSAGE value="reduce RAM in evaluation_on_val rule" />
-    <MESSAGE value="fixed bug and new plotting functions" />
-    <MESSAGE value="8-&gt; 16G RAM for blob_detection" />
-    <MESSAGE value="from keras.utils import to_categorical (now)" />
-    <MESSAGE value="misc" />
-    <MESSAGE value="blob_classification.py: probs in npy and probs in txt" />
-    <MESSAGE value="train.Snakefile: simpler rule names, 16 threads for training" />
-    <MESSAGE value="blob_classification.py: output clas.txt .prob and prob.npy" />
-    <MESSAGE value="classification1 -&gt; count" />
-    <MESSAGE value="blob_classification.py: back to binary output, with probs(txt) added" />
-    <MESSAGE value="plt.close()" />
     <MESSAGE value="blob_classification.py: MIN_P takes config.yaml" />
     <MESSAGE value="blob_classification.py: from tensorflow.keras.optimizers import Adam" />
     <MESSAGE value="basic reset added" />
-    <option name="LAST_COMMIT_MESSAGE" value="basic reset added" />
+    <MESSAGE value="singularity global" />
+    <MESSAGE value="custom_palette" />
+    <MESSAGE value="auc_pr" />
+    <MESSAGE value="mcc_max" />
+    <MESSAGE value="more RAM in train.Snakefile" />
+    <MESSAGE value="import numpy as np" />
+    <MESSAGE value="        value_vars=['Precision', 'Recall', 'F1']," />
+    <MESSAGE value="        hue='ScoreType'," />
+    <MESSAGE value="        value_vars=['F1']," />
+    <MESSAGE value="calculate_AUC_PR, calculate_MCC_Max" />
+    <MESSAGE value=" '.probs.txt', header=&quot;p_no,p_yes&quot;" />
+    <MESSAGE value="MCC_MAX" />
+    <MESSAGE value="MCC_MAX: title fixed" />
+    <MESSAGE value="AUC-PR" />
+    <MESSAGE value="'MCC-MAX'" />
+    <MESSAGE value="AUC curve" />
+    <MESSAGE value="more RAM for jpg2npy" />
+    <MESSAGE value="notebook plots" />
+    <MESSAGE value="prob.txt header fixed" />
+    <MESSAGE value="plot_auc.py" />
+    <MESSAGE value="updated paper's plots" />
+    <MESSAGE value="Instructions" />
+    <option name="LAST_COMMIT_MESSAGE" value="Instructions" />
   </component>
 </project>

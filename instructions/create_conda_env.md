@@ -1,4 +1,20 @@
-# Instructions on creating the conda environment manually
+# Instructions on creating the conda environment 
+
+## Install miniconda or conda
+
+Follow [instructions](https://www.anaconda.com/docs/getting-started/miniconda/install) to install miniconda or conda
+
+
+## Automatically create ccount-env using yml
+
+We need to create a conda environment for C-COUNT, which includes all the python packages that C-COUNT depends on.
+We can install it using the provided [ccount-env.yml]() file, which is located in the `workflow/env` directory of the C-COUNT github repository.
+
+```commandline
+conda env create -f ccount-env.yml
+```
+
+## Manual Install
 
 ```bash
 conda create -n ccount-env python=3.8  # 3.8.20, 2024/09

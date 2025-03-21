@@ -1,9 +1,0 @@
-tensorflow and keras: failed to solve together
-
-
-conda create -n mamba
-conda activate mamba
-conda update conda --all
-conda install -c conda-forge mamba
-
-
