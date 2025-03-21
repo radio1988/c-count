@@ -62,9 +62,13 @@ python workflow/scripts/test_import.py
 
 This test run is to ensure that the C-COUNT workflow is working correctly with a very small example dataset, with a very 'quick and dirty' training setting. As a result, the classification and counting performance of the example data is horrible and does not reflect the performance of C-COUNT on real data.
 
-```commandline
-# The training workflow #
 
+### The training workflow
+Pre-requisite:
+- ccount github repository is downloaded as `ccount` folder (`git clone https://github.com/radio1988/ccount.git`)
+- do not copy `1_training_test` foler to another location for testing
+
+```commandline
 cd ccount/resources/test_runs/1_training_test
 
 conda activate ccount-env
@@ -78,10 +82,13 @@ snakemake -s workflow/train.Snakefile -j 1 --report report.html  # generate repo
 # -j1: run one job at a time, useful for debugging, you can set -j4 or -j16 for real jobs if your computer can handle the RAM usage
 ```
 
-```commandline
-# The counting workflow #
-# have to run this after the training workflow finishes, so that the trained weight h5 file is generated
+###  The counting workflow
+Pre-requisite: 
+- download the example czi file from [here](https://www.dropbox.com/scl/fi/1zqazamukd5i69ers9mns/1unitEpo_1-Stitching-01.czi?rlkey=z1mxzxdk1tr4si2buxhk5kkyk&dl=0), and put it in `ccount/resources/test_runs/2_counting_test/data/czi/` folder
+- have to run this after the training workflow finishes, so that the trained weight h5 file is generated
+- do not copy `2_counting_test` foler to another location for testing
 
+```commandline
 cd ccount/resources/test_runs/2_counting_test
 
 conda activate ccount-env
