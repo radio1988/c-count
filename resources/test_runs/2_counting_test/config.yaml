@@ -3,7 +3,7 @@
 # Not for real training use!!!
 # should use the same Advanced parameters for training and counting
 
-DATA_DIR: inputs/czi  # folder for czi files
+DATA_DIR: data/czi  # folder for czi files
 FORMAT: 2019 # 2019
 I: [1,2,3,4] # all valid index options for czi file
 
