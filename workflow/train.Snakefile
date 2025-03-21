@@ -98,7 +98,9 @@ rule evaluation:
         clas='res/2_count_on_validationSet/{rate}.{rep}.npy.gz',
         data_val=DATA_VAL
     output:
-        eval='res/3_evaluation_on_validationSet/{rate}.{rep}.txt'
+        'res/3_evaluation_on_validationSet/{rate}.{rep}.txt'
+    params:
+        plot='res/3_evaluation_on_validationSet/{rate}.{rep}.pdf'
     log:
         'res/3_evaluation_on_validationSet/{rate}.{rep}.txt.log'
     benchmark:
@@ -113,7 +115,7 @@ rule evaluation:
         """
         python workflow/scripts/eval_classification.py \
         -truth {input.data_val}  -pred {input.clas} \
-        -output {output} &> {log}
+        -output {params.plot} > {output} 2> {log}
         """
 
 rule saturation_plot:

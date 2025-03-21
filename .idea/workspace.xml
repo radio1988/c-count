@@ -7,7 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="-s workflow/train.Snakefile for reset">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="evaluation curve">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/scripts/eval_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/eval_classification.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
@@ -117,13 +117,6 @@
       <workItem from="1741109479174" duration="8541000" />
       <workItem from="1741367012965" duration="4367000" />
       <workItem from="1742212126836" duration="71000" />
-    </task>
-    <task id="LOCAL-00084" summary="train.Snakefile: rep1,2,3,4 added for training [major]">
-      <created>1734034313788</created>
-      <option name="number" value="00084" />
-      <option name="presentableId" value="LOCAL-00084" />
-      <option name="project" value="LOCAL" />
-      <updated>1734034313789</updated>
     </task>
     <task id="LOCAL-00085" summary="train.Snakefile: plot_saturation.py added [major]">
       <created>1734041447533</created>
@@ -461,7 +454,14 @@
       <option name="project" value="LOCAL" />
       <updated>1742587028529</updated>
     </task>
-    <option name="localTasksCounter" value="148" />
+    <task id="LOCAL-00148" summary="evaluation curve">
+      <created>1742588290609</created>
+      <option name="number" value="00148" />
+      <option name="presentableId" value="LOCAL-00148" />
+      <option name="project" value="LOCAL" />
+      <updated>1742588290610</updated>
+    </task>
+    <option name="localTasksCounter" value="149" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -489,7 +489,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="basic reset added" />
     <MESSAGE value="singularity global" />
     <MESSAGE value="custom_palette" />
     <MESSAGE value="auc_pr" />
@@ -514,6 +513,7 @@
     <MESSAGE value="Instructions" />
     <MESSAGE value="ccount-env.yml" />
     <MESSAGE value="-s workflow/train.Snakefile for reset" />
-    <option name="LAST_COMMIT_MESSAGE" value="-s workflow/train.Snakefile for reset" />
+    <MESSAGE value="evaluation curve" />
+    <option name="LAST_COMMIT_MESSAGE" value="evaluation curve" />
   </component>
 </project>
