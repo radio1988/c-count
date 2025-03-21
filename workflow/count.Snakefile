@@ -287,5 +287,5 @@ rule reset:
         rm -rf res/ lsf.log  log/ train.log workflow.pdf rulegraph.pdf
 
         echo 'unlocking dir..'
-        snakemake -j 1 --unlock
+        snakemake -s workflow/count.Snakefile -j 1 --unlock
         """

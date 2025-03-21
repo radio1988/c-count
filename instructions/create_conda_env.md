@@ -1,9 +1,16 @@
-# Instructions on creating the conda environment 
+# Creating the conda environment and running C-COUNT
 
 ## Install miniconda or conda
 
 Follow [instructions](https://www.anaconda.com/docs/getting-started/miniconda/install) to install miniconda or conda
 
+
+## Download C-COUNT from github
+You can download the C-COUNT repository from GitHub using the following command:
+
+```bash
+git clone https://github.com/radio1988/ccount.git
+```
 
 ## Automatically create ccount-env using yml
 
@@ -27,11 +34,9 @@ conda config --add channels bioconda
 conda config --add channels conda-forge
 conda install keras tensorflow 
 # The following is typically installed after keras and tensorflow got installed
-# hdf5-1.10.6, h5py-3.1.0, numpy-1.19.5,
-# cudatoolkit-11.7.0, cudnn-8.2.1.32,
-# tensorflow-base-2.6, nccl-2.12.12.1, scipy-1.10.1, python-3.8.15, keras 2.6
-conda install scikit-learn  # keras and tf downgraded to 2.4.3 (2020), h5py to 2.1
-conda install anaconda::scikit-image #skimage
+# hdf5, h5py, numpy, nccl, scipy
+conda install scikit-learn  
+conda install anaconda::scikit-image 
 conda install matplotlib pandas
 conda install aicsimageio
 conda install jupyterlab ipython
@@ -46,6 +51,8 @@ conda install seaborn
 
 ### Test importing packages
 
+This help confirm all the python packages used by C-COUNT was installed.
+
 ```commandline
 conda activate ccunt-env
 python workflow/scripts/test_import.py
@@ -53,12 +60,32 @@ python workflow/scripts/test_import.py
 
 ### Test Run on Example Data
 
-The Example data are very small subsets of the training data used in the C-COUNT paper. Also, to ensure quick testing, we have provided a very quick setting for training. So the classification and counting performance of the example data is horrible and does not reflect the performance of C-COUNT on real data.
+This test run is to ensure that the C-COUNT workflow is working correctly with a very small example dataset, with a very 'quick and dirty' training setting. As a result, the classification and counting performance of the example data is horrible and does not reflect the performance of C-COUNT on real data.
 
 ```commandline
-snakemake -j1 reset -s workflow/train.Snakefile
+# The training workflow #
+
+cd ccount/resources/test_runs/1_training_test
+
+conda activate ccount-env
+snakemake -s workflow/train.Snakefile  -j1  reset  # remove all previous results 
+snakemake -s workflow/train.Snakefile -pk --ri -j1  # run training on example data (this may take 2-10 mins depending n your computer)
+snakemake -s workflow/train.Snakefile -j 1 --report report.html  # generate report on the run-time
+
+# -p: print out the shell commands that will be run
+# -k: keep running even if some rules fail
+# --ri: re-run all the rules that have been run before
+# -j1: run one job at a time, useful for debugging, you can set -j4 or -j16 for real jobs if your computer can handle the RAM usage
 ```
 
-Here are the testing resources:
-/pi/merav.socolovsky-umw/rui/paper_results/install/1_training_test (10mins run)
-/pi/merav.socolovsky-umw/rui/paper_results/install/2_counting_test (10mins run)
+```commandline
+# The counting workflow #
+# have to run this after the training workflow finishes, so that the trained weight h5 file is generated
+
+cd ccount/resources/test_runs/2_counting_test
+
+conda activate ccount-env
+snakemake -s workflow/count.Snakefile -j1 reset  # remove all previous results
+snakemake -s workflow/count.Snakefile -pk --ri -j1  # run counting on example data
+snakemake -s workflow/count.Snakefile -j 1 --report report.html  # generate report on the run-time
+```

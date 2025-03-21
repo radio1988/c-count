@@ -139,7 +139,7 @@ rule reset:
     shell:
         """
         echo 'deleting files..'
-        rm -rf res/ lsf.log  log/ train.log
+        rm -rf res/ lsf.log  log/ train.log report.html
 
         echo 'unlocking dir..'
         snakemake -s workflow/train.Snakefile -j 1 --unlock

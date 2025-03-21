@@ -7,9 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="ccount-env.yml">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="-s workflow/train.Snakefile for reset">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/instructions/create_conda_env.md" beforeDir="false" afterPath="$PROJECT_DIR$/instructions/create_conda_env.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/count.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/count.Snakefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -117,13 +118,6 @@
       <workItem from="1741109479174" duration="8541000" />
       <workItem from="1741367012965" duration="4367000" />
       <workItem from="1742212126836" duration="71000" />
-    </task>
-    <task id="LOCAL-00082" summary="eval_classification.py renamed">
-      <created>1734013514623</created>
-      <option name="number" value="00082" />
-      <option name="presentableId" value="LOCAL-00082" />
-      <option name="project" value="LOCAL" />
-      <updated>1734013514623</updated>
     </task>
     <task id="LOCAL-00083" summary="protected hdf in train.Snakefile and labeled_crops in jpg2npy.Snakefile">
       <created>1734031376464</created>
@@ -461,7 +455,14 @@
       <option name="project" value="LOCAL" />
       <updated>1742581020517</updated>
     </task>
-    <option name="localTasksCounter" value="146" />
+    <task id="LOCAL-00146" summary="-s workflow/train.Snakefile for reset">
+      <created>1742582969626</created>
+      <option name="number" value="00146" />
+      <option name="presentableId" value="LOCAL-00146" />
+      <option name="project" value="LOCAL" />
+      <updated>1742582969626</updated>
+    </task>
+    <option name="localTasksCounter" value="147" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -489,7 +490,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="blob_classification.py: from tensorflow.keras.optimizers import Adam" />
     <MESSAGE value="basic reset added" />
     <MESSAGE value="singularity global" />
     <MESSAGE value="custom_palette" />
@@ -514,6 +514,7 @@
     <MESSAGE value="updated paper's plots" />
     <MESSAGE value="Instructions" />
     <MESSAGE value="ccount-env.yml" />
-    <option name="LAST_COMMIT_MESSAGE" value="ccount-env.yml" />
+    <MESSAGE value="-s workflow/train.Snakefile for reset" />
+    <option name="LAST_COMMIT_MESSAGE" value="-s workflow/train.Snakefile for reset" />
   </component>
 </project>
