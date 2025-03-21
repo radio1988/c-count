@@ -1,0 +1,33 @@
+
+# priorities: keras, tensorflow, snakemake, 
+# Platform: osx-arm64
+
+# list: 
+
+# update conda
+conda update -n base -c defaults conda
+# conda 24.11.3
+
+# install python
+conda create --platform osx-64 --name py python=3.12
+# python=3.8, since 2019, updated 2024
+# python=3.9, since 2020
+# python=3.12, since 2024
+
+conda create -n test1 python=3.12 -c conda-forge #fail
+conda create -n test1 python #good but no python 
+
+conda create -n test1 python=3.8 # good works
+# Python 3.8.20 (default, Oct  3 2024, 10:25:41)
+# too old, no keras support in 2025
+
+conda install -c conda-forge keras
+
+ conda config --add channels conda-forge
+ conda config --add channels bioconda
+ conda config --add channels biobuilds
+ conda config --add channels anaconda
+conda create -n test1 python=3.12
+
+maybe miniconda is giving us problems, try anaconda on new mac
+
