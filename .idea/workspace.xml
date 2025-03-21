@@ -7,21 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="Instructions">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="ccount-env.yml">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/instructions/create_conda_env.md" beforeDir="false" afterPath="$PROJECT_DIR$/instructions/create_conda_env.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/ccount.exported.1.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/ccount.hpc.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/ccount.old.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/ccount.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/hpc.mamba.conda-list.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/mac.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/note.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/oak.install.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/spec-file.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/test_gpu.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,20 +117,6 @@
       <workItem from="1741109479174" duration="8541000" />
       <workItem from="1741367012965" duration="4367000" />
       <workItem from="1742212126836" duration="71000" />
-    </task>
-    <task id="LOCAL-00080" summary="ccount_utils.clas import split_data">
-      <created>1734008700934</created>
-      <option name="number" value="00080" />
-      <option name="presentableId" value="LOCAL-00080" />
-      <option name="project" value="LOCAL" />
-      <updated>1734008700934</updated>
-    </task>
-    <task id="LOCAL-00081" summary="ccount_utils.clas">
-      <created>1734009374534</created>
-      <option name="number" value="00081" />
-      <option name="presentableId" value="LOCAL-00081" />
-      <option name="project" value="LOCAL" />
-      <updated>1734009374535</updated>
     </task>
     <task id="LOCAL-00082" summary="eval_classification.py renamed">
       <created>1734013514623</created>
@@ -472,7 +447,21 @@
       <option name="project" value="LOCAL" />
       <updated>1742579761053</updated>
     </task>
-    <option name="localTasksCounter" value="144" />
+    <task id="LOCAL-00144" summary="ccount-env.yml">
+      <created>1742580788029</created>
+      <option name="number" value="00144" />
+      <option name="presentableId" value="LOCAL-00144" />
+      <option name="project" value="LOCAL" />
+      <updated>1742580788029</updated>
+    </task>
+    <task id="LOCAL-00145" summary="ccount-env.yml">
+      <created>1742581020517</created>
+      <option name="number" value="00145" />
+      <option name="presentableId" value="LOCAL-00145" />
+      <option name="project" value="LOCAL" />
+      <updated>1742581020517</updated>
+    </task>
+    <option name="localTasksCounter" value="146" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -500,7 +489,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="blob_classification.py: MIN_P takes config.yaml" />
     <MESSAGE value="blob_classification.py: from tensorflow.keras.optimizers import Adam" />
     <MESSAGE value="basic reset added" />
     <MESSAGE value="singularity global" />
@@ -525,6 +513,7 @@
     <MESSAGE value="plot_auc.py" />
     <MESSAGE value="updated paper's plots" />
     <MESSAGE value="Instructions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Instructions" />
+    <MESSAGE value="ccount-env.yml" />
+    <option name="LAST_COMMIT_MESSAGE" value="ccount-env.yml" />
   </component>
 </project>

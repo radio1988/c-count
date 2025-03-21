@@ -142,5 +142,5 @@ rule reset:
         rm -rf res/ lsf.log  log/ train.log
 
         echo 'unlocking dir..'
-        snakemake -j 1 --unlock
+        snakemake -s workflow/train.Snakefile -j 1 --unlock
         """
