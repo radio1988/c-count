@@ -1,24 +1,35 @@
+"""
+Evaluate classification performance using F1 score, AUC-PR, and MCC
+"""
+
 import sys
 import numpy as np
+import argparse
 
 from ccount_utils.blob import load_blobs
 from ccount_utils.clas import F1_calculation
 from ccount_utils.blob import intersect_blobs
+from ccount_utils.clas import calculate_AUC_PR, calculate_MCC_Max
+import matplotlib.pyplot as plt
+from sklearn.metrics import precision_recall_curve, auc
 
-
-print("usage:  python f1_score.py prediction.npy.gz truth.npy.gz > f1_score.t.txt")
-print("note0: the two files should have blobs or crops in them")
-print("note1: calculate based on the intersection of blobs in two files, \
-    different blobs will be discarded\n\n")
 
 def read_labels(blobs):
     labels = blobs[:, 3]
     labels[labels == 9] = 0  # for 2020 April labeled data (0, 1, -2 , 9)
     return labels
 
-name1 = sys.argv[1]  # prediction
-name2 = sys.argv[2]  # truth
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Evaluate classification performance")
+    parser.add_argument('-pred', type=str, required=True, help='Path to predicted blobs (npy.gz)')
+    parser.add_argument('-truth', type=str, required=True, help='Path to ground truth blobs (npy.gz)')
+    parser.add_argument('-output', type=str, default='results.txt', help='Output file for results')
+    return parser.parse_args()
+
+args = parse_args()
+name2 = args.truth
+name1 = args.pred
 
 blobs1 = load_blobs(name1)
 locs1 = blobs1[:, :4]
@@ -35,25 +46,17 @@ labels2b = read_labels(blobs2b)
 y_true = labels2b
 y_pred = labels1b
 
-precision, recall, F1 = F1_calculation(y_pred, y_true)
-
-
-from ccount_utils.clas import calculate_AUC_PR, calculate_MCC_Max
-auc_pr = calculate_AUC_PR(y_true, y_pred)  # average_precision_score computes the precision-recall AUC, which is equivalent to AUC-PR.
-print(f"AUC-PR: {auc_pr:.4f}")
+precision, recall, F1 = F1_calculation(y_pred, y_true) # will be printed
 
 mcc_min = calculate_MCC_Max(y_true, y_pred)
 print(f"MCC-MAX: {mcc_min:.4f}")
-
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics import precision_recall_curve, auc
 
 # Compute precision-recall curve
 precision, recall, _ = precision_recall_curve(y_true, y_pred)
 
 # Compute AUC-PR
 auc_pr = auc(recall, precision)
+print(f"AUC-PR: {auc_pr:.4f}")
 
 # Plot Precision-Recall curve
 plt.figure(figsize=(6, 6))
@@ -63,4 +66,4 @@ plt.ylabel('Precision')
 plt.title('Precision-Recall Curve')
 plt.legend()
 plt.grid()
-plt.savefig('precision_recall_curve.pdf')
+plt.savefig(args.output.replace('.txt', '.pdf'), bbox_inches='tight')

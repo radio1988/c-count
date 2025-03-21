@@ -112,10 +112,8 @@ rule evaluation:
     shell:
         """
         python workflow/scripts/eval_classification.py \
-        {input.clas} \
-        {input.data_val} \
-        1>{output} \
-        2>{log}
+        -truth {input.data_val}  -pred {input.clas} \
+        -output {output} &> {log}
         """
 
 rule saturation_plot:

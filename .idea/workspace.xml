@@ -9,8 +9,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="-s workflow/train.Snakefile for reset">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/instructions/create_conda_env.md" beforeDir="false" afterPath="$PROJECT_DIR$/instructions/create_conda_env.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/count.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/count.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/eval_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/eval_classification.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow/train.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/train.Snakefile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -118,13 +117,6 @@
       <workItem from="1741109479174" duration="8541000" />
       <workItem from="1741367012965" duration="4367000" />
       <workItem from="1742212126836" duration="71000" />
-    </task>
-    <task id="LOCAL-00083" summary="protected hdf in train.Snakefile and labeled_crops in jpg2npy.Snakefile">
-      <created>1734031376464</created>
-      <option name="number" value="00083" />
-      <option name="presentableId" value="LOCAL-00083" />
-      <option name="project" value="LOCAL" />
-      <updated>1734031376464</updated>
     </task>
     <task id="LOCAL-00084" summary="train.Snakefile: rep1,2,3,4 added for training [major]">
       <created>1734034313788</created>
@@ -462,7 +454,14 @@
       <option name="project" value="LOCAL" />
       <updated>1742582969626</updated>
     </task>
-    <option name="localTasksCounter" value="147" />
+    <task id="LOCAL-00147" summary="-s workflow/train.Snakefile for reset">
+      <created>1742587028529</created>
+      <option name="number" value="00147" />
+      <option name="presentableId" value="LOCAL-00147" />
+      <option name="project" value="LOCAL" />
+      <updated>1742587028529</updated>
+    </task>
+    <option name="localTasksCounter" value="148" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
