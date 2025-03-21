@@ -1,0 +1,6 @@
+res/
+log/
+*.czi
+.snakemake
+.keras/
+
