@@ -19,7 +19,7 @@ dependencies:
   - opencv
   - imgaug
   - snakemake
-  - seaborn # added by kai
+  - seaborn
   - graphviz
   - pip:
-    - aicspylibczi>=3.0.5 # added by kai
+    - aicspylibczi>=3.0.5 
