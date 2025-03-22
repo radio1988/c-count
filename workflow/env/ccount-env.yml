@@ -1,8 +1,10 @@
 name: ccount-env
+
 channels:
   - conda-forge
   - bioconda
   - anaconda
+
 dependencies:
   - python=3.8
   - numpy
@@ -21,5 +23,6 @@ dependencies:
   - snakemake
   - seaborn
   - graphviz
+  - pip
   - pip:
     - aicspylibczi>=3.0.5 
