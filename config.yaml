@@ -1,15 +1,15 @@
 ## User params ## 
 # data curve patience5, augmentation 80k
+# 250130
 
-DATA_DIR: data/czi  # for czi files
-
-FORMAT: 2019 # 2019
-I: [1,2,3,4] # all valid index options for czi file
-
-WEIGHT: weight/weight.hdf5
+MIN_P: 0.1  # MIN_P threshold for classification, float num between 0 and 1, the smaller, the more liberal in counting/classification
+DATA_DIR: data/czi  # folder saving czi files
+WEIGHT: data/weights.h5  # only needed in count.Snakefile, not needed in train.Snakefile
 
 ## Advanced params ##
 # (Please don't change unless you're developer)
+FORMAT: 2019 # 2019, czi format
+I: [1,2,3,4] # all valid index options for czi file
 
 # blob detection
 test_mode: False  # only use small subset in blob detection for faster processing
@@ -37,17 +37,39 @@ r_ext_pixels: 10
 # training only
 balancing: True
 aug_sample_size: 80000
-batch_size: 512  # default 256
+batch_size: 256  # default 256
 epochs: 100 
-patience: 3  
-learning_rate: 0.001  # default 0.001 (Adam)
-verbose: 2  # {0, 1, 2}
-# classification(counting) only
-MIN_P: 0.1  # minimum probability for classification, e.g. 0.5, 0.1
+patience: 5  # default 3  
+learning_rate: 0.0003  # default 0.001 (Adam)
+verbose: 2  # {0, 1, 2} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Notes
 
-## 2018 params recommendation
+## params recommendation
 # if scaling_factor == 1:
 #     max_sigma=50 
 #     min_sigma=5

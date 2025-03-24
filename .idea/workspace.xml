@@ -7,14 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="README.md">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="update comments">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/instructions/create_conda_env.md" beforeDir="false" afterPath="$PROJECT_DIR$/instructions/create_conda_env.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/test_runs/1_training_test/report.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/ccount-env.yml" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/env/c-count-env.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/environment_cpu_sci_work.yml" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/env/environment_cpu_sci_work.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/environment_gpu_sci_work.yml" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/env/environment_gpu_sci_work.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/env/environment_mac_m_prossessor_work.yml" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/env/environment_mac_m_prossessor_work.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,20 +116,6 @@
       <workItem from="1741109479174" duration="8541000" />
       <workItem from="1741367012965" duration="4367000" />
       <workItem from="1742212126836" duration="71000" />
-    </task>
-    <task id="LOCAL-00088" summary="polish">
-      <created>1734670394405</created>
-      <option name="number" value="00088" />
-      <option name="presentableId" value="LOCAL-00088" />
-      <option name="project" value="LOCAL" />
-      <updated>1734670394406</updated>
-    </task>
-    <task id="LOCAL-00089" summary="get_replicate adapted to more situations">
-      <created>1737495838504</created>
-      <option name="number" value="00089" />
-      <option name="presentableId" value="LOCAL-00089" />
-      <option name="project" value="LOCAL" />
-      <updated>1737495838505</updated>
     </task>
     <task id="LOCAL-00090" summary="polished">
       <created>1737579776071</created>
@@ -465,7 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1742591090413</updated>
     </task>
-    <option name="localTasksCounter" value="152" />
+    <task id="LOCAL-00152" summary="ccount-env to c-count-env">
+      <created>1742833309872</created>
+      <option name="number" value="00152" />
+      <option name="presentableId" value="LOCAL-00152" />
+      <option name="project" value="LOCAL" />
+      <updated>1742833309873</updated>
+    </task>
+    <task id="LOCAL-00153" summary="update comments">
+      <created>1742833437941</created>
+      <option name="number" value="00153" />
+      <option name="presentableId" value="LOCAL-00153" />
+      <option name="project" value="LOCAL" />
+      <updated>1742833437941</updated>
+    </task>
+    <option name="localTasksCounter" value="154" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,8 +488,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="custom_palette" />
-    <MESSAGE value="auc_pr" />
     <MESSAGE value="mcc_max" />
     <MESSAGE value="more RAM in train.Snakefile" />
     <MESSAGE value="import numpy as np" />
@@ -518,6 +511,8 @@
     <MESSAGE value="-s workflow/train.Snakefile for reset" />
     <MESSAGE value="evaluation curve" />
     <MESSAGE value="README.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="README.md" />
+    <MESSAGE value="ccount-env to c-count-env" />
+    <MESSAGE value="update comments" />
+    <option name="LAST_COMMIT_MESSAGE" value="update comments" />
   </component>
 </project>

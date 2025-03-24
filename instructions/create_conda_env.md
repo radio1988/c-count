@@ -18,7 +18,7 @@ We need to create a conda environment for C-COUNT, which includes all the python
 We can install it using the provided [c-count-env.yml](https://raw.githubusercontent.com/radio1988/ccount/refs/heads/master/workflow/env/c-count-env.yml) file, which is located in the `workflow/env` directory of the C-COUNT github repository.
 
 ```commandline
-conda env create -n c-count-env -f ccount/workflow/env/c-count-env.yml
+conda env create -n c-count-env -f workflow/env/c-count-env.yml
 ```
 
 If the previous command takes too long (sometimes conda is slow), you can try using `mamba`, which is typically faster.

@@ -1,4 +1,8 @@
-DATA_TRAIN: data/npy/ashley.bm200717.0.8.npy.gz
-DATA_VAL: data/npy/ashley.bm200717.0.2.npy.gz
-sampling_rates: [.125, .25, .5, 1.0]
+# config.train.yaml specifies the training and validation data for the training process
+# the sampling rates for creating saturation plot (you can set it to [1.0] if you're only interested in training C-COUNT for counting)
+# REPS decides how many rounds of training will be performed, consider training is a stochastic process, we recommend you set multiple reps here
+DATA_TRAIN: data/FL-A.example.train.npy.gz
+DATA_VAL: data/FL-A.example.val.npy.gz
+sampling_rates: [1.0] # [.125, 1.0]
+REPS: ['rep1'] # ['rep1', 'rep2']
 CCOUNT_CONFIG: config.yaml
