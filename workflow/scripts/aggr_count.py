@@ -1,6 +1,5 @@
 """
-Read jpg2npy.arc.py outputs and aggregate counts,
-replaced by aggr_count.py which takes npy.gz files
+Read count.txt and aggregate counts
 """
 
 import sys
@@ -22,7 +21,7 @@ def aggr_count_info(inputs, label = int(1)):
     return pd.DataFrame(zip(names, counts), columns=['NAME', 'COUNT'])
 
 
-print(">>> usage: aggr_count_info.py COUNT-1.txt COUNT-2.txt ... COUNT-n.txt output.csv")
+print(">>> usage: aggr_count.py COUNT-1.txt COUNT-2.txt ... COUNT-n.txt output.csv")
 print(">>> example: python workflow/scripts/aggr_count_info.py.py \
     x.clas.txt y.clas.txt res/COUNT.csv")
 
@@ -37,6 +36,3 @@ count_df = aggr_count_info(inputs, label=int(1))
 print(">>> output", output, ":\n", count_df)
 
 count_df.to_csv(output)
-
-
-# 
