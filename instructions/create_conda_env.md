@@ -12,23 +12,33 @@ You can download the C-COUNT repository from GitHub using the following command:
 git clone https://github.com/radio1988/ccount.git
 ```
 
-## Automatically create ccount-env using yml
+## Automatically create c-count-env using yml
 
 We need to create a conda environment for C-COUNT, which includes all the python packages that C-COUNT depends on.
-We can install it using the provided [ccount-env.yml](https://raw.githubusercontent.com/radio1988/ccount/refs/heads/master/workflow/env/ccount-env.yml) file, which is located in the `workflow/env` directory of the C-COUNT github repository.
+We can install it using the provided [c-count-env.yml](https://raw.githubusercontent.com/radio1988/ccount/refs/heads/master/workflow/env/c-count-env.yml) file, which is located in the `workflow/env` directory of the C-COUNT github repository.
 
 ```commandline
-conda env create -f ccount-env.yml
+conda env create -n c-count-env -f ccount/workflow/env/c-count-env.yml
 ```
+
+If the previous command takes too long (sometimes conda is slow), you can try using `mamba`, which is typically faster.
+
+```
+conda create -n mamba conda conda-forge::mamba
+conda activate mamba
+mamba env create -n c-count-env -f ccount/workflow/env/c-count-env.yml
+```
+
+
 
 
 ## Manual Install
 
-Sometimes, on some computers, especially on macbook with M processors. And installing all packages listed in ccount-env.yml one by one may be necessary to avoid package version conflicts.
+Sometimes, on some computers, especially on macbook with M processors. And installing all packages listed in c-count-env.yml one by one may be necessary to avoid package version conflicts.
 
 ```bash
-conda create -n ccount-env python=3.8  # 3.8.20, 2024/09
-conda activate ccount-env
+conda create -n c-count-env python=3.8  # 3.8.20, 2024/09
+conda activate c-count-env
 conda config --add channels anaconda
 conda config --add channels bioconda
 conda config --add channels conda-forge
@@ -71,7 +81,7 @@ Pre-requisite:
 ```commandline
 cd ccount/resources/test_runs/1_training_test
 
-conda activate ccount-env
+conda activate c-count-env
 snakemake -s workflow/train.Snakefile  -j1  reset  # remove all previous results 
 snakemake -s workflow/train.Snakefile -pk --ri -j1  # run training on example data (this may take 2-10 mins depending n your computer)
 snakemake -s workflow/train.Snakefile -j 1 --report report.html  # generate report on the run-time
@@ -91,7 +101,7 @@ Pre-requisite:
 ```commandline
 cd ccount/resources/test_runs/2_counting_test
 
-conda activate ccount-env
+conda activate c-count-env
 snakemake -s workflow/count.Snakefile -j1 reset  # remove all previous results
 snakemake -s workflow/count.Snakefile -pk --ri -j1  # run counting on example data
 snakemake -s workflow/count.Snakefile -j 1 --report report.html  # generate report on the run-time

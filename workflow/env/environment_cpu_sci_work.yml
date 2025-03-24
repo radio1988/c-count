@@ -1,4 +1,4 @@
-name: ccount
+name: c-count-env
 channels:
   - anaconda
   - conda-forge

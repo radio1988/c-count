@@ -10,6 +10,11 @@
     <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="README.md">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/instructions/create_conda_env.md" beforeDir="false" afterPath="$PROJECT_DIR$/instructions/create_conda_env.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/test_runs/1_training_test/report.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/ccount-env.yml" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/env/c-count-env.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/environment_cpu_sci_work.yml" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/env/environment_cpu_sci_work.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/environment_gpu_sci_work.yml" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/env/environment_gpu_sci_work.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/env/environment_mac_m_prossessor_work.yml" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/env/environment_mac_m_prossessor_work.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,13 +121,6 @@
       <workItem from="1741109479174" duration="8541000" />
       <workItem from="1741367012965" duration="4367000" />
       <workItem from="1742212126836" duration="71000" />
-    </task>
-    <task id="LOCAL-00087" summary="randomized sub-sets">
-      <created>1734241583291</created>
-      <option name="number" value="00087" />
-      <option name="presentableId" value="LOCAL-00087" />
-      <option name="project" value="LOCAL" />
-      <updated>1734241583291</updated>
     </task>
     <task id="LOCAL-00088" summary="polish">
       <created>1734670394405</created>
@@ -460,7 +458,14 @@
       <option name="project" value="LOCAL" />
       <updated>1742590387120</updated>
     </task>
-    <option name="localTasksCounter" value="151" />
+    <task id="LOCAL-00151" summary="README.md">
+      <created>1742591090413</created>
+      <option name="number" value="00151" />
+      <option name="presentableId" value="LOCAL-00151" />
+      <option name="project" value="LOCAL" />
+      <updated>1742591090413</updated>
+    </task>
+    <option name="localTasksCounter" value="152" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

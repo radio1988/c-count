@@ -1,4 +1,4 @@
-name: ccount-env
+name: c-count-env
 
 channels:
   - conda-forge

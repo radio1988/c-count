@@ -11,7 +11,7 @@
 # Installation
 - install mini-conda: https://docs.conda.io/en/latest/miniconda.html
 - install mamba: https://anaconda.org/conda-forge/mamba  # optional
-- install ccount-env: `mamba env create -n ccount-env -f workflow/env/mac.yaml`  # only tested in mac with M2 processer, works on Ubuntu with minor adaptations, docker image will be provided for easier installation
+- install c-count-env: `mamba env create -n c-count-env -f workflow/env/mac.yaml`  # only tested in mac with M2 processer, works on Ubuntu with minor adaptations, docker image will be provided for easier installation
 
 # Usage
 ## Labeling
@@ -35,7 +35,7 @@
 - mkdir $workdir && cd $workdir
 - ln -s $path_data data
 - ln -s $path_ccount/workflow
-- conda activate ccount-env
+- conda activate c-count-env
 - cp workflow/config.yaml ./ && vim config.yaml (edit config.yaml)
 - cp workflow/config.data_curve.yaml ./ && vim config.data_curve.yaml 
 - `snakemake -s workflow/count.Snakefile -pk -j 1` or `sh submit.sh` (on HPC)

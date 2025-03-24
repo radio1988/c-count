@@ -1,4 +1,4 @@
-name: ccount-env
+name: c-count-env
 channels:
   - conda-forge
   - https://conda.anaconda.org/conda-forge
@@ -472,4 +472,4 @@ dependencies:
   - zstd=1.5.7=h8210216_2
   - pip:
       - aicspylibczi==3.2.1
-prefix: /Users/rui/miniconda3/envs/ccount-env
+prefix: /Users/rui/miniconda3/envs/c-count-env
