@@ -31,6 +31,8 @@ WEIGHT = config["WEIGHT"]
 WKDIR = os.getcwd()
 
 SAMPLES = get_samples(DATA_DIR)
+if len(SAMPLES) == 0:
+    raise ValueError("No czi files found in DATA_DIR")
 
 rule targets:
     input:
