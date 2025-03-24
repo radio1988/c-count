@@ -64,7 +64,7 @@ conda install seaborn
 This help confirm all the python packages used by C-COUNT was installed.
 
 ```commandline
-conda activate ccunt-env
+conda activate c-count-env
 python workflow/scripts/test_import.py
 ```
 
