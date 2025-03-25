@@ -3,4 +3,7 @@ log/
 *.czi
 .snakemake
 .keras/
+workflow.pdf
+rulegraph.pdf
+
 

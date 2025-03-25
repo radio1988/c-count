@@ -49,8 +49,8 @@ rule targets:
             suffix=".crops.clas.npy.gz.jpg"),
         blob_locs=input_names(prefix="res/count/", SAMPLES=SAMPLES, suffix='.locs.clas.npy.gz'),
 #        blob_locs=expand("res/count/{s}.{i}.locs.clas.npy.gz",s=SAMPLES,i=[0, 1, 2, 3]),
-        rulegraph="rulegraph.pdf",
-        plot = "res/plots/areas.histogram.pdf"
+        rulegraph="rulegraph.pdf"
+        # plot = "res/plots/areas.histogram.pdf"
 
 include: 'rules/czi2img.smk'
 include: 'rules/blob_detection.smk'

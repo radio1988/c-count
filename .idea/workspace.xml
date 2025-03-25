@@ -7,9 +7,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="update comments">
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="training.py renamed to train.py">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_3_17_25,_4_11 PM_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_3_17_25__4_11PM__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/instructions/create_conda_env.md" beforeDir="false" afterPath="$PROJECT_DIR$/instructions/create_conda_env.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/test_runs/2_counting_test/rulegraph.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/resources/test_runs/2_counting_test/rulegraph.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/test_runs/2_counting_test/workflow.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/resources/test_runs/2_counting_test/workflow.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/count.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/count.Snakefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/trash/code_log.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/trash/dropbox.upload.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/trash/viewing_blobs.bash" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/trash/workflow.bash" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,28 +46,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;singularity&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/rui/github/ccount&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "singularity",
+    "last_opened_file_path": "/Users/rui",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.editor",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;Python&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Python"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/workflow/scripts" />
@@ -116,34 +124,6 @@
       <workItem from="1741109479174" duration="8541000" />
       <workItem from="1741367012965" duration="4367000" />
       <workItem from="1742212126836" duration="71000" />
-    </task>
-    <task id="LOCAL-00090" summary="polished">
-      <created>1737579776071</created>
-      <option name="number" value="00090" />
-      <option name="presentableId" value="LOCAL-00090" />
-      <option name="project" value="LOCAL" />
-      <updated>1737579776071</updated>
-    </task>
-    <task id="LOCAL-00091" summary="more RAM for evaluation_on_val">
-      <created>1737580049227</created>
-      <option name="number" value="00091" />
-      <option name="presentableId" value="LOCAL-00091" />
-      <option name="project" value="LOCAL" />
-      <updated>1737580049227</updated>
-    </task>
-    <task id="LOCAL-00092" summary="reduce RAM in evaluation_on_val.py">
-      <created>1737580439886</created>
-      <option name="number" value="00092" />
-      <option name="presentableId" value="LOCAL-00092" />
-      <option name="project" value="LOCAL" />
-      <updated>1737580439886</updated>
-    </task>
-    <task id="LOCAL-00093" summary="reduce RAM in evaluation_on_val rule">
-      <created>1737580806309</created>
-      <option name="number" value="00093" />
-      <option name="presentableId" value="LOCAL-00093" />
-      <option name="project" value="LOCAL" />
-      <updated>1737580806309</updated>
     </task>
     <task id="LOCAL-00094" summary="fixed bug and new plotting functions">
       <created>1738186791244</created>
@@ -460,7 +440,35 @@
       <option name="project" value="LOCAL" />
       <updated>1742833437941</updated>
     </task>
-    <option name="localTasksCounter" value="154" />
+    <task id="LOCAL-00154" summary="count.Snakefile raise Error if no czi provided">
+      <created>1742847435368</created>
+      <option name="number" value="00154" />
+      <option name="presentableId" value="LOCAL-00154" />
+      <option name="project" value="LOCAL" />
+      <updated>1742847435368</updated>
+    </task>
+    <task id="LOCAL-00155" summary="area_calculation.py updated">
+      <created>1742865340636</created>
+      <option name="number" value="00155" />
+      <option name="presentableId" value="LOCAL-00155" />
+      <option name="project" value="LOCAL" />
+      <updated>1742865340637</updated>
+    </task>
+    <task id="LOCAL-00156" summary="blob_classification.py renamed to train.py">
+      <created>1742866006888</created>
+      <option name="number" value="00156" />
+      <option name="presentableId" value="LOCAL-00156" />
+      <option name="project" value="LOCAL" />
+      <updated>1742866006888</updated>
+    </task>
+    <task id="LOCAL-00157" summary="training.py renamed to train.py">
+      <created>1742866123602</created>
+      <option name="number" value="00157" />
+      <option name="presentableId" value="LOCAL-00157" />
+      <option name="project" value="LOCAL" />
+      <updated>1742866123602</updated>
+    </task>
+    <option name="localTasksCounter" value="158" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -488,10 +496,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="mcc_max" />
-    <MESSAGE value="more RAM in train.Snakefile" />
-    <MESSAGE value="import numpy as np" />
-    <MESSAGE value="        value_vars=['Precision', 'Recall', 'F1']," />
     <MESSAGE value="        hue='ScoreType'," />
     <MESSAGE value="        value_vars=['F1']," />
     <MESSAGE value="calculate_AUC_PR, calculate_MCC_Max" />
@@ -513,6 +517,10 @@
     <MESSAGE value="README.md" />
     <MESSAGE value="ccount-env to c-count-env" />
     <MESSAGE value="update comments" />
-    <option name="LAST_COMMIT_MESSAGE" value="update comments" />
+    <MESSAGE value="count.Snakefile raise Error if no czi provided" />
+    <MESSAGE value="area_calculation.py updated" />
+    <MESSAGE value="blob_classification.py renamed to train.py" />
+    <MESSAGE value="training.py renamed to train.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="training.py renamed to train.py" />
   </component>
 </project>
