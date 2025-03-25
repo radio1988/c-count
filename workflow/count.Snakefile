@@ -96,7 +96,7 @@ rule classification:
         "log/count/{s}.{i}.benchmark"
     shell:
         """
-        python workflow/scripts/blob_classification.py  \
+        python workflow/scripts/classify.py  \
         -crops {input.blob_crops} -weight {input.weight} \
         -config config.yaml -output {output.crops} &> {log}
         """

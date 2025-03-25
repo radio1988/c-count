@@ -434,11 +434,9 @@ def area_calculation(img, r,
     mask regions out of radius as black and not considered for area_calculation
 
     output area-of-pixels as uint16, so max is 2**16-1
-
     return zero if the image is blank
 
-
-    outname: outname for plotting, e.g. 'view_area_cal.pdf'
+    outname: only for plotting, e.g. 'view_area_cal.pdf'
     """
     img = float_image_auto_contrast(img)
 

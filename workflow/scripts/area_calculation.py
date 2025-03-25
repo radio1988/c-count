@@ -1,6 +1,8 @@
 """
 area_calculation.py -crops <crops.npy.gz> -output <output.txt>
 
+areas.txt, areas.npy.gz, and histogram.pdf will be generated
+
 caveat: if > 65535, will have problems (as npy.gz is only 16 bits)
 """
 
@@ -13,7 +15,7 @@ from ccount_utils.blob import load_blobs, save_crops
 from ccount_utils.blob import area_calculations
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Area calculation for blobs; areas.txt, areas.npy.gz, and histogram.pdf will be generated')
+    parser = argparse.ArgumentParser(description="Area calculation for blobs; areas.txt, areas.npy.gz, and histogram.pdf will be generated")
     parser.add_argument('-crops', type=str, required=True,
                         help='Input blob file (npy.gz)')
     parser.add_argument('-output', type=str, required=True,
