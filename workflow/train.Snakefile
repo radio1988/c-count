@@ -61,7 +61,7 @@ rule train:
         mem_mb=lambda wildcards, attempt: attempt * 4000
     shell:
         """
-        python workflow/scripts/training.py \
+        python workflow/scripts/train.py \
         -crops_train {input.small_crop} \
         -crops_val {input.val_crop} \
         -config {CCOUNT_CONFIG} \

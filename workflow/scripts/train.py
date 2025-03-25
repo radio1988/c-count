@@ -34,7 +34,7 @@ def parse_cmd_and_prep():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent('''\
             Function: Load labeled crops.npy.gz, train model and output trained weights
-            Usage: python workflow/scripts/training.py 
+            Usage: python workflow/scripts/train.py 
             -crops_train labeled.train.npy.gz 
             -crops_val labeled.validation.npy.gz
             -config config.yaml 
