@@ -27,43 +27,49 @@ def parse_args():
     parser.add_argument('-output', type=str, default='auc_curve.pdf', help='Output file for results')
     return parser.parse_args()
 
-args = parse_args()
-name2 = args.truth
-name1 = args.pred
+def main ():
+    args = parse_args()
+    name2 = args.truth
+    name1 = args.pred
 
-blobs1 = load_blobs(name1)
-locs1 = blobs1[:, :4]
-print()
-blobs2 = load_blobs(name2)
-locs2 = blobs2[:, :4]  # yxrL
-print()
+    blobs1 = load_blobs(name1)
+    locs1 = blobs1[:, :4]
+    print()
+    blobs2 = load_blobs(name2)
+    locs2 = blobs2[:, :4]  # yxrL
+    print()
 
-blobs1b, blobs2b = intersect_blobs(blobs1, blobs2)
+    blobs1b, blobs2b = intersect_blobs(blobs1, blobs2)
 
-labels1b = read_labels(blobs1b)
-labels2b = read_labels(blobs2b)
+    labels1b = read_labels(blobs1b)
+    labels2b = read_labels(blobs2b)
 
-y_true = labels2b
-y_pred = labels1b
+    y_true = labels2b
+    y_pred = labels1b
 
-precision, recall, F1 = F1_calculation(y_pred, y_true) # will be printed
+    precision, recall, F1 = F1_calculation(y_pred, y_true) # will be printed
 
-mcc_min = calculate_MCC_Max(y_true, y_pred)
-print(f"MCC-MAX: {mcc_min:.4f}")
+    mcc_min = calculate_MCC_Max(y_true, y_pred)
+    print(f"MCC-MAX: {mcc_min:.4f}")
 
-# Compute precision-recall curve
-precision, recall, _ = precision_recall_curve(y_true, y_pred)
+    # Compute precision-recall curve
+    precision, recall, _ = precision_recall_curve(y_true, y_pred)
 
-# Compute AUC-PR
-auc_pr = auc(recall, precision)
-print(f"AUC-PR: {auc_pr:.4f}")
+    # Compute AUC-PR
+    auc_pr = auc(recall, precision)
+    print(f"AUC-PR: {auc_pr:.4f}")
 
-# Plot Precision-Recall curve
-plt.figure(figsize=(6, 6))
-plt.plot(recall, precision, marker='.', label=f'AUC-PR = {auc_pr:.2f}')
-plt.xlabel('Recall')
-plt.ylabel('Precision')
-plt.title('Precision-Recall Curve')
-plt.legend()
-plt.grid()
-plt.savefig(args.output, bbox_inches='tight')
+    # Plot Precision-Recall curve
+    plt.figure(figsize=(6, 6))
+    plt.plot(recall, precision, marker='.', label=f'AUC-PR = {auc_pr:.2f}')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision-Recall Curve')
+    plt.legend()
+    plt.grid()
+    plt.savefig(args.output, bbox_inches='tight')
+
+
+if __name__ == "__main__":
+    main()
+    print("finished")
