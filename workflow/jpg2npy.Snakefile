@@ -138,7 +138,7 @@ rule jpg2locs:
         mem_mb=lambda wildcards, attempt: attempt * 16000  # 900M RAM usage on Mac 24/04
     shell:
         """
-        python workflow/scripts/jpg2npy.py -jpg {input.jpg} -czi {input.czi} -locs {input.blob_locs} \
+        python workflow/scripts/jpg_labels_to_npy.py -jpg {input.jpg} -czi {input.czi} -locs {input.blob_locs} \
         -sceneIndex {wildcards.sceneIndex} -output {output.label_locs} &> {log}
         """
 

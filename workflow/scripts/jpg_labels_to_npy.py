@@ -246,63 +246,6 @@ def find_largest_cluster(mask):
     return cluster_sizes.max()
 
 
-# def find_unique_colors_at_circle(image, x, y, r):
-#     """
-#     Finds all unique colors at the circle in a PIL image.
-#     circle is counted as r-5 to r in radius
-#
-#     Args:
-#         image: A PIL Image object representing the image.
-#         x: X-coordinate of the circle's center.
-#         y: Y-coordinate of the circle's center.
-#         r: Radius of the circle.
-#
-#     Returns:
-#         A set containing all unique color tuples (R, G, B) found within the circle.
-#     """
-#     unique_colors = set()
-#     width, height = image.size  # test, reversed?
-#     # Iterate through pixels within the circle's bounding box
-#     for i in range(max(0, x - r), min(width - 1, x + r) + 1):
-#         for j in range(max(0, y - r), min(height - 1, y + r) + 1):
-#             # Check if the pixel lies within the circle
-#             if ((i - x) ** 2 + (j - y) ** 2) <= r ** 2 and ((i - x) ** 2 + (j - y) ** 2) >= (r - 5) ** 2:
-#                 # Get the pixel's RGB color
-#                 pixel_color = image.getpixel((i, j))
-#                 unique_colors.add(pixel_color)
-#     return unique_colors
-#
-#
-# def find_dominant_color(colors):
-#     """
-#     Reads RGB colors
-#     Output the color with most pixels, if the color is 2 times brighter than other channels
-#     For RGB only
-#     :param colors: ((235, 156, 151),(237, 136, 152))
-#     :return:
-#         max_key: 0,1, or 2 (R,G,B)
-#         C: count for each color
-#     """
-#     n_pixel = 0
-#     C = {}
-#     C[0] = 0
-#     C[1] = 0
-#     C[2] = 0
-#     for color in colors:
-#         n_pixel += 1
-#         max_i = color.index(max(color))  # most bright color
-#         other_is = [num for num in [0, 1, 2] if num != max_i]
-#         other_colors = [color[i] for i in other_is]
-#         if color[max_i] / (np.mean(other_colors) + 0.0001) > 2:
-#             C[max_i] += 1
-#     max_key = max(C, key=C.get)
-#     # If all gray
-#     if sum(C.values()) < 1:
-#         max_key = None
-#     if len(set(C.values())) < 2:
-#         max_key = None
-#     return max_key, C
-
 def is_pixel_orange(rgb_color):
     """
     Checks if an RGB color is considered orange based on a predefined range.
