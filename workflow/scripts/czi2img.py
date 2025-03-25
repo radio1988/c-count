@@ -30,17 +30,19 @@ def parse_cmd_and_prep():
 
     return [args, config, ofname]
 
+def main():
+    [args, config, ofname] = parse_cmd_and_prep()
 
-##################Start####################
-[args, config, ofname] = parse_cmd_and_prep()
-
-image_obj = read_czi(args.i, Format=config['FORMAT'])
-for i in range(len(img_obj.scenes)):
-    print('For area', i)
     image_obj = read_czi(args.i, Format=config['FORMAT'])
-    image = parse_image_obj(image_obj, i=i, Format=config['FORMAT'])
-    image = uint16_image_auto_contrast(image)  # still uint16
+    for i in range(len(img_obj.scenes)):
+        print('For area', i)
+        image_obj = read_czi(args.i, Format=config['FORMAT'])
+        image = parse_image_obj(image_obj, i=i, Format=config['FORMAT'])
+        image = uint16_image_auto_contrast(image)  # still uint16
 
-    ofname_i = re.sub("jpg$", str(i) + ".jpg", ofname)
-    imsave(ofname_i, image, cmap="gray")
-    print('saved into', ofname_i)
+        ofname_i = re.sub("jpg$", str(i) + ".jpg", ofname)
+        imsave(ofname_i, image, cmap="gray")
+        print('saved into', ofname_i)
+
+if __name__ == "__main__":
+    main()
