@@ -3,10 +3,10 @@ from ccount_utils.clas import split_data
 from ccount_utils.blob import load_blobs, save_crops
 
 
-def parse_cmd_and_prep ():
+def parse_cmd_and_prep():
     # Construct the argument parser and parse the arguments
     parser = argparse.ArgumentParser(
-    	formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(
             """\
         	Usage: 
@@ -18,14 +18,14 @@ def parse_cmd_and_prep ():
         )
     )
     parser.add_argument("-crops", type=str,
-        help="labled blob-crops file, e.g. labeled/labeled.crops.npy.gz")
+                        help="labled blob-crops file, e.g. labeled/labeled.crops.npy.gz")
     parser.add_argument("-ratio", type=float,
-        help="ratio of train/val/test, e.g. 0.7")
+                        help="ratio of train/val/test, e.g. 0.7")
 
     args = parser.parse_args()
 
     if args.ratio > 1 or args.ratio < 0:
-    	raise ValueError('ratio should be between 0, 1')
+        raise ValueError('ratio should be between 0, 1')
 
     print('\n'.join(f'{k}={v}' for k, v in vars(args).items()))
 
@@ -33,6 +33,9 @@ def parse_cmd_and_prep ():
 
 
 args = parse_cmd_and_prep()
+
+if args.ratio < 0 or args.ratio > 1:
+    raise ValueError("ratio should be between 0 and 1")
 
 crops = load_blobs(args.crops)
 print('force uncertain (label=3) and artifacts (label=4) to neg')
@@ -42,7 +45,7 @@ crops[crops[:, 3] == 4, 3] = 0  # artifacts, see ccount.blob.readme.txt
 [crops1, crops2] = split_data(crops, args.ratio)
 print(crops1.shape, crops2.shape)
 out_name1 = args.crops.replace(".npy.gz", "." + str(args.ratio) + ".npy.gz")
-out_name2 = args.crops.replace(".npy.gz", "." + str(round(1-args.ratio, 3)) + ".npy.gz")
+out_name2 = args.crops.replace(".npy.gz", "." + str(round(1 - args.ratio, 3)) + ".npy.gz")
 if out_name2 == out_name1:
     out_name2 = out_name1.replace("npy.gz", "b.npy.gz")
 if out_name2 == out_name1:

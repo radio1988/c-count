@@ -7,17 +7,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="training.py renamed to train.py">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_3_17_25,_4_11 PM_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_3_17_25__4_11PM__Changes_.xml" beforeDir="false" />
+    <list default="true" id="6f342c8f-3d45-4073-b745-2cc3bed6378a" name="Changes" comment="cleaned trash and skipped count.Snakefile summary plot for now">
+      <change afterPath="$PROJECT_DIR$/workflow/scripts/archive/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/test_runs/2_counting_test/rulegraph.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/resources/test_runs/2_counting_test/rulegraph.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/test_runs/2_counting_test/workflow.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/resources/test_runs/2_counting_test/workflow.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/count.Snakefile" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/count.Snakefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/trash/code_log.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/trash/dropbox.upload.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/trash/viewing_blobs.bash" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow/trash/workflow.bash" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/confusion_matrix.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/count_labeled_blobs.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/count_labeled_blobs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_labeling.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/archive/crops_labeling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow/scripts/crops_split.py" beforeDir="false" afterPath="$PROJECT_DIR$/workflow/scripts/crops_split.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,33 +44,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "singularity",
-    "last_opened_file_path": "/Users/rui",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "preferences.editor",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;singularity&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/rui&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "Python"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;Python&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/workflow/scripts" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/workflow/scripts/archive" />
       <recent name="$PROJECT_DIR$/workflow/scripts/ccount" />
     </key>
   </component>
@@ -124,13 +123,6 @@
       <workItem from="1741109479174" duration="8541000" />
       <workItem from="1741367012965" duration="4367000" />
       <workItem from="1742212126836" duration="71000" />
-    </task>
-    <task id="LOCAL-00094" summary="fixed bug and new plotting functions">
-      <created>1738186791244</created>
-      <option name="number" value="00094" />
-      <option name="presentableId" value="LOCAL-00094" />
-      <option name="project" value="LOCAL" />
-      <updated>1738186791244</updated>
     </task>
     <task id="LOCAL-00095" summary="8-&gt; 16G RAM for blob_detection">
       <created>1738189395091</created>
@@ -468,7 +460,14 @@
       <option name="project" value="LOCAL" />
       <updated>1742866123602</updated>
     </task>
-    <option name="localTasksCounter" value="158" />
+    <task id="LOCAL-00158" summary="cleaned trash and skipped count.Snakefile summary plot for now">
+      <created>1742872491481</created>
+      <option name="number" value="00158" />
+      <option name="presentableId" value="LOCAL-00158" />
+      <option name="project" value="LOCAL" />
+      <updated>1742872491481</updated>
+    </task>
+    <option name="localTasksCounter" value="159" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -496,7 +495,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="        hue='ScoreType'," />
     <MESSAGE value="        value_vars=['F1']," />
     <MESSAGE value="calculate_AUC_PR, calculate_MCC_Max" />
     <MESSAGE value=" '.probs.txt', header=&quot;p_no,p_yes&quot;" />
@@ -521,6 +519,7 @@
     <MESSAGE value="area_calculation.py updated" />
     <MESSAGE value="blob_classification.py renamed to train.py" />
     <MESSAGE value="training.py renamed to train.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="training.py renamed to train.py" />
+    <MESSAGE value="cleaned trash and skipped count.Snakefile summary plot for now" />
+    <option name="LAST_COMMIT_MESSAGE" value="cleaned trash and skipped count.Snakefile summary plot for now" />
   </component>
 </project>

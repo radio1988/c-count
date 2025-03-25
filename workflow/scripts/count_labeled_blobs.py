@@ -19,7 +19,7 @@ output.csv
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Input: labeled_locs files, Output: count.csv")
+        description="Input: labeled_locs (npy.gz) files, Output: count.csv")
     parser.add_argument(
         '-input',
         nargs='+',
