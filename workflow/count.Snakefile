@@ -179,7 +179,7 @@ rule area_calculation:
         mem_mb=lambda wildcards, attempt: attempt * 8000
     shell:
         """
-        python workflow/scripts/area_calculation.py {input} {output.txt} &> {log}
+        python workflow/scripts/area_calculation.py -crops {input} -output {output.txt} &> {log}
         """
 
 rule area_aggregation:

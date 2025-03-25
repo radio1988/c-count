@@ -1,42 +1,48 @@
+"""
+area_calculation.py -crops <crops.npy.gz> -output <output.txt>
+
+caveat: if > 65535, will have problems (as npy.gz is only 16 bits)
+"""
+
+
 import sys, subprocess
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
 from ccount_utils.blob import load_blobs, save_crops
 from ccount_utils.blob import area_calculations
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Area calculation for blobs; areas.txt, areas.npy.gz, and histogram.pdf will be generated')
+    parser.add_argument('-crops', type=str, required=True,
+                        help='Input blob file (npy.gz)')
+    parser.add_argument('-output', type=str, required=True,
+                        help='Output area file (txt)')
+    return parser.parse_args()
 
+def main():
+    args = parse_args()
+    inname = args.crops
+    outname_txt = args.output
+    outname_core = outname_txt.replace('.txt', '')
+    outname_hist = outname_core + '.hist.pdf'
+    outname_crops = outname_core + '.npy.gz'
+    print('inname: ', inname,
+        "\noutname_txt: ", outname_txt,
+        "\noutname_crops ", outname_crops)
 
-# no filtering, all reasults saved, bug negative ones should have -1 as output? as the calculation can be wrong for negative ones?? Now it is still calculated for testing
+    crops = load_blobs(inname)
+    areas = area_calculations(crops)
+    # save txt
+    np.savetxt(outname_txt, areas, fmt='%i', delimiter='')
+    # save crops
+    crops[:, 4] = areas
+    save_crops(crops, outname_crops)
+    plt.hist(areas, 40)
+    plt.title(outname_core)
+    plt.savefig(outname_hist)
+    plt.close()
+    print("Area calculation completed successfully.")
 
-
-print("usage: python <area_calculation.py>  <blob.npy.gz>  <output.area.txt>")
-print("area calulation for non-colony is sometimes inaccurate, expecially when it is empty")
-print("cmd:", sys.argv)
-
-if len(sys.argv) is not 3:
-    sys.exit("cmd error")
-
-inname = sys.argv[1]
-outname_txt = sys.argv[2]
-outname_core = outname_txt.replace('.txt', '')
-outname_hist = outname_core + '.hist.png'
-outname_crops = outname_core + '.npy.gz'
-print('inname:', inname, 
-    "\noutname_txt", outname_txt, 
-    "\noutname_crops", outname_crops)
-
-crops = load_blobs(inname)
-areas = area_calculations(crops)
-
-# save txt
-np.savetxt(outname_txt, areas, fmt='%i', delimiter='')
-
-# save crops
-crops[:, 4] = areas
-save_crops(crops, outname_crops)
-
-
-plt.hist(areas, 40)
-plt.title(outname_core)
-plt.savefig(outname_hist)
-plt.close()
+if __name__ == "__main__":
+    main()

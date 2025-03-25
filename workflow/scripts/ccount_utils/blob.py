@@ -429,34 +429,38 @@ def area_calculation(img, r,
                      plotting=False, outname=None,
                      blob_extention_ratio=1.4, blob_extention_radius=10):
     """
-    read one image
-    output area-of-pixels as int
+    read one crop image
+    find threshold to tell foreground from background using Yen's method within the radius
+    mask regions out of radius as black and not considered for area_calculation
+
+    output area-of-pixels as uint16, so max is 2**16-1
+
+    return zero if the image is blank
+
+
     outname: outname for plotting, e.g. 'view_area_cal.pdf'
     """
-    # automatic thresholding method such as Otsu's (avaible in scikit-image)
     img = float_image_auto_contrast(img)
 
     try:
         val = filters.threshold_yen(img)
     except ValueError:
-        # print("Ops, got blank blob crop")
-        return (0)
+        return 0  # blank image exception
 
-    r = r * blob_extention_ratio + blob_extention_radius
-
-    # cells as 1 (white), background as 0 (black)
-    drops = ndimage.binary_fill_holes(img < val)
+    binary_img = ndimage.binary_fill_holes(img < val)  # 1 is white (foreground), 0 is black (background)
 
     # mask out of the circle to be zero
     w = int(img.shape[0] / 2)
-    mask = np.zeros((2 * w, 2 * w))
+    r = r * blob_extention_ratio + blob_extention_radius
+    mask = np.zeros((2 * w, 2 * w))  # whole crop is black
     rr, cc = disk((w - 1, w - 1), min(r, w - 1))
-    mask[rr, cc] = 1  # 1 is white
+    mask[rr, cc] = 1  # within radius is white (1), out of radius is black (0)
 
     # apply mask on binary image
-    masked = abs(drops * mask)
+    masked = binary_img * mask  # 1 is white (foreground), 0 is black (background), out of radius always 0
+    # abs(masked) removed, seems not necessary
 
-    if (plotting):
+    if plotting:
         plt.subplot(1, 2, 1)
         plt.imshow(img, 'gray', clim=(0, 1))
         plt.subplot(1, 2, 2)
@@ -467,7 +471,13 @@ def area_calculation(img, r,
         else:
             plt.show()
 
-    return int(sum(sum(masked)))
+    area = int(sum(sum(masked)))
+
+    if area > 2 ** 16 - 1:  # won't have issue for 160*160 crop images
+        warnings.warn("area too large, uint16 overflow, set to 2**16-1")
+        area = 2 ** 16 - 1
+
+    return area
 
 
 def area_calculations(crops,
