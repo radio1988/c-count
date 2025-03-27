@@ -41,6 +41,7 @@ We also provided singularity images if you are on a HPC cluster. See [singularit
 ## Example dataset
 From [zenodo.15086309](https://zenodo.org/records/15086309) you can find example datasets. It contains two example `czi` raw microscopic images, two example labeled `jpg` images for one scene in the corresponding `czi` file (each czi file here has 4 scenes). We also provided the training data set in `npy.gz` format that can be used to reproduce the training process mentioned in the manuscript. 
 
-In  you can find the trained weight h5 file that can be used to count colonies in the example dataset. 
 
-## 
+## Pre-trained weight h5 file
+In [github/resources/weights](resources/weights) you can find the trained weight h5 file that can be used to count CFU-e colonies in the example dataset. 
+
