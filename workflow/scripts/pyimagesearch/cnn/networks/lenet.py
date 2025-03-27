@@ -1,12 +1,12 @@
 # import the necessary packages
 from keras.models import Sequential
-from keras.layers import Convolution2D # updated for Mac
+from keras.layers import Convolution2D  # updated for Mac
 from keras.layers import MaxPooling2D  # updated for Mac
-from keras.layers import Dropout # updated for Mac
-from keras.layers import Activation # updated for Mac
-from keras.layers import Flatten # updated for Mac
-from keras.layers import Dense # updated for Mac
-from keras import backend as K 
+from keras.layers import Dropout  # updated for Mac
+from keras.layers import Activation  # updated for Mac
+from keras.layers import Flatten  # updated for Mac
+from keras.layers import Dense  # updated for Mac
+from keras import backend as K
 
 
 class LeNet:
@@ -23,7 +23,7 @@ class LeNet:
 
         # define the first set of CONV => ACTIVATION => POOL layers
         model.add(Convolution2D(20, 5, padding="same",  # 20 filters of 5x5 todo: larger conv
-                         input_shape=inputShape))
+                                input_shape=inputShape))
         model.add(Dropout(0.5))
         model.add(Activation(activation))
         model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
