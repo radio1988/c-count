@@ -1,0 +1,5 @@
+DATA_TRAIN: data/AF.train.npy.gz
+DATA_VAL: data/AF.val.npy.gz
+sampling_rates: [.015625, .03125, .0625,.125, .25, .5, 1.0]
+REPS: ['rep1', 'rep2', 'rep3', 'rep4', 'rep5']
+CCOUNT_CONFIG: config.yaml
