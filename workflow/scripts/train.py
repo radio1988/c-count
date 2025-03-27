@@ -92,6 +92,7 @@ def cleanup_crops(crops):
 
     return crops
 
+
 # parse cmd
 args, corename, config = parse_cmd_and_prep()
 
@@ -138,7 +139,7 @@ valrs = valrs / config['clas_scaling_factor']
 
 # equalization (skipped)
 if config['classification_equalization']:
-    print("Equalizing images...") # todo: more channels (scaled + equalized + original)
+    print("Equalizing images...")  # todo: more channels (scaled + equalized + original)
     trainimages = np.array([equalize(image) for image in trainimages])
     valimages = np.array([equalize(image) for image in valimages])
 
@@ -182,11 +183,9 @@ earlystop = keras.callbacks.EarlyStopping(monitor='val_loss',
                                           baseline=None, restore_best_weights=True)
 callbacks_list = [earlystop]
 
-print("[INFO] training...",  flush=True)
+print("[INFO] training...", flush=True)
 # todo: add radius to model
-# todo: augmentation in batch training
 
-# todo augmentation here is bad, mask issue
 datagen = ImageDataGenerator(
     featurewise_std_normalization=False,
     rotation_range=90,
@@ -198,81 +197,31 @@ datagen = ImageDataGenerator(
 
 datagen.fit(trainimages)
 
-# model.fit(trainimages, trainlabels, validation_data=(valimagesMsk, vallabels),
-#           batch_size=config['batch_size'], epochs=config['epochs'],
-#           verbose=config['verbose'])
-
-model.fit(datagen.flow(trainimages, trainlabels2, batch_size=int(config['batch_size'])),
-                    validation_data=(valimages, vallabels2),
-                    steps_per_epoch= int(len(trainimages) / config['batch_size']),
-                    epochs=config['epochs'],
-                    callbacks=callbacks_list,
-                    verbose=config['verbose'])
+model.fit(
+    datagen.flow(trainimages, trainlabels2, batch_size=int(config['batch_size'])),
+    validation_data=(valimages, vallabels2),
+    steps_per_epoch=int(len(trainimages) / config['batch_size']),
+    epochs=config['epochs'],
+    callbacks=callbacks_list,
+    verbose=config['verbose']
+)
 
 # Evaluation of the model
 print("[INFO] evaluating...")
-(loss, f1) = model.evaluate(trainimages, trainlabels2,
-                            batch_size=config['batch_size'], verbose=config['verbose'])
+(loss, f1) = model.evaluate(
+    trainimages, trainlabels2,
+    batch_size=config['batch_size'],
+    verbose=config['verbose']
+)
 print("[INFO] training F1: {:.2f}%".format(f1 * 100))
 
 print("[INFO] evaluating...")
-(loss, f1) = model.evaluate(valimages, vallabels2,
-                            batch_size=config['batch_size'], verbose=config['verbose'])
+(loss, f1) = model.evaluate(
+    valimages, vallabels2,
+    batch_size=config['batch_size'], verbose=config['verbose']
+)
 print("[INFO] validation F1: {:.2f}%".format(f1 * 100))
 
 print("[INFO] dumping weights to file...")
 model.save_weights(args.output, overwrite=True)
-
-#### MANUAL boosting ###
-if config['BOOSTING']:
-    probs = model.predict(trainimages)
-    classifications = probs.argmax(axis=1)
-
-    tricky_idx = trainlabels != classifications
-    tricky_images = trainimages[tricky_idx]  # (501, 40, 40, 1)
-    tricky_labels = trainlabels[tricky_idx]  #
-    print("trainimages.shape:", trainimages.shape)
-    print("tricky_images.shape:", tricky_images.shape)
-
-    for i in range(2):
-        tricky_images = np.concatenate((tricky_images, tricky_images))
-        tricky_labels = np.concatenate((tricky_labels, tricky_labels))
-
-    boost_size = min(len(tricky_labels), config['aug_sample_size'] // 4)
-    tricky_images = tricky_images[0:boost_size]
-    tricky_labels = tricky_labels[0:boost_size]
-    print(">>>duplicated tricky_images.shape:", tricky_images.shape)
-    print(">>>duplicated tricky_labels.shape:", tricky_labels.shape)
-
-    tricky_labels2 = to_categorical(tricky_labels, config['numClasses'])
-    print("tricky_labels2.shape:", tricky_labels2.shape)
-
-    retrain_images = np.concatenate((tricky_images, trainimages))
-    retrain_labels = np.concatenate((tricky_labels, trainlabels))
-    retrain_labels2 = to_categorical(retrain_labels, config['numClasses'])
-
-    print("retrain_images.shape:", retrain_images.shape)
-    print("retrain_labels.shape:", retrain_labels.shape)
-    print("retrain_labels2.shape:", retrain_labels2.shape)
-
-    datagen.fit(retrain_images)
-    model.fit_generator(datagen.flow(retrain_images, retrain_labels2,
-                                     batch_size=config['batch_size']),
-                        validation_data=(valimages, vallabels2),
-                        steps_per_epoch=len(retrain_images) / config['batch_size'],
-                        epochs=config['epochs'],
-                        callbacks=callbacks_list,
-                        verbose=config['verbose'])
-
-    print("[INFO] evaluating...")
-    (loss, f1) = model.evaluate(trainimages, trainlabels2,
-                                batch_size=config['batch_size'], verbose=config['verbose'])
-    print("[INFO] training F1: {:.2f}%".format(f1 * 100))
-
-    print("[INFO] evaluating...")
-    (loss, f1) = model.evaluate(valimages, vallabels2,
-                                batch_size=config['batch_size'], verbose=config['verbose'])
-    print("[INFO] validation F1: {:.2f}%".format(f1 * 100))
-
-    print("[INFO] dumping weights to file...")
-    model.save_weights(args.output, overwrite=True)
+print("[INFO] done.")
