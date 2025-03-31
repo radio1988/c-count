@@ -6,7 +6,7 @@ C-COUNT is described in 'C-COUNT: a Convolutional Neural Network-Based Tool for 
 
 C-COUNT is implemented as a modified LeNet convolutional neural network (LeCun Y et al., Gradient-Based Learning Applied to Document Recognition. Proc of The IEEE. 1998). C-COUNT is trained to measure the number and size of colony-forming-unit-erythroid (CFU-e) colonies in colony-formation assays. The input to the tool are grayscale automated-microscopy bright-field images of CFU-e colony assay plates. Prior to imaging the plates are stained with diaminobenzidine, which turns CFU-e colonies dark and allows them to be distinguished from other colony types, debris or cell aggregates. 
 
-The trained tool (provided with an h5 weights file) is expected to identify CFU-e colonies in images with a similar microscopy set-up to that described in Li et al.. It is possible to re-train the tool to improve performance for each laboratory's microscopy setup. With appropriate training datasets it may be possible to adapt C-COUNT to identify other colony types.  
+The trained tool (provided with an h5 weights file) is expected to identify CFU-e colonies in images with a similar microscopy set-up to that described in Li et al.. It is possible to re-train the tool to improve performance for each laboratory's microscopy setup. With appropriate training datasets, it may be possible to adapt C-COUNT to identify other colony types.  
 
 Users may ask a question in [issues](https://github.com/radio1988/c-count/issues) page to help guide them in adapting C-COUNT to their specific needs. Training dataset images need to be suitable (clear, and with well separated colonies).
 
