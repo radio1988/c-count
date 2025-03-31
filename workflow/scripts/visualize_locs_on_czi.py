@@ -15,28 +15,34 @@ def parse_cmd_and_prep():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent('''\
-                    Read czi and locs/crops, 
-                    output images with blobs circled; 
+                    Read czi and one or two locs/crops files 
+                    output images with blobs circled
+                    
+                    If only one locs/crops file is given, 
+                    circles will be colored Ref/Blue for positives/negatives
+                    
+                    If two locs/crops files are given (classification and ground-truth), 
+                    circles will be colored for Red/Yellow/Green/Blue for FP/FN/TP/TN
 
-                    CMD1: 
+                    CMD1 (Red/Blue): 
                     visualize_locs_on_czi.py 
                     -crops locs.npy.gz  
                     -czi image.czi  
                     -index 0  
-                    -output image.blobs.jpg (gray circles)
+                    -output image.blobs.jpg # (Red/Blue circles)
                     
-                    CMD2: 
+                    CMD2 (Red/Yellow/Green/Blue): 
                     visualize_locs_on_czi.py 
                     -crops locs.npy.gz 
                     -crops2 ground_truth.locs.npy.gz       
                     -czi image.czi  
                     -index 0  
-                    -output image.blobs.jpg (colored circles for TN, FP, FN, TP)
+                    -output image.blobs.jpg #  (Red/Yellow/Green/Blue Circles)
                     '''))
     parser.add_argument('-crops', type=str,
                         help='locs/crops filename: path/xxx.npy.gz')
     parser.add_argument('-crops2', type=str,
-                        help='locs/crops filename, optional: path/ground_truth.npy.gz')
+                        help='(optional) locs/crops filename: path/ground_truth.npy.gz')
     parser.add_argument('-czi', type=str,
                         help='czi image filename: path/xxx.czi')
     parser.add_argument('-index', type=int, default=0,
@@ -47,22 +53,17 @@ def parse_cmd_and_prep():
                         help='output image with blobs circled')
 
     args = parser.parse_args()
-    print('-crops::', args.crops)
-    print('-crops2::', args.crops2)
-    print('-czi:', args.czi)
-    print('-index:', args.index)
-    print('-output:', args.output)
+    print(args)
 
-    Path(os.path.dirname(args.output)).mkdir(parents=True, exist_ok=True)
 
-    # with open(args.config, 'r') as stream:
-    #     config = yaml.safe_load(stream)
-
-    return [args]
+    return args
 
 
 def main():
     args = parse_cmd_and_prep()
+
+    Path(os.path.dirname(args.output)).mkdir(parents=True, exist_ok=True)
+
     with open(args.config, 'r') as stream:
         config = yaml.safe_load(stream)
 
