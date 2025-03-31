@@ -15,7 +15,7 @@ Users may ask a question in [issues](https://github.com/radio1988/c-count/issues
 - C-COUNT uses Snakemake workflow management system to make the workflow reproducible and scalable
 - A training dataset of microscopy images from CFU-e colony plates are required as input
 - The 'blob-detection' script outputs the images as jpg files where objects ('blobs') are circled
-- The user labels the circled blobs that are positive (CFU-e colonies) by adding an orange dot within the circle [example_jpg]()
+- The user labels the circled blobs that are positive (CFU-e colonies) by adding an orange dot within the circle [example_jpg](https://www.dropbox.com/scl/fi/xocqgwkjc2n9evufchwqw/1unitEpo_1-Stitching-01.0.crops.clas.npy.gz.jpg?rlkey=sr7qm8l5avhzak1gt8wdtfyz4&dl=0)
 - The user runs the 'jpg2npy' workflow to convert the labeled jpg images to npy.gz files
 - The user runs the 'train' workflow, which outputs a trained weight h5 file
 
