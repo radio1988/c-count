@@ -1,15 +1,10 @@
 ## User params ## 
-# data curve patience5, augmentation 80k
-# 250130
-
-MIN_P: 0.1
-
+# only change DATA_DIR, WEIGHT and MIN_P if you intent to use the manuscript version
 DATA_DIR: data/czi  # for czi files
-
 FORMAT: 2019 # 2019
 I: [1,2,3,4] # all valid index options for czi file
-
-WEIGHT: data/1.0.weights.h5
+WEIGHT: AF_tf2.6_paper.h5  # manuscript version
+MIN_P: 0.01
 
 ## Advanced params ##
 # (Please don't change unless you're developer)
