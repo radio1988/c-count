@@ -35,7 +35,7 @@ Logic:
 configfile: "config.yaml"
 CZI_PATH = 'data/czi'
 LABEL_PATH = 'data/label_img'
-IMG_SUFFIX = '.crops.clas.npy.gz'  # point5U_Epo_3-Stitching-11.1.crops.clas.npy.gz
+# PRIOR_IMG_SUFFIX = '.crops.clas.npy.gz'  # to be determined by get_sam
 
 
 def get_sampleName_from_sceneName(sceneName):
@@ -76,18 +76,29 @@ def get_samples_and_sceneIndexes_from_dir(LABEL_PATH):
     # 'point5U_Epo_1-Stitching-09.0', '1U_Epo_1-Stitching-01.2']
 
     """
-    filenames = os.listdir(LABEL_PATH)
+    filenames = os.listdir(LABEL_PATH)  # jpg files plate.scene.jpg or plate.scene.crops.clas.npy.gz
+    if any("crops.clas.npy.gz" in filename for filename in filenames):
+        IMG_SUFFIX = ".crops.clas.npy.gz"
+    elif all("crops.clas.npy.gz" not in filename for filename in filenames):
+        IMG_SUFFIX = ""
+    else:
+        raise ValueError("No crops.clas.npy.gz or crops.clas.npy found in the directory")
+    # if not same, then raise error
+    if any("crops.clas.npy.gz" in filename for filename in filenames) and \
+            all("crops.clas.npy.gz" not in filename for filename in filenames):
+        raise ValueError("Mix of crops.clas.npy.gz and non-crops.clas.npy.gz files found in the directory")
+
     jpg_filenames = [filename for filename in filenames if
                      filename.endswith(".jpg")]  # point5U_Epo_3-Stitching-11.1.crops.clas.npy.gz.jpg
     basenames = [os.path.splitext(filename)[0] for filename in
                  jpg_filenames]  # point5U_Epo_3-Stitching-11.1.crops.clas.npy.gz
-    SCENES = [x.replace(IMG_SUFFIX,"") for x in basenames]  #  point5U_Epo_3-Stitching-11.1
+    SCENES = [x.replace(IMG_SUFFIX, "") for x in basenames]  # point5U_Epo_3-Stitching-11.1
     SAMPLES = [get_sampleName_from_sceneName(x) for x in SCENES]  # point5U_Epo_3-Stitching-11
-    return SAMPLES, SCENES
+    return SAMPLES, SCENES, IMG_SUFFIX
 
 
 ### START
-SAMPLES, SCENES = get_samples_and_sceneIndexes_from_dir(LABEL_PATH)
+SAMPLES, SCENES, IMG_SUFFIX = get_samples_and_sceneIndexes_from_dir(LABEL_PATH)
 
 rule targets:
     input:
