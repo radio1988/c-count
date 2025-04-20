@@ -101,3 +101,6 @@ def main():
     labels2b = get_labels(blobs2b)
 
     compare(labels1b, labels2b)
+
+if __name__ == "__main__":
+    main()
