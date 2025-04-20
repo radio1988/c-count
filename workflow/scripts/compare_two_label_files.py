@@ -91,7 +91,9 @@ def compare(labels_t, labels_p, tname, pname, sample):
 def main():
     args = argparse_args()
 
+    print("Reading truth blobs:", args.t)
     blobs_t = load_blobs(args.t)
+    print("Reading predicted blobs:", args.p)
     blobs_p = load_blobs(args.p)
 
     tname = args.tname
