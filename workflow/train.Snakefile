@@ -2,26 +2,25 @@
 Train
 """
 
-
 import os
 
 configfile: "config.train.yaml"
 singularity: "workflow/ccount.sif"
 
-WKDIR=os.getcwd()
-DATA_TRAIN=config['DATA_TRAIN']
-DATA_VAL=config['DATA_VAL']
+WKDIR = os.getcwd()
+DATA_TRAIN = config['DATA_TRAIN']
+DATA_VAL = config['DATA_VAL']
 SAMSPLING_RATES = config['sampling_rates']
-CCOUNT_CONFIG=config['CCOUNT_CONFIG']
-REPS=config['REPS']
+CCOUNT_CONFIG = config['CCOUNT_CONFIG']
+REPS = config['REPS']
 
 rule targets:
     input:
         evaluations=expand(
-        'res/3_evaluation_on_validationSet/{rate}.{rep}.txt',
-        rate=SAMSPLING_RATES,
-        rep=REPS),
-        curve = 'res/plots/saturation_analysis.pdf'
+            'res/3_evaluation_on_validationSet/{rate}.{rep}.txt',
+            rate=SAMSPLING_RATES,
+            rep=REPS),
+        curve='res/plots/saturation_analysis.pdf'
 
 rule subsample:
     input:
@@ -31,7 +30,7 @@ rule subsample:
     log:
         'res/0_trainingData_subsets/{rate}.{rep}.npy.gz.log'
     benchmark:
-         'res/0_trainingData_subsets/{rate}.{rep}.npy.gz.benchmark'
+        'res/0_trainingData_subsets/{rate}.{rep}.npy.gz.benchmark'
     threads:
         1
     resources:
@@ -54,7 +53,7 @@ rule train:
     log:
         'res/1_trained_weights/{rate}.{rep}.weights.h5.log'
     benchmark:
-         'res/1_trained_weights/{rate}.{rep}.weights.h5.benchmark'
+        'res/1_trained_weights/{rate}.{rep}.weights.h5.benchmark'
     threads:
         16
     resources:
@@ -74,7 +73,7 @@ rule classification:
         weight='res/1_trained_weights/{rate}.{rep}.weights.h5',
         data_val=DATA_VAL
     output:
-        clas='res/2_count_on_validationSet/{rate}.{rep}.npy.gz' #todo:  test for non-complete scenes
+        clas='res/2_count_on_validationSet/{rate}.{rep}.npy.gz'  #todo:  test for non-complete scenes
     log:
         'res/2_count_on_validationSet/{rate}.{rep}.npy.gz.log'
     benchmark:
@@ -120,7 +119,7 @@ rule evaluation:
 
 rule saturation_plot:
     input:
-        expand('res/3_evaluation_on_validationSet/{rate}.{rep}.txt', rate=SAMSPLING_RATES, rep=REPS)
+        expand('res/3_evaluation_on_validationSet/{rate}.{rep}.txt',rate=SAMSPLING_RATES,rep=REPS)
     output:
         'res/plots/saturation_analysis.pdf'
     log:
