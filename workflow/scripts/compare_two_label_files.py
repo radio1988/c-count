@@ -1,3 +1,9 @@
+"""
+true: tname
+pred: pname
+"""
+from random import sample
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -12,9 +18,11 @@ from ccount_utils.img import equalize, read_czi, parse_image_obj
 
 def argparse_args():
     parser = argparse.ArgumentParser(description="Compare two label files (crops.npy.gz or blobs.npy.gz)")
-    parser.add_argument('-pred', type=str, required=True, help='Path to predicted blobs (npy.gz)')
-    parser.add_argument('-truth', type=str, required=True, help='Path to ground truth blobs (npy.gz)')
-    parser.add_argument('-sample', type=str, required=True, help='Sample name')
+    parser.add_argument('-t', type=str, required=True, help='Path to ground truth blobs (npy.gz)')
+    parser.add_argument('-tname', type=str, required=True, help='Name of the ground truth blobs in plots')
+    parser.add_argument('-p', type=str, required=True, help='Path to predicted blobs (npy.gz)')
+    parser.add_argument('-pname', type=str, required=True, help='Name of the predicted blobs in plots')
+    parser.add_argument('-sample', type=str, required=True, help='Sample name for output files')
     return parser.parse_args()
 
 
@@ -39,33 +47,33 @@ def get_labels(blobs):
     return labels
 
 
-def compare(y_true, y_pred):
+def compare(labels_t, labels_p):
     # Compute confusion matrix
-    cm = confusion_matrix(y_true, y_pred)
+    cm = confusion_matrix(labels_t, labels_p)
 
     # Plot confusion matrix
     plt.figure(figsize=(5, 4))
     sns.heatmap(cm, annot=True, fmt='d', cmap="Blues", xticklabels=["neg", "pos"], yticklabels=["neg", "pos"])
-    plt.xlabel(name2)  # y_pred
-    plt.ylabel(name1)  # y_true
+    plt.xlabel(pname)  # labels_p
+    plt.ylabel("GT: " + tname)  # labels_t
     plt.title(sample)
-    plt.savefig(f'{sample}.{name1}.{name2}.confusion.pdf')
+    plt.savefig(f'{sample}.{tname}.{pname}.confusion.pdf')
 
     # Compute metrics
-    precision = precision_score(labels1, labels2, zero_division=0)
-    recall = recall_score(labels1, labels2, zero_division=0)
-    f1 = f1_score(labels1, labels2, zero_division=0)
-    mcc = matthews_corrcoef(labels1, labels2)
+    precision = precision_score(labels_t, labels_p, zero_division=0)
+    recall = recall_score(labels_t, labels_p, zero_division=0)
+    f1 = f1_score(labels_t, labels_p, zero_division=0)
+    mcc = matthews_corrcoef(labels_t, labels_p)
 
     # Print results
-    print(f'between {name1} & {name2}')
+    print(f'between Truth: {tname} & Pred: {pname}')
     print(f"Precision: {precision:.4f}")
     print(f"Recall:    {recall:.4f}")
     print(f"F1-score:  {f1:.4f}")
     print(f"MCC:       {mcc:.4f}")
     # Save to CSV using pandas
     metrics_dict = {
-        "Comparison": [f"{name1} vs {name2}"],
+        "Comparison": [f"{tname} vs {pname}"],
         "Precision": [precision],
         "Recall": [recall],
         "F1-score": [f1],
@@ -73,34 +81,36 @@ def compare(y_true, y_pred):
     }
 
     df = pd.DataFrame(metrics_dict)
-    csv_filename = f"{sample}.{name1}.{name2}_metrics.csv"
+    csv_filename = f"{sample}.{tname}.{pname}_metrics.csv"
     df.to_csv(csv_filename, index=False)
 
     print(f"Metrics saved to {csv_filename}")
 
 def main():
     args = argparse_args()
-    name1 = args.pred
-    name2 = args.truth
+
+    blobs_t = load_blobs(args.t)
+    blobs_p = load_blobs(args.p)
+    tname = args.tname
+    pname = args.pname
     sample = args.sample
+    global tname, pname, sample
 
-    blobs1 = load_blobs(name1)
-    locs1 = blobs1[:, :4]
-    print()
-    blobs2 = load_blobs(name2)
-    locs2 = blobs2[:, :4]  # yxrL
-    print()
+    blobs_t2, blobs_p2 = intersect_blobs(blobs_t, blobs_p)
+    if len(blobs_t2) == 0 or len(blobs_p2) == 0:
+        raise Exception("Blobs do not intersect")
+    if len(blobs_t) != len(blobs_p):
+        raise Exception("Blobs do not match")
+    if len(blobs_t) != len(blobs_t2) or len(blobs_p) != len(blobs_p2):
+        raise Exception("Blobs intersection smaller than original")
 
-    blobs1b, blobs2b = intersect_blobs(blobs1, blobs2)
-    if blobs1b is None or blobs2b is None:
-        raise Exception("No intersection found.")
-    if len(blobs1b) != len(blobs1) or len(blobs2b) != len(blobs2):
-        raise Exception("Warning: The number of blobs in the intersection is not equal to the original blobs.")
+    labels_t = get_labels(blobs_t2)
+    labels_p = get_labels(blobs_p2)
 
-    labels1b = get_labels(blobs1b)
-    labels2b = get_labels(blobs2b)
+    compare(labels_t, labels_p)
 
-    compare(labels1b, labels2b)
+
+
 
 if __name__ == "__main__":
     main()
