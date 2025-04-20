@@ -47,7 +47,7 @@ def get_labels(blobs):
     return labels
 
 
-def compare(labels_t, labels_p):
+def compare(labels_t, labels_p, tname, pname, sample):
     # Compute confusion matrix
     cm = confusion_matrix(labels_t, labels_p)
 
@@ -66,14 +66,16 @@ def compare(labels_t, labels_p):
     mcc = matthews_corrcoef(labels_t, labels_p)
 
     # Print results
-    print(f'between Truth: {tname} & Pred: {pname}')
+    print(f'Truth: {tname}')
+    print(f'Pred:  {pname}')
     print(f"Precision: {precision:.4f}")
     print(f"Recall:    {recall:.4f}")
     print(f"F1-score:  {f1:.4f}")
     print(f"MCC:       {mcc:.4f}")
     # Save to CSV using pandas
     metrics_dict = {
-        "Comparison": [f"{tname} vs {pname}"],
+        "Truth": [tname],
+        "Pred": [pname],
         "Precision": [precision],
         "Recall": [recall],
         "F1-score": [f1],
@@ -91,10 +93,10 @@ def main():
 
     blobs_t = load_blobs(args.t)
     blobs_p = load_blobs(args.p)
+
     tname = args.tname
     pname = args.pname
     sample = args.sample
-    global tname, pname, sample
 
     blobs_t2, blobs_p2 = intersect_blobs(blobs_t, blobs_p)
     if len(blobs_t2) == 0 or len(blobs_p2) == 0:
@@ -107,7 +109,7 @@ def main():
     labels_t = get_labels(blobs_t2)
     labels_p = get_labels(blobs_p2)
 
-    compare(labels_t, labels_p)
+    compare(labels_t, labels_p, tname, pname, sample)
 
 
 
