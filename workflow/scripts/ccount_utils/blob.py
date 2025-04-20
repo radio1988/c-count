@@ -165,6 +165,11 @@ def load_blobs(fname):
     else:
         raise Exception("blob file format not recognized, suffix not npy nor npy.gz")
 
+    if np.any(np.isnan(array)):
+        print(f"blob file {fname} contains NaN values")
+        print(array[0:5, 0:10])
+        raise Exception("blob file contains NaN values")
+
     get_blob_statistics(array)
     return array
 
