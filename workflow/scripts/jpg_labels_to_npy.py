@@ -142,7 +142,8 @@ def remove_jpg_white_canvas(jpg_img, jpg_fname):
 
 def get_labels(
         jpg_img, jpg_locs,
-        blob_extention_ratio=1.4, blob_extention_radius=10
+        blob_extention_ratio=1.4, blob_extention_radius=10,
+        TEST=False
 ):
     """
     If >15 connected orange pixels are found in the corresponding circle, mark positive, otherwise negative
@@ -172,11 +173,11 @@ def get_labels(
         else:
             labels.append(int(0))
 
-    # test
-    plt.hist(blob_orange_pixel_counts, bins=40)
-    plt.yscale('log')  # Set y-axis to logarithmic scale
-    plt.title("Histogram of Counts for orange Pixels")
-    plt.savefig("hist.connected_orange_pixel_count.pdf", dpi=300)
+    if TEST:
+        plt.hist(blob_orange_pixel_counts, bins=40)
+        plt.yscale('log')  # Set y-axis to logarithmic scale
+        plt.title("Histogram of Counts for orange Pixels")
+        plt.savefig("hist.connected_orange_pixel_count.pdf", dpi=300)
 
     return labels
 
@@ -271,6 +272,7 @@ def is_pixel_orange(rgb_color):
 
 def main():
     args = parse_args()
+    TEST = False
 
     czi_obj = read_czi(args.czi)
     czi_img = parse_image_obj(
@@ -294,7 +296,7 @@ def main():
     jpg_locs[:, 0:3] = czi_locs[:, 0:3] * scale
     print("example jpg sized locs(should be scaled):\n", jpg_locs[0:4, :])
 
-    jpg_labels = get_labels(jpg_img, jpg_locs, blob_extention_ratio, blob_extention_radius)
+    jpg_labels = get_labels(jpg_img, jpg_locs, blob_extention_ratio, blob_extention_radius, TEST)
     jpg_labels = np.array(jpg_labels).reshape(-1, 1)
     czi_locs_labeled = np.hstack((czi_locs, jpg_labels))
     print("example output locs(should be czi sized):\n", czi_locs_labeled[0:4, ])
