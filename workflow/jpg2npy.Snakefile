@@ -106,7 +106,7 @@ rule targets:
         label_locs=expand('res/label_locs/{scene}.label.npy.gz',scene=SCENES),
         label_crops=expand('res/label_crops/{scene}.label.npy.gz',scene=SCENES),
         label_count="res/count.label.csv",
-        #merge_crops="res/label_crops_merged/merged.label.npy.gz"
+        merge_crops='res/merged_label_crops.npy.gz'
 
 
 rule blob_detection:
@@ -170,21 +170,21 @@ rule locs2crops:
         -config config.yaml -o {output.npy} > {output.log} 2> {log}
         """
 
-# rule merge_crops:
-#     input:
-#         expand('res/label_crops/{scene}.label.npy.gz', scene = SCENES)
-#     output:
-#         'res/label_crops_merged/merged.label.npy.gz'
-#     log:
-#         'res/label_crops_merged/merged.label.npy.gz.log'
-#     threads:
-#         1
-#     resources:
-#         mem_mb=lambda wildcards, attempt: attempt * 16000
-#     shell:
-#         """
-#         python workflow/scripts/crops_merge.py -crops {input} -output {output} &> {log}
-#         """
+rule merge_crops:
+    input:
+        expand('res/label_crops/{scene}.label.npy.gz',scene=SCENES)
+    output:
+        'res/merged_label_crops.npy.gz'
+    log:
+        'res/merged_label_crops.npy.gz.log'
+    threads:
+        1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 64000
+    shell:
+        """
+        python workflow/scripts/crops_merge.py -crops {input} -output {output} &> {log}
+        """
 
 
 rule aggr_label_based_count:
