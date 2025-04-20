@@ -83,7 +83,7 @@ def compare(labels_t, labels_p, tname, pname, sample):
     }
 
     df = pd.DataFrame(metrics_dict)
-    csv_filename = f"{sample}.{tname}.{pname}_metrics.csv"
+    csv_filename = f"{sample}.{tname}_vs_{pname}_metrics.csv"
     df.to_csv(csv_filename, index=False)
 
     print(f"Metrics saved to {csv_filename}")
