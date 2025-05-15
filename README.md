@@ -2,7 +2,7 @@
 
 ## Overview: C-COUNT, a deep learning tool for measuring the number and size of erythroid progenitors. 
 
-C-COUNT is described in 'C-COUNT: a Convolutional Neural Network-Based Tool for Automated Scoring of Erythroid Colonies' by Li, Winward, Lalonde, Hidalgo, Sardella, Hwang, Swaminathan, Thackeray, Hu, Zhu and Socolovsky (in press). 
+C-COUNT is described in 'C-COUNT: a Convolutional Neural Network-Based Tool for Automated Scoring of Erythroid Colonies' by Li, Winward, Lalonde, Hidalgo, Sardella, Hwang, Swaminathan, Thackeray, Hu, Zhu and Socolovsky [link](https://authors.elsevier.com/a/1l5j8,6sioenj5). 
 
 C-COUNT is implemented as a modified LeNet convolutional neural network (LeCun Y et al., Gradient-Based Learning Applied to Document Recognition. Proc of The IEEE. 1998). C-COUNT is trained to measure the number and size of colony-forming-unit-erythroid (CFU-e) colonies in colony-formation assays. The input to the tool is grayscale automated-microscopy bright-field images of CFU-e colony assay plates. Before imaging, the plates are stained with diaminobenzidine, which turns CFU-e colonies dark and allows them to be distinguished from other colony types, debris or cell aggregates. 
 
