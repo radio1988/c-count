@@ -2,7 +2,7 @@
 
 ## Overview: C-COUNT, a deep learning tool for measuring the number and size of erythroid progenitors. 
 
-C-COUNT is described in Li, R., Winward, A., Lalonde, L. R., Hidalgo, D., Sardella, J. P., Hwang, Y., Swaminathan, A., Thackeray, S., Hu, K., Zhu, L. J., & Socolovsky, M. (2025). C-COUNT: A convolutional neural network–based tool for automated scoring of erythroid colonies. Experimental Hematology. Advance online publication. https://doi.org/10.1016/j.exphem.2025.104786 
+C-COUNT is described in Li, R., Winward, A., Lalonde, L. R., Hidalgo, D., Sardella, J. P., Hwang, Y., Swaminathan, A., Thackeray, S., Hu, K., Zhu, L. J., & Socolovsky, M. (2025). C-COUNT: A convolutional neural network–based tool for automated scoring of erythroid colonies. Experimental Hematology. https://doi.org/10.1016/j.exphem.2025.104786 
 
 Here is a temporary full access link till 07/04/2025: https://authors.elsevier.com/a/1l5j8,6sioenj5
 
